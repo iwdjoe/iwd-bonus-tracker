@@ -37,7 +37,8 @@ exports.handler = async function(event, context) {
         }
 
         const entries = data['time-entries'] || [];
-        const GLOBAL_RATE = 155;
+        // READ GLOBAL RATE FROM DB OR DEFAULT TO 155
+        const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
         let users = {};
         let projects = {};
@@ -79,7 +80,7 @@ exports.handler = async function(event, context) {
             body: JSON.stringify({
                 users: userList,
                 projects: projectList,
-                meta: { count: entries.length, range: `${fromDate}-${toDate}`, serverTime: new Date().toISOString() }
+                meta: { count: entries.length, range: `${fromDate}-${toDate}`, serverTime: new Date().toISOString(), globalRate: GLOBAL_RATE }
             })
         };
 
