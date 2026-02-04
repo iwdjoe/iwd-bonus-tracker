@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/iwdjoe/iwd-bonus-tracker#readme",
   "dependencies": {
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^2.6.1"
   }
 }
