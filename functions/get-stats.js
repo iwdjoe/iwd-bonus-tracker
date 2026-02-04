@@ -1,6 +1,7 @@
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
-    const TOKEN = process.env.TEAMWORK_API_TOKEN;
+    // Fallback to hardcoded token if env var is missing (User provided: dryer498desert)
+    const TOKEN = process.env.TEAMWORK_API_TOKEN || 'dryer498desert';
     const DOMAIN = 'iwdagency.teamwork.com';
     
     // Auth Check
@@ -15,11 +16,13 @@ exports.handler = async function(event, context) {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-    const dateRange = `${startOfMonth.replace(/-/g,'')}000000:${endOfMonth.replace(/-/g,'')}235959`;
+    // Teamwork API requires YYYYMMDD for date filtering
+    const fromDate = startOfMonth.replace(/-/g, '');
+    const toDate = endOfMonth.replace(/-/g, '');
 
     try {
         // Fetch Time Entries
-        const url = `https://${DOMAIN}/time_entries.json?page=1&pageSize=500&billableType=billable&fromDate=${dateRange.split(':')[0].slice(0,8)}&toDate=${dateRange.split(':')[1].slice(0,8)}`;
+        const url = `https://${DOMAIN}/time_entries.json?page=1&pageSize=500&billableType=billable&fromDate=${fromDate}&toDate=${toDate}`;
         
         console.log("Fetching from:", url);
         
@@ -55,9 +58,9 @@ exports.handler = async function(event, context) {
             projects[project] += hours;
         });
 
-        // Format Output
+        // Format Output (Default Rate Updated to 155)
         const userList = Object.keys(users).map(name => ({ name, hours: users[name] }));
-        const projectList = Object.keys(projects).map(name => ({ id: name.replace(/[^a-z0-9]/gi, ''), name, hours: projects[name], def: 150 }));
+        const projectList = Object.keys(projects).map(name => ({ id: name.replace(/[^a-z0-9]/gi, ''), name, hours: projects[name], def: 155 }));
 
         return {
             statusCode: 200,
@@ -68,7 +71,7 @@ exports.handler = async function(event, context) {
             body: JSON.stringify({
                 users: userList,
                 projects: projectList,
-                meta: { count: entries.length, range: dateRange }
+                meta: { count: entries.length, range: `${fromDate}-${toDate}` }
             })
         };
 
