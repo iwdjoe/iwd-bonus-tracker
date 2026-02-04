@@ -3,16 +3,11 @@ exports.handler = async function(event, context) {
     const TOKEN = process.env.TEAMWORK_API_TOKEN || 'dryer498desert';
     const DOMAIN = 'iwdagency.teamwork.com';
     
-    // --- SHARED RATE CONFIGURATION ---
-    // Update these here so the whole team sees the same numbers.
-    const GLOBAL_RATE = 155;
-    const RATE_OVERRIDES = {
-        // "Project Name": Rate
-        "SchoolFix - Migration to Adobe Live Search": 140,
-        "DMC Tools - Maintenance": 140,
-        // Add others here as needed
-    };
-    // ---------------------------------
+    // --- GITHUB DB CONFIG ---
+    const GH_TOKEN = process.env.GITHUB_PAT; 
+    const REPO = "iwdjoe/iwd-bonus-tracker";
+    const PATH = "rates.json";
+    // ------------------------
 
     // Auth Check
     if (!TOKEN) return { statusCode: 500, body: JSON.stringify({ error: "Missing Token" }) };
@@ -25,13 +20,24 @@ exports.handler = async function(event, context) {
     const toDate = endOfMonth.replace(/-/g, '');
 
     try {
-        const url = `https://${DOMAIN}/time_entries.json?page=1&pageSize=500&billableType=billable&fromDate=${fromDate}&toDate=${toDate}`;
-        const response = await fetch(url, { headers: { 'Authorization': authHeader } });
-        
-        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        // PARALLEL FETCH: Teamwork Data + Saved Rates
+        const [twResponse, ratesResponse] = await Promise.all([
+            fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&billableType=billable&fromDate=${fromDate}&toDate=${toDate}`, { headers: { 'Authorization': authHeader } }),
+            fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
+        ]);
 
-        const data = await response.json();
+        if (!twResponse.ok) throw new Error(`API Error: ${twResponse.status}`);
+
+        const data = await twResponse.json();
+        
+        // Parse Rates (Default to empty if missing)
+        let savedRates = {};
+        if (ratesResponse.ok) {
+            savedRates = await ratesResponse.json();
+        }
+
         const entries = data['time-entries'] || [];
+        const GLOBAL_RATE = 155;
 
         let users = {};
         let projects = {};
@@ -52,15 +58,18 @@ exports.handler = async function(event, context) {
 
         const userList = Object.keys(users).map(name => ({ name, hours: users[name] }));
         
-        // Apply Rates Server-Side
+        // Apply Rates Server-Side (Merge Teamwork + Saved JSON)
         const projectList = Object.keys(projects).map(name => {
-            const rate = RATE_OVERRIDES[name] || GLOBAL_RATE;
+            // Check by ID (sanitized) or Name
+            const id = name.replace(/[^a-z0-9]/gi, '');
+            const rate = savedRates[id] || savedRates[name] || GLOBAL_RATE;
+            
             return { 
-                id: name.replace(/[^a-z0-9]/gi, ''), 
+                id: id, 
                 name, 
                 hours: projects[name], 
-                rate: rate,     // The actual active rate
-                def: GLOBAL_RATE // The global default for comparison
+                rate: parseInt(rate),     
+                def: GLOBAL_RATE 
             };
         });
 
