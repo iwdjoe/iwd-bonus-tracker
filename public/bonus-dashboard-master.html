@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IWD Bonus Mission Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        astro: {
+                            900: '#0f172a',
+                            800: '#1e293b', 
+                            700: '#334155',
+                            neon: '#4ade80'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        
+        /* Dark Mode Styles */
+        .dark body { background: radial-gradient(circle at top, #1e1b4b, #020617); color: #e2e8f0; }
+        .dark .glass { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .dark .neon-text { text-shadow: 0 0 15px rgba(74, 222, 128, 0.4); }
+        
+        /* Range Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
+            background: #4ade80; cursor: pointer; margin-top: -10px;
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.5); border: 2px solid white;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px; cursor: pointer;
+            background: #cbd5e1; border-radius: 4px;
+        }
+        .dark input[type=range]::-webkit-slider-runnable-track { background: #475569; }
+
+        .rate-input { 
+            background: transparent; border-bottom: 1px dashed #9ca3af; 
+            text-align: right; width: 50px; font-variant-numeric: tabular-nums;
+        }
+        .rate-input:focus { outline: none; border-bottom-color: #3b82f6; color: #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen pb-20">
+
+    <!-- THEME TOGGLE -->
+    <button onclick="toggleTheme()" class="fixed top-4 right-4 z-50 bg-white dark:bg-slate-800 p-2 rounded-full shadow-lg border border-gray-200 dark:border-slate-700 hover:scale-110 transition-transform">
+        <span class="dark:hidden">🌙</span>
+        <span class="hidden dark:inline">☀️</span>
+    </button>
+
+    <div class="max-w-6xl mx-auto p-6">
+        
+        <!-- HEADER -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+            <div class="text-center md:text-left">
+                <h1 class="text-4xl font-extrabold tracking-tight mb-1 dark:text-white flex items-center gap-2 justify-center md:justify-start">
+                    🚀 Mission Control
+                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-bold uppercase tracking-wider">Live</span>
+                </h1>
+                <p class="text-gray-500 dark:text-slate-400 font-medium">February 2026 Bonus Forecast</p>
+            </div>
+            
+            <!-- MAIN NUMBER -->
+            <div class="text-center bg-white dark:glass p-6 rounded-2xl shadow-lg border border-gray-200 dark:border-slate-700 min-w-[300px]">
+                <div class="text-xs font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest mb-1">Projected Bonus Pool</div>
+                <div class="text-6xl font-black text-green-600 dark:text-green-400 dark:neon-text transition-all" id="hero-pool">$3,000</div>
+                <div class="text-xs text-gray-500 dark:text-slate-500 mt-2 font-medium" id="hero-gap">
+                    Needs $7,120 for next tier
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-white dark:glass p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700/50">
+                <h3 class="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase">Current Revenue</h3>
+                <div class="text-3xl font-bold mt-2 dark:text-white" id="stat-revenue">$6,882</div>
+                <p class="text-xs text-gray-500 mt-1 dark:text-slate-400"><span id="stat-hours">49.2</span> Billable Hours</p>
+            </div>
+            <div class="bg-white dark:glass p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700/50">
+                <h3 class="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase">Projected Finish</h3>
+                <div class="text-3xl font-bold mt-2 dark:text-white" id="stat-proj">$137,640</div>
+                <p class="text-xs text-green-600 dark:text-green-400 mt-1 font-bold">On Track for Tier 3</p>
+            </div>
+            <div class="bg-white dark:glass p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700/50">
+                <h3 class="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase">Mission Clock</h3>
+                <div class="text-3xl font-bold mt-2 dark:text-white">18 <span class="text-lg font-normal text-gray-400">Days</span></div>
+                <p class="text-xs text-gray-500 mt-1 dark:text-slate-400">10% Complete</p>
+            </div>
+        </div>
+
+        <!-- PROGRESS BAR -->
+        <div class="bg-white dark:glass p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 mb-10 relative">
+            <div class="flex justify-between text-xs font-bold text-gray-400 dark:text-slate-500 uppercase mb-4">
+                <span>Launch ($0)</span>
+                <span>Orbit ($160k+)</span>
+            </div>
+            <div class="relative h-12 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden border border-gray-200 dark:border-slate-700">
+                <!-- Actual -->
+                <div id="bar-actual" class="absolute h-full bg-blue-600 dark:bg-indigo-600 z-20 flex items-center justify-center text-xs text-white font-bold transition-all duration-500 w-0"></div>
+                <!-- Projected -->
+                <div id="bar-proj" class="absolute h-full bg-green-400 dark:bg-green-500/30 z-10 transition-all duration-500 w-0"></div>
+                
+                <!-- Markers -->
+                <div class="absolute h-full w-px bg-white/50 dark:bg-white/10" style="left: 53%"></div>
+                <div class="absolute h-full w-px bg-white/50 dark:bg-white/10" style="left: 62%"></div>
+                <div class="absolute h-full w-px bg-white/50 dark:bg-white/10" style="left: 72%"></div> <!-- Goal -->
+            </div>
+            <div class="flex justify-between text-[10px] text-gray-400 mt-2 font-mono">
+                <span style="margin-left: 53%">$85k</span>
+                <span style="margin-left: 62%">$100k</span>
+                <span style="margin-left: 72%" class="text-green-600 dark:text-green-400 font-bold">$115k</span>
+                <span style="margin-left: 81%">$130k</span>
+                <span style="margin-left: 90%">$145k</span>
+            </div>
+        </div>
+
+        <!-- SIMULATOR -->
+        <div class="bg-indigo-50 dark:bg-slate-800/80 p-8 rounded-2xl border border-indigo-100 dark:border-indigo-500/30 mb-12 shadow-inner">
+            <h3 class="text-xl font-bold text-indigo-900 dark:text-indigo-300 mb-2">🔮 "What If" Simulator</h3>
+            <p class="text-sm text-indigo-600 dark:text-indigo-400 mb-8">Drag to add extra effort!</p>
+            
+            <input type="range" min="0" max="600" value="0" id="sim-slider" oninput="updateSim(this.value)">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 text-center">
+                <div>
+                    <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Extra Hours</div>
+                    <div class="text-3xl font-bold text-indigo-600 dark:text-white" id="sim-hours">0</div>
+                </div>
+                <div class="bg-white dark:bg-slate-700/50 rounded-lg p-4 border border-indigo-100 dark:border-slate-600 transform scale-110 shadow-lg">
+                    <div class="text-xs font-bold text-indigo-500 dark:text-indigo-300 uppercase tracking-widest mb-1">Per Person / Day</div>
+                    <div class="text-2xl font-black text-indigo-700 dark:text-indigo-200" id="sim-per-person">+0.0 hrs</div>
+                    <div class="text-[10px] text-gray-400 mt-1">Based on 9 people, 18 days</div>
+                </div>
+                <div>
+                    <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">New Bonus Pool</div>
+                    <div class="text-4xl font-bold text-green-600 dark:text-green-400" id="sim-pool">$3,000</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEAM LEADERBOARD -->
+        <div class="bg-white dark:glass rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden mb-12">
+            <div class="px-8 py-5 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">🏆 Crew Leaderboard</h3>
+                <span class="text-xs font-mono text-gray-400">Updates Live</span>
+            </div>
+            <table class="min-w-full">
+                <thead class="bg-white dark:bg-slate-900/50 text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-8 py-4 text-left">Member</th>
+                        <th class="px-8 py-4 text-right">Hours</th>
+                        <th class="px-8 py-4 text-right">Share</th>
+                        <th class="px-8 py-4 text-right text-green-600 dark:text-green-400">Est. Bonus</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-slate-700" id="team-list"></tbody>
+            </table>
+        </div>
+
+        <!-- CLIENTS (EDITABLE) -->
+        <div class="bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+            <div class="px-6 py-4 flex justify-between items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" onclick="document.getElementById('client-area').classList.toggle('hidden')">
+                <h3 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">⚙️ Client Rates (Click to Edit)</h3>
+                <span class="text-gray-400">▼</span>
+            </div>
+            <div id="client-area" class="hidden">
+                <div class="px-6 py-2 bg-yellow-50 dark:bg-yellow-900/20 text-[10px] text-yellow-700 dark:text-yellow-500 flex justify-between">
+                    <span>* Changes auto-save to your browser.</span>
+                    <button onclick="resetRates()" class="underline">Reset Defaults</button>
+                </div>
+                <table class="min-w-full text-sm">
+                    <thead class="bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
+                        <tr>
+                            <th class="px-6 py-2 text-left">Project</th>
+                            <th class="px-6 py-2 text-right">Hours</th>
+                            <th class="px-6 py-2 text-right">Rate ($)</th>
+                            <th class="px-6 py-2 text-right">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-slate-700 bg-white dark:bg-slate-900/20" id="client-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA ---
+        const TEAM_SIZE = 9;
+        const DAYS_LEFT = 18;
+        
+        // Initial Data (Feb 4th Snap)
+        const RAW_PROJECTS = [
+            {id: 'p1', name: "SchoolFix - Adobe Migration", hours: 23.82, def: 140},
+            {id: 'p2', name: "Inyo Pools - Hammerhead", hours: 12.97, def: 140},
+            {id: 'p3', name: "PSU Extension", hours: 1.97, def: 140},
+            {id: 'p4', name: "School Fix - Maintenance", hours: 3.63, def: 140},
+            {id: 'p5', name: "DMC Tools - Maintenance", hours: 2.60, def: 140},
+            {id: 'p6', name: "Pryor - SEO Migration", hours: 0.75, def: 140},
+            {id: 'p7', name: "Europa Eyewear", hours: 1.32, def: 140},
+            {id: 'p8', name: "US Camera Pro", hours: 0.65, def: 140},
+            {id: 'p9', name: "Purdue - Maintenance", hours: 1.45, def: 140}
+        ];
+
+        const RAW_USERS = [
+            {name: "Marcos Araujo", hours: 12.87},
+            {name: "Oleg Sergiyenko", hours: 12.23},
+            {name: "Irina Lukyanchuk", hours: 9.55},
+            {name: "Pradeep Mudaliar", hours: 6.53},
+            {name: "Yaro Plotnitsky", hours: 3.92},
+            {name: "DMC Tools", hours: 2.6}, // Wait, DMC is a project? Filtered out in logic
+            {name: "Dharmendra Panchal", hours: 1.95},
+            {name: "Purdue", hours: 1.45}, // Filter
+            {name: "Europa", hours: 1.32}, // Filter
+            {name: "Bohdan Bohaichuk", hours: 1.07},
+            {name: "Rafael Vianna", hours: 0.93},
+            {name: "Max Dmitrenko", hours: 0.1}
+        ].filter(u => u.name.includes(" ") && !u.name.includes("Tools")); // Simple filter for real names
+
+        let state = {
+            projects: [],
+            pool: 0,
+            simPool: 0,
+            totalRev: 0,
+            projRev: 0,
+            simProjRev: 0
+        };
+
+        // --- CORE LOGIC ---
+        function init() {
+            // Load Rates
+            const saved = JSON.parse(localStorage.getItem('iwd_rates_v7') || '{}');
+            state.projects = RAW_PROJECTS.map(p => ({
+                ...p,
+                rate: saved[p.id] || p.def
+            }));
+            
+            // Check Theme
+            if (localStorage.getItem('theme') === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+
+            calc();
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        function calc() {
+            // Base Revenue (Actual)
+            state.totalRev = state.projects.reduce((sum, p) => sum + (p.hours * p.rate), 0);
+            
+            // Projection (Run Rate)
+            const daysPassed = 2.0; 
+            const totalDays = 20;
+            state.projRev = (state.totalRev / daysPassed) * totalDays;
+            
+            // Simulator Add-on
+            const addedHours = parseInt(document.getElementById('sim-slider').value) || 0;
+            // Avg rate for sim
+            const avgRate = state.totalRev / state.projects.reduce((s,p)=>s+p.hours,0) || 140;
+            const addedRev = addedHours * avgRate;
+            
+            state.simProjRev = state.projRev + addedRev;
+            state.simPool = getPool(state.simProjRev);
+            state.pool = getPool(state.projRev); // Baseline pool
+
+            render();
+        }
+
+        function getPool(rev) {
+            if (rev >= 160000) return 6000;
+            if (rev >= 145000) return 5000;
+            if (rev >= 130000) return 4000;
+            if (rev >= 115000) return 3000;
+            if (rev >= 100000) return 2000;
+            if (rev >= 85000) return 1000;
+            return 0;
+        }
+
+        function updateSim(val) {
+            calc();
+        }
+
+        function saveRate(id, val) {
+            const p = state.projects.find(x => x.id === id);
+            if (p) {
+                p.rate = parseInt(val) || 0;
+                const saved = JSON.parse(localStorage.getItem('iwd_rates_v7') || '{}');
+                saved[id] = p.rate;
+                localStorage.setItem('iwd_rates_v7', JSON.stringify(saved));
+                calc();
+            }
+        }
+
+        function resetRates() {
+            if(confirm("Reset rates?")) {
+                localStorage.removeItem('iwd_rates_v7');
+                init();
+            }
+        }
+
+        // --- RENDER ---
+        function render() {
+            // Header
+            document.getElementById('hero-pool').innerText = '$' + state.simPool.toLocaleString();
+            const nextTier = [85000,100000,115000,130000,145000,160000].find(t => t > state.simProjRev) || 160000;
+            const gap = nextTier - state.simProjRev;
+            document.getElementById('hero-gap').innerText = gap > 0 ? '$' + Math.round(gap).toLocaleString() : 'Max Orbit!';
+
+            // KPIs
+            document.getElementById('stat-revenue').innerText = '$' + Math.round(state.totalRev).toLocaleString();
+            document.getElementById('stat-hours').innerText = state.projects.reduce((s,p)=>s+p.hours,0).toFixed(1);
+            document.getElementById('stat-proj').innerText = '$' + Math.round(state.projRev).toLocaleString();
+
+            // Progress Bar
+            const max = 160000;
+            const actPct = Math.min((state.totalRev / max)*100, 100);
+            const simPct = Math.min((state.simProjRev / max)*100, 100);
+            document.getElementById('bar-actual').style.width = actPct + '%';
+            document.getElementById('bar-actual').innerText = '$' + Math.round(state.totalRev/1000) + 'k';
+            document.getElementById('bar-proj').style.width = simPct + '%';
+            document.getElementById('text-projection').innerText = '$' + Math.round(state.simProjRev).toLocaleString();
+
+            // Sim Stats
+            const addedHours = document.getElementById('sim-slider').value;
+            const perPerson = addedHours / TEAM_SIZE / DAYS_LEFT;
+            document.getElementById('sim-hours').innerText = '+' + addedHours;
+            document.getElementById('sim-per-person').innerText = '+' + perPerson.toFixed(1) + ' hrs';
+            document.getElementById('sim-pool').innerText = '$' + state.simPool.toLocaleString();
+
+            // Team Table
+            const tbody = document.getElementById('team-list');
+            tbody.innerHTML = '';
+            const totalHours = RAW_USERS.reduce((s,u)=>s+u.hours,0);
+            
+            RAW_USERS.sort((a,b)=>b.hours-a.hours).forEach(u => {
+                const share = u.hours / totalHours;
+                const bonus = Math.round(state.simPool * share);
+                const pct = (share * 100).toFixed(1) + '%';
+                
+                const hl = bonus > 0 ? 'bg-green-50 dark:bg-green-900/20' : '';
+                
+                tbody.innerHTML += `
+                    <tr class="border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800 transition ${hl}">
+                        <td class="px-8 py-4 font-medium text-gray-900 dark:text-white">${u.name}</td>
+                        <td class="px-8 py-4 text-right text-gray-500 dark:text-slate-400">${u.hours.toFixed(2)}</td>
+                        <td class="px-8 py-4 text-right text-gray-500 dark:text-slate-400">${pct}</td>
+                        <td class="px-8 py-4 text-right font-bold text-green-600 dark:text-green-400 transition-all duration-300">$${bonus}</td>
+                    </tr>`;
+            });
+
+            // Client Table
+            const cbody = document.getElementById('client-list');
+            cbody.innerHTML = '';
+            state.projects.forEach(p => {
+                cbody.innerHTML += `
+                    <tr>
+                        <td class="px-6 py-2 text-gray-900 dark:text-slate-300">${p.name}</td>
+                        <td class="px-6 py-2 text-right text-gray-500 dark:text-slate-500">${p.hours.toFixed(2)}</td>
+                        <td class="px-6 py-2 text-right">
+                            <input type="number" value="${p.rate}" class="rate-input" onchange="saveRate('${p.id}', this.value)">
+                        </td>
+                        <td class="px-6 py-2 text-right text-gray-500 dark:text-slate-500">$${Math.round(p.hours*p.rate).toLocaleString()}</td>
+                    </tr>`;
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

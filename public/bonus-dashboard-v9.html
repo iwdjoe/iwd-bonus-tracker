@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IWD Bonus Dashboard V9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { astro: { 900: '#0f172a', 800: '#1e293b' } },
+                    animation: { 'spin-slow': 'spin 3s linear infinite', 'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
+        
+        /* Dark Mode: Starry Background */
+        .dark body { 
+            background: #0f172a; 
+            background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+            radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+            radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            color: #e2e8f0;
+        }
+        .dark .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* Rocket Slider (Dark Mode Only) */
+        .dark input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 32px; width: 32px; margin-top: -14px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><text y="20" font-size="20">🚀</text></svg>') center no-repeat;
+            background-size: contain; border: none; box-shadow: none; cursor: grab;
+            transform: rotate(45deg);
+        }
+        /* Standard Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; width: 100%; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
+            background: #10b981; cursor: pointer; margin-top: -10px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #cbd5e1; border-radius: 4px; cursor: pointer; }
+        .dark input[type=range]::-webkit-slider-runnable-track { background: #475569; }
+
+        /* Markers */
+        .tier-mark { position: absolute; top: 10px; width: 2px; height: 8px; background: #94a3b8; transform: translateX(-50%); }
+        .tier-text { position: absolute; top: 20px; transform: translateX(-50%); font-size: 10px; color: #64748b; font-weight: bold; }
+        .rate-input { background: transparent; border-bottom: 1px dashed #9ca3af; text-align: right; width: 50px; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen pb-20">
+
+    <div class="max-w-7xl mx-auto p-6">
+        
+        <!-- HEADER ROW -->
+        <div class="flex flex-col md:flex-row justify-between items-start mb-8 gap-6">
+            <!-- LEFT: Title + Toggle -->
+            <div>
+                <div class="flex items-center gap-4">
+                    <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Team Bonus Tracker</h1>
+                    <button onclick="toggleTheme()" class="bg-white dark:bg-slate-700 p-2 rounded-full shadow-sm border border-gray-200 dark:border-slate-600 hover:scale-105 transition-transform text-xl">
+                        <span class="dark:hidden">🌙</span><span class="hidden dark:inline">☀️</span>
+                    </button>
+                </div>
+                <p class="text-gray-500 dark:text-slate-400 text-sm mt-1" id="sub-header">Live Forecast for February 2026</p>
+            </div>
+
+            <!-- RIGHT: Revenue + Rate -->
+            <div class="text-right bg-white dark:glass p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex flex-col items-end">
+                <div class="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1" id="label-proj">Projected Revenue</div>
+                <div class="text-5xl font-black text-gray-900 dark:text-white tracking-tight" id="hero-revenue">$0</div>
+                <div class="flex items-center gap-2 mt-2">
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">Default Rate:</label>
+                    <input type="number" id="global-rate" value="140" class="w-12 bg-transparent font-bold text-gray-800 dark:text-white border-b border-gray-300 text-right focus:outline-none" onchange="recalcAll()">
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <!-- BONUS POOL (Card 1) -->
+            <div class="bg-white dark:glass p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700/50 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
+                <h3 class="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase" id="label-pool">Projected Bonus Pool</h3>
+                <div class="text-4xl font-black mt-2 text-green-600 dark:text-green-400" id="card-pool">$0</div>
+                <p class="text-xs text-gray-500 mt-1 dark:text-slate-400" id="text-status">Loading...</p>
+            </div>
+
+            <!-- ACTUAL REVENUE (Card 2) -->
+            <div class="bg-white dark:glass p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700/50">
+                <h3 class="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase" id="label-actual">Current Revenue</h3>
+                <div class="text-4xl font-bold mt-2 text-gray-900 dark:text-white" id="card-actual">$0</div>
+                <p class="text-xs text-gray-500 mt-1 dark:text-slate-400"><span id="card-hours">0</span> Billable Hours</p>
+            </div>
+
+            <!-- TIME (Card 3) -->
+            <div class="bg-white dark:glass p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700/50">
+                <h3 class="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase" id="label-time">Time Remaining</h3>
+                <div class="text-4xl font-bold mt-2 text-gray-900 dark:text-white">18 <span class="text-xl font-normal text-gray-400">Days</span></div>
+                <p class="text-xs text-gray-500 mt-1 dark:text-slate-400">10% Complete</p>
+            </div>
+        </div>
+
+        <!-- PROGRESS BAR -->
+        <div class="bg-white dark:glass p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 mb-10">
+            <h3 class="text-sm font-bold text-gray-800 dark:text-white mb-6" id="label-progress">Tier Progress</h3>
+            <div class="relative h-12 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden border border-gray-200 dark:border-slate-700">
+                <div id="bar-actual" class="absolute h-full bg-blue-600 dark:bg-indigo-600 z-20 flex items-center justify-center text-xs text-white font-bold transition-all duration-500 w-0"></div>
+                <div id="bar-proj" class="absolute h-full bg-green-400 dark:bg-green-500/30 z-10 transition-all duration-500 w-0"></div>
+                
+                <!-- Markers -->
+                <div class="absolute h-full w-px bg-white/50 dark:bg-white/10" style="left: 53%"></div>
+                <div class="absolute h-full w-px bg-white/50 dark:bg-white/10" style="left: 62%"></div>
+                <div class="absolute h-full w-px bg-white/50 dark:bg-white/10" style="left: 72%"></div>
+                <div class="absolute h-full w-px bg-white/50 dark:bg-white/10" style="left: 81%"></div>
+                <div class="absolute h-full w-px bg-white/50 dark:bg-white/10" style="left: 90%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-gray-400 mt-2 font-mono">
+                <span style="margin-left: 53%">$85k</span>
+                <span style="margin-left: 62%">$100k</span>
+                <span style="margin-left: 72%" class="text-green-600 dark:text-green-400 font-bold">$115k</span>
+                <span style="margin-left: 81%">$130k</span>
+                <span style="margin-left: 90%">$145k</span>
+            </div>
+        </div>
+
+        <!-- SIMULATOR -->
+        <div class="bg-indigo-50 dark:bg-slate-800/50 p-8 rounded-2xl border border-indigo-100 dark:border-indigo-500/30 mb-12 shadow-inner">
+            <h3 class="text-lg font-bold text-indigo-900 dark:text-indigo-300 mb-6" id="label-sim">🔮 "What If" Simulator</h3>
+            
+            <div class="relative w-full h-16 mb-8">
+                <input type="range" min="0" max="600" value="0" class="absolute w-full h-2 top-2 z-20 opacity-80" id="sim-slider" oninput="updateSlider(this.value)">
+                
+                <!-- Slider Marks -->
+                <div class="relative w-full h-2 top-2 z-10 opacity-50">
+                    <div class="tier-mark" style="left: 0%"></div>
+                    <div class="tier-mark" style="left: 33%"></div>
+                    <div class="tier-mark" style="left: 66%"></div>
+                    <div class="tier-mark" style="left: 100%"></div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center text-center gap-6 bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-indigo-50 dark:border-slate-700">
+                <div>
+                    <div class="text-xs font-bold text-gray-400 uppercase">Extra Effort</div>
+                    <div class="text-2xl font-bold text-indigo-600 dark:text-white" id="sim-hours">0 Hrs</div>
+                </div>
+                
+                <div class="px-6 py-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-full">
+                    <span class="text-xs text-indigo-600 dark:text-indigo-300 font-bold uppercase">Impact</span>
+                    <div class="text-xl font-black text-indigo-700 dark:text-indigo-200" id="sim-per-person">+0.0</div>
+                    <div class="text-[10px] text-indigo-500 dark:text-indigo-400">hours / person / day</div>
+                </div>
+
+                <div>
+                    <div class="text-xs font-bold text-gray-400 uppercase">New Bonus Pool</div>
+                    <div class="text-3xl font-bold text-green-600 dark:text-green-400" id="sim-pool">$3,000</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEAM LEADERBOARD -->
+        <div class="bg-white dark:glass rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden mb-12">
+            <div class="px-8 py-5 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white" id="label-team">🏆 Team Leaderboard</h3>
+            </div>
+            <table class="min-w-full">
+                <thead class="bg-white dark:bg-slate-900/50 text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-8 py-4 text-left">Member</th>
+                        <th class="px-8 py-4 text-right">Hours</th>
+                        <th class="px-8 py-4 text-right">Share</th>
+                        <th class="px-8 py-4 text-right text-green-600 dark:text-green-400">Est. Bonus</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-slate-700" id="team-body"></tbody>
+            </table>
+        </div>
+
+        <!-- CLIENTS -->
+        <div class="bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center cursor-pointer" onclick="document.getElementById('client-area').classList.toggle('hidden')">
+                <h3 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">⚙️ Client Rates (Edit)</h3>
+                <span class="text-gray-400">▼</span>
+            </div>
+            <div id="client-area" class="hidden">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400">
+                        <tr>
+                            <th class="px-6 py-2 text-left">Project</th>
+                            <th class="px-6 py-2 text-right">Hours</th>
+                            <th class="px-6 py-2 text-right">Rate ($)</th>
+                            <th class="px-6 py-2 text-right">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-slate-700 bg-white dark:bg-slate-900/20" id="client-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA ---
+        const TEAM_SIZE = 9;
+        const DAYS_LEFT = 18;
+
+        const DATA = {
+            users: [
+                {name: "Marcos Araujo", hours: 12.87}, {name: "Oleg Sergiyenko", hours: 12.23},
+                {name: "Irina Lukyanchuk", hours: 9.55}, {name: "Pradeep Mudaliar", hours: 6.53},
+                {name: "Yaro Plotnitsky", hours: 3.92}, {name: "Dharmendra Panchal", hours: 1.95},
+                {name: "Purdue", hours: 1.45}, {name: "Europa", hours: 1.32}, // Check cleanup
+                {name: "Bohdan Bohaichuk", hours: 1.07}, {name: "Rafael Vianna", hours: 0.93},
+                {name: "Max Dmitrenko", hours: 0.10}
+            ],
+            projects: [
+                {id: 'p1', name: "SchoolFix - Adobe Migration", hours: 23.82, def: 140},
+                {id: 'p2', name: "Inyo Pools - Hammerhead", hours: 12.97, def: 140},
+                {id: 'p3', name: "PSU Extension", hours: 1.97, def: 140},
+                {id: 'p4', name: "School Fix - Maintenance", hours: 3.63, def: 140},
+                {id: 'p5', name: "DMC Tools - Maintenance", hours: 2.60, def: 140},
+                {id: 'p6', name: "Pryor - SEO Migration", hours: 0.75, def: 140},
+                {id: 'p7', name: "Europa Eyewear", hours: 1.32, def: 140},
+                {id: 'p8', name: "US Camera Pro", hours: 0.65, def: 140},
+                {id: 'p9', name: "Purdue - Maintenance", hours: 1.45, def: 140}
+            ]
+        };
+
+        // Filter users to remove project names if they slipped in
+        const CLEAN_USERS = DATA.users.filter(u => u.name.includes(" ") && !u.name.includes("Purdue") && !u.name.includes("Europa"));
+
+        let state = {
+            projects: [],
+            totalRev: 0,
+            projRev: 0,
+            simProjRev: 0,
+            pool: 0,
+            simPool: 0
+        };
+
+        const TEXT = {
+            light: { header: "Projected Revenue", pool: "Projected Bonus Pool", actual: "Current Revenue", time: "Time Remaining", progress: "Tier Progress", sim: "🔮 \"What If\" Calculator", team: "🏆 Team Leaderboard", sub: "Live Forecast for February 2026" },
+            dark: { header: "Orbital Velocity", pool: "Mission Payload (Bonus)", actual: "Current Altitude", time: "T-Minus Countdown", progress: "Orbital Injection", sim: "🚀 Thruster Boost", team: "👨‍🚀 Crew Standings", sub: "Mission Control: Feb 2026" }
+        };
+
+        function init() {
+            // Load Rates
+            const saved = JSON.parse(localStorage.getItem('iwd_rates_v9') || '{}');
+            state.projects = DATA.projects.map(p => ({ ...p, rate: saved[p.id] || p.def }));
+            
+            // Check Theme
+            if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+            updateText();
+            calc();
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            updateText();
+        }
+
+        function updateText() {
+            const mode = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            const t = TEXT[mode];
+            document.getElementById('label-proj').innerText = t.header;
+            document.getElementById('label-pool').innerText = t.pool;
+            document.getElementById('label-actual').innerText = t.actual;
+            document.getElementById('label-time').innerText = t.time;
+            document.getElementById('label-progress').innerText = t.progress;
+            document.getElementById('label-sim').innerText = t.sim;
+            document.getElementById('label-team').innerText = t.team;
+            document.getElementById('sub-header').innerText = t.sub;
+        }
+
+        function getPool(rev) {
+            if (rev >= 160000) return 6000;
+            if (rev >= 145000) return 5000;
+            if (rev >= 130000) return 4000;
+            if (rev >= 115000) return 3000;
+            if (rev >= 100000) return 2000;
+            if (rev >= 85000) return 1000;
+            return 0;
+        }
+
+        function calc() {
+            const globalRate = parseInt(document.getElementById('global-rate').value) || 140;
+
+            state.totalRev = state.projects.reduce((sum, p) => {
+                const effectiveRate = (p.rate === p.def) ? globalRate : p.rate;
+                return sum + (p.hours * effectiveRate);
+            }, 0);
+
+            const hoursTotal = state.projects.reduce((s,p)=>s+p.hours,0);
+            const daysPassed = 2.0; 
+            const totalDays = 20;
+            state.projRev = (state.totalRev / daysPassed) * totalDays;
+            
+            // Sim
+            const addedHours = parseInt(document.getElementById('sim-slider').value) || 0;
+            const avgRate = state.totalRev / hoursTotal || globalRate;
+            state.simProjRev = state.projRev + (addedHours * avgRate);
+            state.pool = getPool(state.projRev); // Current path
+            state.simPool = getPool(state.simProjRev); // With extra effort
+
+            render();
+        }
+
+        function saveRate(id, val) {
+            const p = state.projects.find(x => x.id === id);
+            if (p) {
+                p.rate = parseInt(val) || 0;
+                const saved = JSON.parse(localStorage.getItem('iwd_rates_v9') || '{}');
+                saved[id] = p.rate;
+                localStorage.setItem('iwd_rates_v9', JSON.stringify(saved));
+                calc();
+            }
+        }
+
+        function resetRates() {
+            if(confirm("Reset rates?")) { localStorage.removeItem('iwd_rates_v9'); init(); }
+        }
+
+        function updateSlider(val) { calc(); } // Recalc triggers render
+        function recalcAll() { calc(); }
+
+        function render() {
+            // Header Stats
+            document.getElementById('hero-revenue').innerText = '$' + Math.round(state.projRev).toLocaleString();
+            
+            // Cards
+            document.getElementById('card-pool').innerText = '$' + state.pool.toLocaleString();
+            const gap = 85000 - state.projRev;
+            document.getElementById('text-status').innerText = gap > 0 ? `Need $${Math.round(gap).toLocaleString()} for Tier 1` : 'Bonus Unlocked! 🚀';
+            document.getElementById('card-actual').innerText = '$' + Math.round(state.totalRev).toLocaleString();
+            document.getElementById('card-hours').innerText = state.projects.reduce((s,p)=>s+p.hours,0).toFixed(1);
+
+            // Progress Bar
+            const max = 160000;
+            const actPct = Math.min((state.totalRev / max)*100, 100);
+            const simPct = Math.min((state.simProjRev / max)*100, 100);
+            document.getElementById('bar-actual').style.width = actPct + '%';
+            document.getElementById('bar-proj').style.width = simPct + '%';
+
+            // Sim Stats
+            const addedHours = document.getElementById('sim-slider').value;
+            const perPerson = addedHours / TEAM_SIZE / DAYS_LEFT;
+            document.getElementById('sim-hours').innerText = '+' + addedHours + ' Hrs';
+            document.getElementById('sim-per-person').innerText = '+' + perPerson.toFixed(1);
+            document.getElementById('sim-pool').innerText = '$' + state.simPool.toLocaleString();
+
+            // Team Table (Using SIMULATED Pool)
+            const tbody = document.getElementById('team-body');
+            tbody.innerHTML = '';
+            const totalHours = CLEAN_USERS.reduce((s,u)=>s+u.hours,0);
+            
+            CLEAN_USERS.sort((a,b)=>b.hours-a.hours).forEach(u => {
+                const share = u.hours / totalHours;
+                const bonus = Math.round(state.simPool * share);
+                const pct = (share * 100).toFixed(1) + '%';
+                const hl = bonus > 0 ? 'bg-green-50 dark:bg-green-900/20' : '';
+                
+                tbody.innerHTML += `
+                    <tr class="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition ${hl}">
+                        <td class="px-8 py-4 font-medium text-gray-900 dark:text-white">${u.name}</td>
+                        <td class="px-8 py-4 text-right text-gray-500 dark:text-slate-400">${u.hours.toFixed(2)}</td>
+                        <td class="px-8 py-4 text-right text-gray-500 dark:text-slate-400">${pct}</td>
+                        <td class="px-8 py-4 text-right font-bold text-green-600 dark:text-green-400 transition-all duration-300">$${bonus}</td>
+                    </tr>`;
+            });
+
+            // Client Table
+            const cbody = document.getElementById('client-list');
+            cbody.innerHTML = '';
+            const globalRate = parseInt(document.getElementById('global-rate').value) || 140;
+            
+            state.projects.forEach(p => {
+                const displayRate = (p.rate === p.def) ? globalRate : p.rate;
+                cbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800">
+                        <td class="px-6 py-2 text-gray-900 dark:text-slate-300">${p.name}</td>
+                        <td class="px-6 py-2 text-right text-gray-500 dark:text-slate-500">${p.hours.toFixed(2)}</td>
+                        <td class="px-6 py-2 text-right">
+                            <input type="number" value="${displayRate}" class="rate-input dark:text-white" onchange="saveRate('${p.id}', this.value)">
+                        </td>
+                        <td class="px-6 py-2 text-right text-gray-500 dark:text-slate-500">$${Math.round(p.hours*displayRate).toLocaleString()}</td>
+                    </tr>`;
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
