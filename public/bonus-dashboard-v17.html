@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IWD Bonus Dashboard V18</title>
+    <title>IWD Bonus Dashboard V17</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -30,14 +30,15 @@
         .marker-line { position: absolute; top: 0; bottom: 0; width: 2px; background: #cbd5e1; z-index: 30; }
         .dark .marker-line { background: #475569; }
         
+        /* Adjusted labels to be closer to bar */
         .marker-label { 
-            position: absolute; top: -25px; transform: translateX(-50%); 
-            font-size: 10px; font-weight: 700; color: #4b5563; white-space: nowrap; 
+            position: absolute; top: -20px; transform: translateX(-50%); 
+            font-size: 10px; font-weight: 700; color: #6b7280; white-space: nowrap; 
         }
         .dark .marker-label { color: #9ca3af; }
 
         .marker-bonus { 
-            position: absolute; bottom: -25px; transform: translateX(-50%); 
+            position: absolute; bottom: -20px; transform: translateX(-50%); 
             font-size: 11px; font-weight: 800; color: #10b981; white-space: nowrap;
         }
         
@@ -69,7 +70,7 @@
             </div>
         </div>
 
-        <!-- STATS ROW -->
+        <!-- KPI GRID -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div class="card bg-white p-5 rounded-lg shadow-sm border border-gray-200 relative overflow-hidden group">
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
@@ -90,19 +91,22 @@
             <div class="card bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                 <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Work Days Remaining</h3>
                 <div class="text-3xl font-bold text-gray-900 dark:text-white" id="stat-days-left">0</div>
-                <div class="text-xs text-gray-400 mt-1" id="stat-days-passed">Day 2 of 20</div>
+                <div class="text-xs text-gray-400 mt-1" id="stat-days-passed">Day 0 of 20</div>
             </div>
         </div>
 
         <!-- PROGRESS BAR -->
-        <div class="card bg-white dark:bg-gray-900 p-6 pt-10 pb-10 rounded-lg shadow-sm border border-gray-200 mb-8">
-            <h3 class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase mb-8">Tier Progress</h3>
+        <div class="card bg-white dark:bg-gray-900 p-6 pt-8 pb-8 rounded-lg shadow-sm border border-gray-200 mb-8">
+            <div class="flex justify-between items-end mb-8">
+                <h3 class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase">Tier Progress</h3>
+                <span class="text-xs font-mono text-gray-500" id="progress-text">$0 / $160k Goal</span>
+            </div>
             
             <div class="relative h-8 bg-gray-100 dark:bg-gray-800 rounded-full mb-2">
                 <div id="bar-actual" class="absolute h-full bg-blue-600 z-20 rounded-l-full transition-all duration-500 w-0"></div>
                 <div id="bar-proj" class="absolute h-full bg-green-400 dark:bg-green-600 opacity-40 z-10 rounded-l-full transition-all duration-500 w-0"></div>
                 
-                <!-- Markers -->
+                <!-- Markers with Both Labels -->
                 <div class="marker-line" style="left: 53%"></div><div class="marker-label" style="left: 53%">$85k</div><div class="marker-bonus" style="left: 53%">$1k</div>
                 <div class="marker-line" style="left: 62%"></div><div class="marker-label" style="left: 62%">$100k</div><div class="marker-bonus" style="left: 62%">$2k</div>
                 <div class="marker-line" style="left: 72%"></div><div class="marker-label" style="left: 72%">$115k</div><div class="marker-bonus" style="left: 72%">$3k</div>
@@ -120,9 +124,9 @@
                 </p>
 
                 <div class="mb-8 relative">
-                    <input type="range" min="0" max="1000" value="0" id="sim-slider" oninput="updateSim(this.value)">
+                    <input type="range" min="0" max="400" value="0" id="sim-slider" oninput="updateSim(this.value)">
                     <div class="flex justify-between text-[10px] text-gray-400 mt-2 font-mono absolute w-full top-4">
-                        <span>0</span><span>+500</span><span>+1000</span>
+                        <span>0</span><span>+200</span><span>+400</span>
                     </div>
                 </div>
 
@@ -146,7 +150,6 @@
             <div class="lg:col-span-2 card bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
                     <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300">🏆 Team Leaderboard</h3>
-                    <span class="text-[10px] text-gray-400 font-mono">Est. Payout</span>
                 </div>
                 <table class="min-w-full">
                     <thead class="bg-white dark:bg-black text-[10px] font-bold text-gray-400 uppercase tracking-wider">
@@ -227,12 +230,8 @@
 
         async function init() {
             const data = await fetchData();
-            const savedRates = JSON.parse(localStorage.getItem('iwd_rates_live') || '{}');
-            state.projects = (data.projects || []).map(p => ({ 
-                ...p, 
-                id: p.name.replace(/[^a-z0-9]/gi, ''), 
-                rate: savedRates[p.name.replace(/[^a-z0-9]/gi, '')] || p.def || 150 
-            }));
+            const savedRates = JSON.parse(localStorage.getItem('iwd_rates_v17') || '{}');
+            state.projects = (data.projects || []).map(p => ({ ...p, id: p.name.replace(/[^a-z0-9]/gi, ''), rate: savedRates[p.name.replace(/[^a-z0-9]/gi, '')] || p.def || 150 }));
             state.users = (data.users || []).filter(u => u.name.includes(" "));
             if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
             calc();
@@ -279,18 +278,22 @@
             const gap = nextGoal - state.simProjRev;
             document.getElementById('stat-gap').innerText = gap > 0 ? `Need $${Math.round(gap).toLocaleString()} for next tier` : 'Top Tier!';
 
+            // Sim Values
             const addedHours = document.getElementById('sim-slider').value;
             const perPerson = addedHours / TEAM_SIZE / daysLeft;
             document.getElementById('sim-hours-total').innerText = '+' + addedHours;
             document.getElementById('sim-workload').innerText = '+' + (isFinite(perPerson) ? perPerson.toFixed(1) : 0);
             document.getElementById('sim-pool-result').innerText = '$' + state.simPool.toLocaleString();
 
+            // Progress
             const max = 160000;
             const actPct = Math.min((state.totalRev / max)*100, 100);
             const simPct = Math.min((state.simProjRev / max)*100, 100);
             document.getElementById('bar-actual').style.width = actPct + '%';
             document.getElementById('bar-proj').style.width = simPct + '%';
+            document.getElementById('progress-text').innerText = '$' + Math.round(state.simProjRev).toLocaleString() + ' / $160k Goal';
 
+            // Tables
             const tbody = document.getElementById('team-body');
             tbody.innerHTML = '';
             const userTotal = state.users.reduce((s,u)=>s+u.hours,0);
@@ -314,8 +317,8 @@
         function updateSim() { calc(); }
         function recalcAll() { calc(); }
         function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
-        function saveRate(id, val) { const p = state.projects.find(x => x.id === id); if (p) { p.rate = parseInt(val) || 0; const saved = JSON.parse(localStorage.getItem('iwd_rates_live') || '{}'); saved[id] = p.rate; localStorage.setItem('iwd_rates_live', JSON.stringify(saved)); calc(); } }
-        function resetRates() { if(confirm("Reset rates?")) { localStorage.removeItem('iwd_rates_live'); init(); } }
+        function saveRate(id, val) { const p = state.projects.find(x => x.id === id); if (p) { p.rate = parseInt(val) || 0; const saved = JSON.parse(localStorage.getItem('iwd_rates_v17') || '{}'); saved[id] = p.rate; localStorage.setItem('iwd_rates_v17', JSON.stringify(saved)); calc(); } }
+        function resetRates() { if(confirm("Reset rates?")) { localStorage.removeItem('iwd_rates_v17'); init(); } }
 
         init();
     </script>
