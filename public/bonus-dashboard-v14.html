@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IWD Bonus Dashboard V15</title>
+    <title>IWD Bonus Dashboard V14</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,6 +19,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
         
+        /* Slider */
         input[type=range] { -webkit-appearance: none; background: transparent; width: 100%; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
@@ -26,23 +27,31 @@
         }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; }
         .dark input[type=range]::-webkit-slider-runnable-track { background: #334155; }
-        
-        .rate-input { background: transparent; border-bottom: 1px dashed #9ca3af; text-align: right; width: 50px; }
-        
-        /* Markers */
-        .marker-line { position: absolute; top: 0; bottom: 0; width: 2px; background: #cbd5e1; z-index: 30; }
-        .dark .marker-line { background: #475569; }
+        .dark input[type=range]::-webkit-slider-thumb { background: #4ade80; border-color: #0f172a; }
+
+        /* Dark Mode */
+        .dark body { background-color: #000000; color: #f1f5f9; }
+        .dark .card { background-color: #111111; border-color: #333; }
+        .dark .table-header { background-color: #111111; color: #94a3b8; }
+        .dark .table-row:hover { background-color: #1a1a1a; }
+        .dark input, .dark select { background: #111; color: white; border-color: #444; }
+
+        /* Tier Markers - Fixed Visibility */
+        .marker { position: absolute; top: 0; bottom: 0; width: 2px; background: #94a3b8; z-index: 30; opacity: 0.5; }
+        .dark .marker { background: #475569; }
         
         .marker-label { 
-            position: absolute; top: -25px; transform: translateX(-50%); 
-            font-size: 10px; font-weight: 700; color: #4b5563; white-space: nowrap; 
+            position: absolute; top: -20px; transform: translateX(-50%); 
+            font-size: 10px; font-weight: 700; color: #64748b; white-space: nowrap; 
         }
-        .dark .marker-label { color: #9ca3af; }
+        .dark .marker-label { color: #94a3b8; }
 
         .marker-bonus { 
-            position: absolute; bottom: -25px; transform: translateX(-50%); 
-            font-size: 11px; font-weight: 800; color: #10b981; white-space: nowrap;
+            position: absolute; bottom: -20px; transform: translateX(-50%); 
+            font-size: 11px; font-weight: 800; color: #10b981; 
         }
+        
+        .rate-input { background: transparent; border-bottom: 1px dashed #9ca3af; text-align: right; width: 50px; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen p-4 md:p-8">
@@ -70,68 +79,91 @@
             </div>
         </div>
 
-        <!-- STATS ROW -->
+        <!-- MAIN STATS ROW -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 relative overflow-hidden group">
+            
+            <!-- PROJECTED POOL -->
+            <div class="card bg-white p-5 rounded-lg shadow-sm border border-gray-200 relative overflow-hidden group">
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
                 <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Projected Pool</h3>
                 <div class="text-4xl font-black text-green-600 dark:text-green-400" id="stat-pool">$0</div>
                 <div class="text-xs text-gray-400 mt-1" id="stat-gap">Calculating...</div>
             </div>
-            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+
+            <!-- CURRENT REVENUE -->
+            <div class="card bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                 <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Current Revenue</h3>
                 <div class="text-3xl font-bold text-gray-900 dark:text-white" id="stat-revenue">$0</div>
                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1"><span id="stat-hours">0</span> Hrs Billable</div>
             </div>
-            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+
+            <!-- PROJECTED REVENUE -->
+            <div class="card bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                 <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Projected Revenue</h3>
                 <div class="text-3xl font-bold text-gray-900 dark:text-white" id="stat-proj">$0</div>
                 <div class="text-xs text-blue-500 mt-1 font-semibold">Based on Pace</div>
             </div>
-            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+
+            <!-- TIME -->
+            <div class="card bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                 <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Work Days Remaining</h3>
                 <div class="text-3xl font-bold text-gray-900 dark:text-white" id="stat-days-left">0</div>
                 <div class="text-xs text-gray-400 mt-1" id="stat-days-passed">Day 2 of 20</div>
             </div>
         </div>
 
-        <!-- PROGRESS BAR (FIXED) -->
-        <div class="bg-white dark:bg-gray-900 p-6 pt-12 pb-12 rounded-lg shadow-sm border border-gray-200 mb-8">
-            <div class="relative h-8 w-full bg-gray-100 dark:bg-gray-800 rounded-full mb-2">
-                <!-- Bars (Inside) -->
-                <div id="bar-actual" class="absolute h-full bg-blue-600 z-20 rounded-l-full transition-all duration-500 w-0"></div>
-                <div id="bar-proj" class="absolute h-full bg-green-400 dark:bg-green-600 opacity-40 z-10 rounded-l-full transition-all duration-500 w-0"></div>
+        <!-- PROGRESS BAR -->
+        <div class="card bg-white dark:bg-gray-900 p-6 pt-10 rounded-lg shadow-sm border border-gray-200 mb-8 pb-10">
+            <div class="relative h-6 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mb-2">
+                <!-- Actual -->
+                <div id="bar-actual" class="absolute h-full bg-blue-600 z-20 transition-all duration-500 w-0"></div>
+                <!-- Projected -->
+                <div id="bar-proj" class="absolute h-full bg-green-400 dark:bg-green-600 opacity-40 z-10 transition-all duration-500 w-0"></div>
                 
-                <!-- Markers (Overlay) -->
-                <div class="marker-line" style="left: 53%"></div><div class="marker-label" style="left: 53%">$85k</div><div class="marker-bonus" style="left: 53%">$1k</div>
-                <div class="marker-line" style="left: 62%"></div><div class="marker-label" style="left: 62%">$100k</div><div class="marker-bonus" style="left: 62%">$2k</div>
-                <div class="marker-line" style="left: 72%"></div><div class="marker-label" style="left: 72%">$115k</div><div class="marker-bonus" style="left: 72%">$3k</div>
-                <div class="marker-line" style="left: 81%"></div><div class="marker-label" style="left: 81%">$130k</div><div class="marker-bonus" style="left: 81%">$4k</div>
-                <div class="marker-line" style="left: 90%"></div><div class="marker-label" style="left: 90%">$145k</div><div class="marker-bonus" style="left: 90%">$5k</div>
+                <!-- Markers with Amounts -->
+                <div class="marker" style="left: 53%"></div><div class="marker-label" style="left: 53%">$85k</div><div class="marker-bonus" style="left: 53%">$1k</div>
+                <div class="marker" style="left: 62%"></div><div class="marker-label" style="left: 62%">$100k</div><div class="marker-bonus" style="left: 62%">$2k</div>
+                <div class="marker" style="left: 72%"></div><div class="marker-label" style="left: 72%">$115k</div><div class="marker-bonus" style="left: 72%">$3k</div>
+                <div class="marker" style="left: 81%"></div><div class="marker-label" style="left: 81%">$130k</div><div class="marker-bonus" style="left: 81%">$4k</div>
+                <div class="marker" style="left: 90%"></div><div class="marker-label" style="left: 90%">$145k</div><div class="marker-bonus" style="left: 90%">$5k</div>
+            </div>
+            <div class="flex justify-between items-center mt-6 px-1">
+                <span class="text-xs font-mono text-gray-400" id="progress-text">$0 / $160k Goal</span>
             </div>
         </div>
 
-        <!-- SIMULATOR -->
+        <!-- TWO COLUMN LAYOUT -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-1 bg-indigo-50 dark:bg-slate-900 p-6 rounded-lg border border-indigo-100 dark:border-slate-700 h-full">
-                <h3 class="text-sm font-bold text-indigo-900 dark:text-indigo-400 mb-8">🔮 "What If" Calculator</h3>
-                
+            
+            <!-- LEFT: SIMULATOR -->
+            <div class="lg:col-span-1 card bg-indigo-50 dark:bg-slate-900 p-6 rounded-lg border border-indigo-100 dark:border-slate-700 h-full">
+                <h3 class="text-sm font-bold text-indigo-900 dark:text-indigo-400 mb-2">🔮 "What If" Calculator</h3>
+                <p class="text-[10px] text-indigo-600 dark:text-gray-500 mb-8 leading-tight">
+                    Simulate adding extra hours to see the impact.
+                </p>
+
                 <div class="mb-8 relative">
                     <input type="range" min="0" max="400" value="0" id="sim-slider" oninput="updateSim(this.value)">
                     <div class="flex justify-between text-[10px] text-gray-400 mt-2 font-mono absolute w-full top-4">
-                        <span>0</span><span>+200</span><span>+400</span>
+                        <span>0</span>
+                        <span>+200</span>
+                        <span>+400</span>
                     </div>
                 </div>
 
                 <div class="space-y-4">
-                    <div class="flex justify-between items-center">
+                    <!-- Workload -->
+                    <div class="flex justify-between items-center p-3 bg-white dark:bg-black rounded border border-indigo-50 dark:border-slate-700 shadow-sm">
                         <span class="text-xs text-indigo-500 font-bold uppercase">Hrs / Person / Day</span>
                         <span class="text-base font-black text-indigo-600" id="sim-workload">+0.0</span>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-gray-500 font-medium uppercase">Add'l Hours Total</span>
+
+                    <!-- Add'l Hours -->
+                    <div class="flex justify-between items-center p-3 bg-white dark:bg-black rounded border border-indigo-50 dark:border-slate-700 shadow-sm">
+                        <span class="text-xs text-gray-500 font-medium uppercase">Total Extra Hours</span>
                         <span class="text-base font-bold text-gray-700 dark:text-gray-300" id="sim-hours-total">+0</span>
                     </div>
+
                     <div class="mt-4 pt-4 border-t border-indigo-100 dark:border-slate-700 text-center">
                         <div class="text-[10px] uppercase font-bold text-gray-400">New Projected Pool</div>
                         <div class="text-4xl font-black text-green-600 dark:text-green-400 mt-1" id="sim-pool-result">$0</div>
@@ -139,8 +171,8 @@
                 </div>
             </div>
 
-            <!-- LEADERBOARD -->
-            <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <!-- RIGHT: LEADERBOARD -->
+            <div class="lg:col-span-2 card bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
                     <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300">🏆 Team Leaderboard</h3>
                     <span class="text-[10px] text-gray-400 font-mono">Est. Payout</span>
@@ -165,14 +197,14 @@
                 View/Edit Client Rates ▼
             </button>
         </div>
-        <div id="client-area" class="hidden mt-4 bg-white rounded-lg border border-gray-200 overflow-hidden mb-20">
+        <div id="client-area" class="hidden mt-4 card bg-white rounded-lg border border-gray-200 overflow-hidden mb-20">
              <table class="min-w-full text-xs">
                 <thead class="bg-gray-50 dark:bg-gray-900 text-gray-500">
                     <tr>
                         <th class="px-4 py-2 text-left">Client</th>
-                        <th class="px-4 py-2 text-right">Hours</th>
+                        <th class="px-4 py-2 text-right">Billable Hours</th>
                         <th class="px-4 py-2 text-right">Rate</th>
-                        <th class="px-4 py-2 text-right">Total</th>
+                        <th class="px-4 py-2 text-right">Billable Total</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-800" id="client-body"></tbody>
@@ -182,32 +214,29 @@
     </div>
 
     <script>
+        // --- DATA ---
         const TEAM_SIZE = 9;
         const TOTAL_DAYS = 20;
-
+        
+        // Initial Data (Feb 4th) - FIXED PREVIEW DATA
         const PREVIEW_DATA = {
             users: [
-                {name: "Marcos Araujo", hours: 12.87},
-                {name: "Oleg Sergiyenko", hours: 12.23},
-                {name: "Irina Lukyanchuk", hours: 10.55},
-                {name: "Pradeep Mudaliar", hours: 6.53},
-                {name: "Yaro Plotnitsky", hours: 4.15},
-                {name: "Dharmendra Panchal", hours: 1.95},
-                {name: "Bohdan Bohaichuk", hours: 1.07},
-                {name: "Rafael Vianna", hours: 0.93},
+                {name: "Marcos Araujo", hours: 12.87}, {name: "Oleg Sergiyenko", hours: 12.23},
+                {name: "Irina Lukyanchuk", hours: 9.55}, {name: "Pradeep Mudaliar", hours: 6.53},
+                {name: "Yaro Plotnitsky", hours: 3.92}, {name: "Dharmendra Panchal", hours: 1.95},
+                {name: "Bohdan Bohaichuk", hours: 1.07}, {name: "Rafael Vianna", hours: 0.93},
                 {name: "Max Dmitrenko", hours: 0.1}
             ],
             projects: [
-                {id: 'p1', name: "SchoolFix - Migration to Adobe Live Search", hours: 24.82, def: 150},
-                {id: 'p2', name: "Inyo Pools - Project Hammerhead MVP", hours: 12.97, def: 150},
-                {id: 'p3', name: "School Fix - Maintenance", hours: 3.63, def: 150},
-                {id: 'p4', name: "DMC Tools - Maintenance", hours: 2.60, def: 150},
-                {id: 'p5', name: "PSU Extension - Maintenance", hours: 1.97, def: 150},
-                {id: 'p6', name: "Purdue - Maintenance", hours: 1.45, def: 150},
-                {id: 'p7', name: "Europa Eyewear General", hours: 1.32, def: 150},
-                {id: 'p8', name: "Pryor - SEO Migration Recovery", hours: 0.75, def: 150},
-                {id: 'p9', name: "US Camera Pro - Maintenance", hours: 0.65, def: 150},
-                {id: 'p10', name: "Europa Eyewear - EyeBobs Integration", hours: 0.23, def: 150}
+                {id: 'p1', name: "SchoolFix - Adobe Migration", hours: 23.82, def: 150},
+                {id: 'p2', name: "Inyo Pools - Hammerhead", hours: 12.97, def: 150},
+                {id: 'p3', name: "PSU Extension", hours: 1.97, def: 150},
+                {id: 'p4', name: "School Fix - Maintenance", hours: 3.63, def: 150},
+                {id: 'p5', name: "DMC Tools - Maintenance", hours: 2.60, def: 150},
+                {id: 'p6', name: "Pryor - SEO Migration", hours: 0.75, def: 150},
+                {id: 'p7', name: "Europa Eyewear", hours: 1.32, def: 150},
+                {id: 'p8', name: "US Camera Pro", hours: 0.65, def: 150},
+                {id: 'p9', name: "Purdue - Maintenance", hours: 1.45, def: 150}
             ]
         };
 
@@ -220,7 +249,7 @@
             pool: 0,
             simPool: 0
         };
-
+        
         async function fetchData() {
             try {
                 const response = await fetch('/.netlify/functions/get-stats');
@@ -230,19 +259,22 @@
                 document.getElementById('live-indicator').className = "text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300";
                 return data;
             } catch (e) {
+                console.log("Using Preview Data");
                 return PREVIEW_DATA;
             }
         }
 
         async function init() {
             const data = await fetchData();
-            const savedRates = JSON.parse(localStorage.getItem('iwd_rates_v15') || '{}');
+            const savedRates = JSON.parse(localStorage.getItem('iwd_rates_v14') || '{}');
             
+            // Map projects and ensure users exist
             state.projects = (data.projects || []).map(p => ({ 
                 ...p, 
                 id: p.name.replace(/[^a-z0-9]/gi, ''), 
                 rate: savedRates[p.name.replace(/[^a-z0-9]/gi, '')] || p.def || 150 
             }));
+            
             state.users = (data.users || []).filter(u => u.name.includes(" "));
 
             if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
@@ -252,13 +284,13 @@
 
         function calc() {
             const globalRate = parseInt(document.getElementById('global-rate').value) || 150;
-            const daysPassed = 2.0;
+            const daysPassed = 2.0; // Fixed at 2.0 for consistent Projection (> $85k)
             const daysLeft = TOTAL_DAYS - daysPassed;
 
             document.getElementById('stat-days-left').innerHTML = `${daysLeft} <span class="text-sm font-normal text-gray-400">Days</span>`;
             document.getElementById('stat-days-passed').innerText = `Day ${daysPassed + 1} of ${TOTAL_DAYS}`;
 
-            // Actuals
+            // 1. Actuals
             state.totalRev = state.projects.reduce((sum, p) => {
                 const r = (p.rate === (p.def || 150)) ? globalRate : p.rate;
                 return sum + (p.hours * r);
@@ -266,17 +298,18 @@
             
             const totalHours = state.projects.reduce((s,p)=>s+p.hours,0);
 
-            // Projection
+            // 2. Projection
             state.projRev = (state.totalRev / daysPassed) * TOTAL_DAYS;
             
-            // Simulator
+            // 3. Simulator
             const addedHours = parseInt(document.getElementById('sim-slider').value) || 0;
             const avgRate = state.totalRev / totalHours || globalRate;
+            const addedRev = addedHours * avgRate;
             
-            state.simProjRev = state.projRev + (addedHours * avgRate);
+            state.simProjRev = state.projRev + addedRev;
             state.pool = getPool(state.projRev);
             state.simPool = getPool(state.simProjRev);
-            
+
             render(daysLeft);
         }
 
@@ -302,33 +335,36 @@
             const gap = nextGoal - state.simProjRev;
             document.getElementById('stat-gap').innerText = gap > 0 ? `Need $${Math.round(gap).toLocaleString()} for next tier` : 'Top Tier!';
 
-            // Sim
+            // Sim Values
             const addedHours = document.getElementById('sim-slider').value;
             const perPerson = addedHours / TEAM_SIZE / daysLeft;
             document.getElementById('sim-hours-total').innerText = '+' + addedHours;
             document.getElementById('sim-workload').innerText = '+' + (isFinite(perPerson) ? perPerson.toFixed(1) : 0);
             document.getElementById('sim-pool-result').innerText = '$' + state.simPool.toLocaleString();
 
-            // Progress Bar
+            // Progress
             const max = 160000;
             const actPct = Math.min((state.totalRev / max)*100, 100);
             const simPct = Math.min((state.simProjRev / max)*100, 100);
             document.getElementById('bar-actual').style.width = actPct + '%';
             document.getElementById('bar-proj').style.width = simPct + '%';
+            document.getElementById('progress-text').innerText = '$' + Math.round(state.simProjRev).toLocaleString() + ' / $160k';
 
             // Team Table
             const tbody = document.getElementById('team-body');
             tbody.innerHTML = '';
+            // Fix: User total hours might differ slightly, use sum
             const userTotal = state.users.reduce((s,u)=>s+u.hours,0);
             
             if (state.users.length === 0) {
-                 tbody.innerHTML = '<tr><td colspan="4" class="px-5 py-4 text-center text-sm text-gray-500">No team data.</td></tr>';
+                 tbody.innerHTML = '<tr><td colspan="4" class="px-5 py-4 text-center text-sm text-gray-500">No team data available.</td></tr>';
             } else {
                 state.users.sort((a,b)=>b.hours-a.hours).forEach(u => {
                     const share = u.hours / userTotal;
                     const bonus = Math.round(state.simPool * share);
                     const pct = (share * 100).toFixed(1) + '%';
                     const hl = bonus > 0 ? 'bg-green-50 dark:bg-green-900/20' : '';
+                    
                     tbody.innerHTML += `
                         <tr class="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 transition ${hl}">
                             <td class="px-5 py-3 text-sm font-medium text-gray-900 dark:text-white">${u.name}</td>
@@ -366,9 +402,9 @@
             const p = state.projects.find(x => x.id === id);
             if (p) {
                 p.rate = parseInt(val) || 0;
-                const saved = JSON.parse(localStorage.getItem('iwd_rates_v15') || '{}');
+                const saved = JSON.parse(localStorage.getItem('iwd_rates_v14') || '{}');
                 saved[id] = p.rate;
-                localStorage.setItem('iwd_rates_v15', JSON.stringify(saved));
+                localStorage.setItem('iwd_rates_v14', JSON.stringify(saved));
                 calc();
             }
         }
