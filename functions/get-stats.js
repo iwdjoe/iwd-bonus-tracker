@@ -1,4 +1,8 @@
-// MAIN BACKEND (V86 - BULLETPROOF DATE LOGIC)
+// MAIN BACKEND (V90 - THE CLEANER)
+// Single source of truth for both dashboards
+// FETCH STRATEGY: Last 45 days to guarantee data availability
+// FILTER LOGIC: Strict JavaScript filtering using YYYYMMDD integers
+
 let cache = { data: null, time: 0 };
 
 exports.handler = async function(event, context) {
@@ -8,7 +12,7 @@ exports.handler = async function(event, context) {
     const GH_TOKEN = process.env.GITHUB_PAT; 
     const REPO = "iwdjoe/iwd-bonus-tracker";
     
-    // CACHE: 1 Minute (Short cache for fast debugging)
+    // CACHE: 1 Minute
     if (cache.data && (Date.now() - cache.time < 60000)) {
         return { statusCode: 200, body: JSON.stringify(cache.data) };
     }
@@ -17,31 +21,27 @@ exports.handler = async function(event, context) {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
         
         // ========================================
-        // BULLETPROOF DATE LOGIC (V86)
+        // DATE LOGIC
         // ========================================
-        
-        // Helper: Convert date string (YYYY-MM-DD) to comparable integer (YYYYMMDD)
         const toInt = (dateStr) => parseInt(dateStr.replace(/-/g, ''), 10);
         
-        // Get today in local timezone (where the function runs)
         const now = new Date();
         
-        // Calculate Monday of current week (ISO week starts Monday)
-        const dayOfWeek = now.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
-        const daysFromMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1; // If Sunday, go back 6 days
+        // Monday of current week
+        const dayOfWeek = now.getDay();
+        const daysFromMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
         const thisMonday = new Date(now);
         thisMonday.setDate(now.getDate() - daysFromMonday);
         thisMonday.setHours(0, 0, 0, 0);
         
-        // Calculate Monday of last week
+        // Monday of last week
         const lastMonday = new Date(thisMonday);
         lastMonday.setDate(thisMonday.getDate() - 7);
         
-        // Calculate start of current month
+        // Start of current month
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         monthStart.setHours(0, 0, 0, 0);
         
-        // Convert to YYYY-MM-DD strings (local timezone)
         const formatDate = (d) => {
             const y = d.getFullYear();
             const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -53,26 +53,27 @@ exports.handler = async function(event, context) {
         const lastWeekStart = formatDate(lastMonday);
         const monthStartStr = formatDate(monthStart);
         
-        // Convert to integers for fast comparison
         const thisWeekInt = toInt(thisWeekStart);
         const lastWeekInt = toInt(lastWeekStart);
         const monthStartInt = toInt(monthStartStr);
         
         // ========================================
-        // FETCH SAFE RANGE (Last 45 days)
+        // FETCH RANGE: Last 45 Days → Tomorrow
         // ========================================
         const fetchStart = new Date(now);
         fetchStart.setDate(now.getDate() - 45);
         const fetchEnd = new Date(now);
-        fetchEnd.setDate(now.getDate() + 2); // +2 days for safety
+        fetchEnd.setDate(now.getDate() + 1);
         
         const fetchStartStr = formatDate(fetchStart).replace(/-/g, '');
         const fetchEndStr = formatDate(fetchEnd).replace(/-/g, '');
 
-        // Fetch time entries
+        console.log(`[GET-STATS] Fetching ${fetchStartStr} → ${fetchEndStr}`);
+
         const twRes = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}`, { 
             headers: { 'Authorization': AUTH } 
         });
+        
         if(!twRes.ok) throw new Error("Teamwork API " + twRes.status);
         const twData = await twRes.json();
         
@@ -88,56 +89,71 @@ exports.handler = async function(event, context) {
 
         const entries = twData['time-entries'] || [];
         
+        console.log(`[GET-STATS] Found ${entries.length} entries`);
+        
         // ========================================
-        // PROCESS & FILTER IN MEMORY
+        // FILTER & AGGREGATE
         // ========================================
         let users = {};
         let projects = {};
-        let wStats = { 
+        let stats = { 
             thisWeek: { b: 0, t: 0 }, 
-            lastWeek: { b: 0, t: 0 } 
+            lastWeek: { b: 0, t: 0 },
+            month: { b: 0, t: 0 }
         };
 
-        entries.forEach(e => {
+        const sampleEntries = [];
+
+        entries.forEach((e, idx) => {
             // Skip internal projects
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
             
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             const isBill = e['isbillable'] === '1';
-            const dateStr = e.date; // Format: "YYYY-MM-DD"
+            const dateStr = e.date; // "YYYY-MM-DD"
             const dateInt = toInt(dateStr);
 
-            // ========================================
-            // MAIN STATS (Current Month Only)
-            // ========================================
+            // Debug: Capture first 3 entries
+            if (idx < 3) {
+                sampleEntries.push({
+                    name: e['person-first-name'] + ' ' + e['person-last-name'],
+                    date: dateStr,
+                    hours: hours.toFixed(2),
+                    billable: isBill
+                });
+            }
+
+            // MONTHLY STATS (for main dashboard)
             if (dateInt >= monthStartInt) {
                 const user = e['person-first-name'] + ' ' + e['person-last-name'];
                 const project = e['project-name'];
                 
+                // Only billable hours count for user leaderboard
                 if (isBill) {
                     if (!users[user]) users[user] = 0;
                     users[user] += hours;
                 }
                 
+                // All hours count for project totals
                 if (!projects[project]) projects[project] = { hours: 0 };
                 projects[project].hours += hours;
+
+                stats.month.t += hours;
+                if (isBill) stats.month.b += hours;
             }
 
-            // ========================================
-            // WEEKLY PULSE STATS
-            // ========================================
-            
-            // This Week (from this Monday onwards)
+            // WEEKLY STATS (for pulse)
             if (dateInt >= thisWeekInt) {
-                wStats.thisWeek.t += hours;
-                if (isBill) wStats.thisWeek.b += hours;
-            }
-            // Last Week (from last Monday, but BEFORE this Monday)
-            else if (dateInt >= lastWeekInt && dateInt < thisWeekInt) {
-                wStats.lastWeek.t += hours;
-                if (isBill) wStats.lastWeek.b += hours;
+                stats.thisWeek.t += hours;
+                if (isBill) stats.thisWeek.b += hours;
+            } else if (dateInt >= lastWeekInt && dateInt < thisWeekInt) {
+                stats.lastWeek.t += hours;
+                if (isBill) stats.lastWeek.b += hours;
             }
         });
+
+        console.log(`[GET-STATS] This Week: ${stats.thisWeek.b}h billable / ${stats.thisWeek.t}h total`);
+        console.log(`[GET-STATS] Last Week: ${stats.lastWeek.b}h billable / ${stats.lastWeek.t}h total`);
 
         // ========================================
         // BUILD RESPONSE
@@ -170,21 +186,22 @@ exports.handler = async function(event, context) {
                     thisWeekStart,
                     lastWeekStart,
                     monthStartStr,
-                    entriesProcessed: entries.length
+                    entriesProcessed: entries.length,
+                    sampleEntries: sampleEntries
                 }
             },
-            weekly: { 
+            pulse: {
                 thisWeek: { 
-                    billable: Math.round(wStats.thisWeek.b * 10) / 10, 
-                    total: Math.round(wStats.thisWeek.t * 10) / 10 
+                    b: Math.round(stats.thisWeek.b * 10) / 10, 
+                    t: Math.round(stats.thisWeek.t * 10) / 10 
                 },
                 lastWeek: { 
-                    billable: Math.round(wStats.lastWeek.b * 10) / 10, 
-                    total: Math.round(wStats.lastWeek.t * 10) / 10 
-                }, 
-                ranges: { 
-                    this: `${thisWeekStart} onwards`, 
-                    last: `${lastWeekStart} to ${thisWeekStart}` 
+                    b: Math.round(stats.lastWeek.b * 10) / 10, 
+                    t: Math.round(stats.lastWeek.t * 10) / 10 
+                },
+                month: {
+                    b: Math.round(stats.month.b * 10) / 10,
+                    t: Math.round(stats.month.t * 10) / 10
                 }
             }
         };
@@ -195,11 +212,14 @@ exports.handler = async function(event, context) {
         return { 
             statusCode: 200, 
             body: JSON.stringify(responseData),
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 
+                'Content-Type': 'application/json',
+                'Cache-Control': 'public, max-age=60'
+            }
         };
 
     } catch (error) {
-        console.error('Function error:', error);
+        console.error('[GET-STATS] ERROR:', error);
         return { 
             statusCode: 500, 
             body: JSON.stringify({ 
