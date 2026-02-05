@@ -28,16 +28,30 @@ exports.handler = async function(event, context) {
         const fetchStartStr = formatDate(fetchStart);
         const fetchEndStr = formatDate(fetchEnd);
 
-        // Double Fetch to overcome 500 limit if needed, though usually not hit in 45 days unless huge volume
-        // We'll stick to Page 1 for speed, usually enough. If zero data, we'll expand.
-        const twRes = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } });
-        const twData = await twRes.json();
+        // FETCH MULTIPLE PAGES (2000 entries max) to ensure we reach back 45 days
+        // If team logs ~50 entries/day, 45 days = 2250 entries. 500 is not enough.
+        const [p1, p2, p3, p4] = await Promise.all([
+            fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
+            fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
+            fetch(`https://${DOMAIN}/time_entries.json?page=3&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
+            fetch(`https://${DOMAIN}/time_entries.json?page=4&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } })
+        ]);
+
+        const d1 = p1.ok ? await p1.json() : {};
+        const d2 = p2.ok ? await p2.json() : {};
+        const d3 = p3.ok ? await p3.json() : {};
+        const d4 = p4.ok ? await p4.json() : {};
         
         const ratesRes = await fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } });
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
-        const entries = twData['time-entries'] || [];
+        const entries = [
+            ...(d1['time-entries'] || []),
+            ...(d2['time-entries'] || []),
+            ...(d3['time-entries'] || []),
+            ...(d4['time-entries'] || [])
+        ];
         
         const cleanEntries = entries.map(e => {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return null;

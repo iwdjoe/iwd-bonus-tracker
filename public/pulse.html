@@ -45,7 +45,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v104</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v105</span></h1>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -85,7 +85,7 @@
                 <span class="text-xs font-mono opacity-50" id="week-range"></span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
-                <div class="p-8 text-center bg-blue-50 dark:bg-blue-900/20 flex flex-col justify-center items-center">
+                <div class="p-8 text-center bg-blue-50 dark:bg-gray-800 flex flex-col justify-center items-center">
                     <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs">
                         <div class="text-center">
@@ -283,7 +283,7 @@
                 const sorted = Object.keys(listObj).map(k => ({ name: k, hours: listObj[k].hours || listObj[k] }));
                 sorted.sort((a,b) => b.hours - a.hours).slice(0,5).forEach((item, i) => {
                     el.innerHTML += `
-                        <tr class="hover:bg-white hover:bg-opacity-10 border-b border-gray-200 dark:border-gray-800">
+                        <tr class="hover:bg-white hover:bg-opacity-10 dark:border-gray-800">
                             <td class="px-6 py-3 w-10 text-xs font-mono opacity-50">0${i+1}</td>
                             <td class="px-6 py-3 font-medium">${item.name}</td>
                             <td class="px-6 py-3 text-right font-mono opacity-80">${Math.round(item.hours)}h</td>
