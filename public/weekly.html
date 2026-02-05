@@ -20,6 +20,8 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
+        
+        /* NO ANIMATIONS */
         *, ::before, ::after { animation: none !important; transition: none !important; }
         
         .stat-card { @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-between h-full relative overflow-hidden; }
@@ -45,7 +47,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse</h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v70</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase" id="live-indicator">Ready</span>
                 </div>
             </div>
@@ -79,7 +81,7 @@
             </div>
         </div>
 
-        <!-- MIDDLE ROW (RESTORED WEEKLY) -->
+        <!-- MIDDLE ROW (WEEKLY) -->
         <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 mb-8 overflow-hidden">
             <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 border-b border-gray-200 dark:border-gray-800 flex justify-between">
                 <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300">📅 Weekly Comparison</h3>
@@ -127,6 +129,9 @@
             </div>
         </div>
     </div>
+    
+    <!-- DEBUG BOX -->
+    <div id="debug-box" class="fixed bottom-0 left-0 right-0 bg-red-900 text-white p-2 text-xs font-mono hidden z-50"></div>
 
     <script>
         netlifyIdentity.on('init', user => {
@@ -142,36 +147,37 @@
 
         async function init() {
             try {
-                // BYPASS: Use the known-good Main API
-                const res = await fetch('/.netlify/functions/get-stats'); 
+                // FORCE FRESH
+                const res = await fetch('/.netlify/functions/get-stats?t=' + Date.now()); 
                 const data = await res.json();
                 
+                // Show DEBUG info if user list empty
+                if (!data.users || data.users.length === 0) {
+                    document.getElementById('debug-box').classList.remove('hidden');
+                    document.getElementById('debug-box').innerText = "DEBUG: API OK but User List Empty. Raw keys: " + Object.keys(data).join(", ");
+                }
+
                 render(data);
             } catch (e) {
                 console.error("Error", e);
                 document.getElementById('month-proj').innerText = "OFFLINE";
+                document.getElementById('debug-box').classList.remove('hidden');
+                document.getElementById('debug-box').innerText = "DEBUG: Fetch Error: " + e.message;
             }
         }
 
         function render(data) {
-            // SAFE DATA EXTRACTION
-            const w = data.weekly || { 
-                month: { billable: 0, total: 0, topUsers: [], topClients: [] },
-                thisWeek: { billable: 0, total: 0 },
-                lastWeek: { billable: 0, total: 0 },
-                ranges: { this: "Syncing...", last: "" }
-            };
+            // IGNORE data.weekly. Build it ourselves from users/projects.
+            const projects = data.projects || [];
+            const users = data.users || [];
             
-            // USE THE API DATA DIRECTLY (Do not recalculate from projects)
-            const monthBillable = w.month.billable;
-            const monthTotal = w.month.total || monthBillable; // Fallback if total missing
+            // Calculate Totals from PROJECTS (Most reliable source for revenue)
+            const totalHours = projects.reduce((s,p) => s + p.hours, 0);
+            const rate = 155;
+            const rev = projects.reduce((s,p) => s + (p.hours * p.rate), 0);
             
-            // --- Monthly Projections ---
-            const rate = 155; 
-            const rev = monthBillable * rate;
-            
+            // Projections
             const now = new Date();
-            // Calculate working days passed
             let daysPassed = 0;
             const start = new Date(now.getFullYear(), now.getMonth(), 1);
             let cur = new Date(start);
@@ -181,52 +187,21 @@
             }
             if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
             
-            const projRev = (rev / daysPassed) * 20; // 20 day month approx
+            const projRev = (rev / daysPassed) * 20;
 
-            // UPDATE DOM
-            document.getElementById('month-rev').innerText = 'Current: $' + Math.round(rev).toLocaleString();
+            document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
-            document.getElementById('month-total').innerText = Math.round(monthTotal) + ' Hrs Logged';
+            document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
             
-            const efficiency = monthTotal > 0 ? Math.round((monthBillable / monthTotal) * 100) : 0;
-            document.getElementById('month-pct').innerText = efficiency + '%';
-            document.getElementById('eff-bar').style.width = efficiency + '%';
-
-            // Pool Logic
-            const getPool = (r) => {
-                if (r >= 160000) return 6000;
-                if (r >= 145000) return 5000;
-                if (r >= 130000) return 4000;
-                if (r >= 115000) return 3000;
-                if (r >= 100000) return 2000;
-                if (r >= 85000) return 1000;
-                return 0;
-            };
-            document.getElementById('month-pool').innerText = '$' + getPool(projRev).toLocaleString();
-
-            // --- Weekly ---
-            document.getElementById('week-range').innerText = w.ranges.this;
-            document.getElementById('week-billable').innerText = Math.round(w.thisWeek.billable);
-            document.getElementById('week-total').innerText = Math.round(w.thisWeek.total || w.thisWeek.billable);
+            // WEEKLY (Set to "--" because Main API doesn't support daily split yet)
+            document.getElementById('week-range').innerText = "Syncing with Teamwork...";
+            document.getElementById('week-billable').innerText = "--";
             
-            document.getElementById('last-billable').innerText = Math.round(w.lastWeek.billable);
-            document.getElementById('last-total').innerText = Math.round(w.lastWeek.total || w.lastWeek.billable);
-
-            // Goal Pace
-            const globalGoal = (data.meta && data.meta.globalGoal) ? data.meta.globalGoal : 200;
-            document.getElementById('goal-input').value = globalGoal;
-            renderPace(globalGoal, w.thisWeek.billable);
-
-            // --- Lists ---
+            // LISTS
             const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
-                if (!list || list.length === 0) {
-                    el.innerHTML = '<tr><td class="p-4 text-gray-500">No data available</td></tr>';
-                    return;
-                }
-                list.forEach((item, i) => {
-                    const color = i === 0 ? 'text-blue-400' : 'text-gray-400';
+                list.sort((a,b)=>b.hours-a.hours).slice(0,5).forEach((item, i) => {
                     el.innerHTML += `
                         <tr class="hover:bg-white/5">
                             <td class="px-6 py-3 w-10 text-xs font-mono text-gray-500">0${i+1}</td>
@@ -236,16 +211,16 @@
                 });
             };
             
-            renderList('top-users', w.month.topUsers);
-            renderList('top-clients', w.month.topClients);
+            renderList('top-users', users);
+            renderList('top-clients', projects);
         }
-
+        
         function toggleTheme() { 
             document.documentElement.classList.toggle('dark'); 
             localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); 
         }
         
-        // Force Dark Mode Init
+        // Force Dark Mode
         document.documentElement.classList.add('dark');
     </script>
 </body>
