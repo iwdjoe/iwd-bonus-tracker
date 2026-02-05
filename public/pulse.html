@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (V98)</title>
+    <title>Team Bonus Tracker - Pulse v99</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -21,10 +21,6 @@
         body { font-family: 'Inter', sans-serif; }
         *, ::before, ::after { animation: none !important; transition: none !important; }
         
-        /* HEADER MATCHING BONUS DASHBOARD */
-        h1 { letter-spacing: -0.025em; }
-        
-        /* HARDCODED COLORS */
         .light-card { background: white; border: 1px solid #e5e7eb; color: #111827; }
         .dark-card { background: #111827; border: 1px solid #1f2937; color: white; }
         .light-bg { background: #f9fafb; }
@@ -35,26 +31,25 @@
 
     <!-- STATUS BAR -->
     <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Syncing V98...
+        Syncing V99...
     </div>
 
     <!-- DASHBOARD -->
     <div id="dashboard" class="max-w-6xl mx-auto pt-6">
         
-        <!-- HEADER (MATCHING MAIN DASHBOARD STYLE) -->
+        <!-- HEADER (EXACT CLONE) -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v98</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Team Bonus Tracker <span class="text-xs font-normal opacity-50 ml-1">Pulse v99</span></h1>
+                    <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE API</span>
                 </div>
+                <div class="text-xs opacity-50 mt-1 ml-11">Last Updated: <span id="time-updated">Just now</span></div>
             </div>
             <div class="flex items-center gap-4">
                 <button onclick="toggleTheme()" class="text-sm font-medium px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-800 hover:opacity-80 transition-opacity">
                     🌗 Theme
-                </button>
-                <button onclick="location.reload()" class="text-sm font-medium px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors">
-                    ↻ Refresh
                 </button>
             </div>
         </div>
@@ -70,7 +65,6 @@
             <div class="card p-6 rounded-xl shadow-sm flex flex-col justify-between h-full">
                 <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 text-purple-600">Weekly Goal</h3>
                 <div class="flex items-baseline gap-2">
-                    <span class="text-2xl font-black opacity-30">$</span>
                     <input type="number" id="goal-input" value="200" class="bg-transparent text-4xl font-black w-24 border-b border-gray-300 dark:border-gray-700 focus:outline-none">
                 </div>
                 <div class="text-xs mt-2 font-bold" id="week-pace">Pace: --%</div>
@@ -130,12 +124,6 @@
                 <table class="w-full text-sm"><tbody class="divide-y" id="top-clients"></tbody></table>
             </div>
         </div>
-        
-        <!-- DEBUG FOOTER -->
-        <div class="mt-8 p-4 bg-gray-900 text-green-400 font-mono text-[10px] rounded overflow-x-auto">
-            <strong>Debug Info:</strong>
-            <pre id="debug-pre">Waiting...</pre>
-        </div>
     </div>
 
     <script>
@@ -171,14 +159,7 @@
                 const res = await fetch(API_URL);
                 const data = await res.json();
                 
-                // Debug Output
-                document.getElementById('debug-pre').innerText = JSON.stringify({
-                    entries: data.meta.count,
-                    serverTime: data.meta.serverTime,
-                    sample: data.entries ? data.entries.slice(0,1) : "No Entries"
-                }, null, 2);
-                
-                status.innerText = "Loaded (" + data.meta.count + " entries)";
+                status.innerText = "Loaded (" + (data.entries ? data.entries.length : 0) + " entries)";
                 status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
                 setTimeout(() => status.classList.add('hidden'), 3000);
                 
@@ -195,7 +176,7 @@
             const rates = data.rates || {};
             const globalRate = data.globalRate || 155;
 
-            // 1. DATE BOUNDARIES (String Comparison YYYY-MM-DD)
+            // 1. DATE BOUNDARIES
             const now = new Date();
             
             // This Week (Monday)
@@ -209,14 +190,10 @@
             
             const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
             
-            // Helper: YYYY-MM-DD
             const toStr = (dateObj) => dateObj.toISOString().split('T')[0];
-            
             const thisWeekStr = toStr(thisMon);
             const lastWeekStr = toStr(lastMon);
             const monthStartStr = toStr(monthStart);
-
-            console.log("Ranges:", { thisWeekStr, lastWeekStr, monthStartStr });
 
             // 2. AGGREGATE
             let stats = {
@@ -229,9 +206,6 @@
             let projects = {};
 
             entries.forEach(e => {
-                // e.d is "YYYY-MM-DD"
-                
-                // MONTHLY
                 if (e.d >= monthStartStr) {
                     stats.month.t += e.h;
                     if (e.b) stats.month.b += e.h;
@@ -247,7 +221,6 @@
                     projects[e.p].hours += e.h;
                 }
 
-                // WEEKLY (String Compare Works Correctly for ISO Dates)
                 if (e.d >= thisWeekStr) {
                     stats.thisWeek.t += e.h;
                     if (e.b) stats.thisWeek.b += e.h;
@@ -257,15 +230,12 @@
                 }
             });
 
-            // Update Range Display
             document.getElementById('week-range').innerText = `${thisWeekStr} -> Now`;
-
-            // 3. RENDER
             render(stats, users, projects);
         }
 
         function render(stats, users, projects) {
-            // Monthly Proj
+            // Monthly
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), 1);
             let daysPassed = 0;
@@ -291,7 +261,19 @@
             const lPct = stats.lastWeek.t > 0 ? Math.round((stats.lastWeek.b / stats.lastWeek.t) * 100) : 0;
             document.getElementById('last-pct').innerText = lPct + '%';
 
-            // Lists
+            const updatePace = () => {
+                const goal = parseFloat(document.getElementById('goal-input').value) || 200;
+                const billable = stats.thisWeek.b || 0;
+                const pace = Math.round((billable / goal) * 100);
+                const el = document.getElementById('week-pace');
+                el.innerText = `Pace: ${pace}%`;
+                if (pace >= 100) el.style.color = "#10b981"; 
+                else if (pace >= 80) el.style.color = "#d97706"; 
+                else el.style.color = "inherit";
+            };
+            updatePace();
+            document.getElementById('goal-input').addEventListener('input', updatePace);
+
             const renderList = (id, listObj) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
@@ -305,22 +287,8 @@
                         </tr>`;
                 });
             };
-            
             renderList('top-users', users);
             renderList('top-clients', projects);
-            
-            const updatePace = () => {
-                const goal = parseFloat(document.getElementById('goal-input').value) || 200;
-                const billable = stats.thisWeek.b || 0;
-                const pace = Math.round((billable / goal) * 100);
-                const el = document.getElementById('week-pace');
-                el.innerText = `Pace: ${pace}%`;
-                if (pace >= 100) el.style.color = "#10b981"; 
-                else if (pace >= 80) el.style.color = "#d97706"; 
-                else el.style.color = "inherit";
-            };
-            updatePace();
-            document.getElementById('goal-input').addEventListener('input', updatePace);
         }
     </script>
 </body>

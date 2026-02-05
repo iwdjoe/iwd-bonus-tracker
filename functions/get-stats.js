@@ -1,5 +1,6 @@
-// MAIN BACKEND (V97 - EMERGENCY BYPASS)
-// If Teamwork fails/timeouts, return hardcoded dummy data to prove frontend works.
+// MAIN BACKEND (V99 - FINAL CONVERGENCE)
+// Restores V38 Logic exactly for Main Dashboard compatibility
+// Adds minimal extension for Pulse Dashboard (Last Week)
 
 let cache = { data: null, time: 0 };
 
@@ -10,29 +11,23 @@ exports.handler = async function(event, context) {
     const GH_TOKEN = process.env.GITHUB_PAT; 
     const REPO = "iwdjoe/iwd-bonus-tracker";
     
-    // EMERGENCY DUMMY DATA
-    const DUMMY_DATA = {
-        entries: [
-            { u: "Oleg Sergiyenko", p: "SchoolFix", pid: "SF", d: "2026-02-04", h: 5.5, b: true },
-            { u: "Irina Lukyanchuk", p: "Inyo Pools", pid: "IP", d: "2026-02-04", h: 4.0, b: true },
-            { u: "Marcos Araujo", p: "Pryor", pid: "PR", d: "2026-02-03", h: 6.2, b: true },
-            { u: "Oleg Sergiyenko", p: "SchoolFix", pid: "SF", d: "2026-01-28", h: 8.0, b: true } // Last Week
-        ],
-        rates: {},
-        globalRate: 155,
-        meta: { count: 4, serverTime: "EMERGENCY_MODE" }
-    };
+    // CACHE: 1 Minute
+    if (cache.data && (Date.now() - cache.time < 60000)) {
+        return { statusCode: 200, body: JSON.stringify(cache.data) };
+    }
 
     try {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
         const now = new Date();
         
-        // FETCH RANGE: Last 25 Days
-        const fetchStart = new Date(now);
-        fetchStart.setDate(now.getDate() - 25);
+        // DATE LOGIC (V38 Original + 7 Days Padding)
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const fetchStart = new Date(startOfMonth);
+        fetchStart.setDate(fetchStart.getDate() - 7); // Go back 7 days to catch Last Week overlap
+        
         const fetchEnd = new Date(now);
         fetchEnd.setDate(now.getDate() + 1);
-        
+
         const formatDate = (d) => {
             const y = d.getFullYear();
             const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -43,52 +38,73 @@ exports.handler = async function(event, context) {
         const fetchStartStr = formatDate(fetchStart);
         const fetchEndStr = formatDate(fetchEnd);
 
-        // Attempt Real Fetch with Timeout Race
-        const realFetch = Promise.all([
-            fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}`, { headers: { 'Authorization': AUTH } }),
-            fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}`, { headers: { 'Authorization': AUTH } }),
-            fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
-        ]);
-
-        // TIMEOUT: 8 Seconds (Netlify kills at 10s)
-        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("TIMEOUT")), 8000));
-
-        const [p1, p2, ratesRes] = await Promise.race([realFetch, timeout]);
-
-        if (!p1.ok) throw new Error("Teamwork API Error: " + p1.status);
-
-        const d1 = await p1.json();
-        const d2 = await p2.json();
+        // API CALL
+        const twRes = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}`, { headers: { 'Authorization': AUTH } });
+        if(!twRes.ok) throw new Error("Teamwork API " + twRes.status);
+        const twData = await twRes.json();
+        
+        const ratesRes = await fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } });
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
-        // Combine entries
-        const rawEntries = [
-            ...(d1['time-entries'] || []),
-            ...(d2['time-entries'] || [])
-        ];
+        // PROCESS ENTRIES
+        // We pass the raw list to the client so the client can do the filtering.
+        // This ensures the Main Dashboard (which does client-side math) receives the raw data it expects.
         
-        // MINIMAL PROCESSING
-        const cleanEntries = rawEntries.map(e => {
+        const rawEntries = twData['time-entries'] || [];
+        
+        // V38 COMPATIBILITY: We must return "users" and "projects" arrays for the Main Dashboard
+        let users = {};
+        let projects = {};
+        const monthStartStr = formatDate(startOfMonth); // YYYYMMDD string for comparison
+
+        rawEntries.forEach(e => {
+            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
+            
+            // Only aggregate for Main Dashboard if in Current Month
+            const dateStr = e.date.replace(/-/g, '');
+            if (dateStr >= monthStartStr) {
+                const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
+                const user = e['person-first-name'] + ' ' + e['person-last-name'];
+                const project = e['project-name'];
+                
+                if (!users[user]) users[user] = 0;
+                users[user] += hours;
+                
+                if (!projects[project]) projects[project] = { hours: 0 };
+                projects[project].hours += hours;
+            }
+        });
+
+        const userList = Object.keys(users).map(name => ({ name, hours: users[name] }));
+        const projectList = Object.keys(projects).map(name => {
+            const id = name.replace(/[^a-z0-9]/gi, '');
+            const rate = savedRates[id] || savedRates[name] || GLOBAL_RATE;
+            return { id, name, hours: projects[name].hours, rate: parseInt(rate), def: 155 };
+        });
+
+        // FOR PULSE: We send a simplified list of ALL fetched entries (including Last Week)
+        const pulseEntries = rawEntries.map(e => {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return null;
             return {
-                u: e['person-first-name'] + ' ' + e['person-last-name'], // User
-                p: e['project-name'], // Project
-                pid: e['project-name'].replace(/[^a-z0-9]/gi, ''), // Project ID
-                d: e.date, // Date YYYY-MM-DD
-                h: parseFloat(e.hours) + (parseFloat(e.minutes) / 60), // Hours
-                b: e['isbillable'] === '1' // Billable
+                u: e['person-first-name'] + ' ' + e['person-last-name'],
+                p: e['project-name'],
+                pid: e['project-name'].replace(/[^a-z0-9]/gi, ''),
+                d: e.date,
+                h: parseFloat(e.hours) + (parseFloat(e.minutes) / 60),
+                b: e['isbillable'] === '1'
             };
         }).filter(Boolean);
 
         const responseData = {
-            entries: cleanEntries,
-            rates: savedRates,
-            globalRate: GLOBAL_RATE,
-            meta: { 
-                count: cleanEntries.length,
-                serverTime: new Date().toISOString()
-            }
+            // V38 Fields (Restores Main Dashboard)
+            users: userList,
+            projects: projectList,
+            meta: { serverTime: new Date().toISOString(), globalRate: GLOBAL_RATE, cached: false },
+            
+            // V99 Fields (For Pulse Dashboard)
+            entries: pulseEntries,
+            rates: savedRates
         };
         
         cache.data = responseData;
@@ -97,8 +113,6 @@ exports.handler = async function(event, context) {
         return { statusCode: 200, body: JSON.stringify(responseData) };
 
     } catch (error) {
-        console.error("API FAIL - Serving Dummy Data:", error);
-        // RETURN DUMMY DATA ON FAILURE
-        return { statusCode: 200, body: JSON.stringify(DUMMY_DATA) };
+        return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
 };
