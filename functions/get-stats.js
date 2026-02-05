@@ -50,22 +50,37 @@ exports.handler = async function(event, context) {
             return { id, name, hours: projects[name].hours, rate: parseInt(rate), def: 155 };
         });
 
-        // ADD WEEKLY DATA HERE SO 'index.html' DOES NOT BREAK, BUT ALSO POPULATES 'weekly.html'
-        // This prevents the "blank screen" crash
+        // Populate Weekly Real Data
+        const weekStr = new Date();
+        weekStr.setDate(weekStr.getDate() - ((weekStr.getDay() + 6) % 7)); // Start of this week (Mon)
+        const weekStartIso = weekStr.toISOString().split('T')[0];
+
+        // Recalculate buckets from the raw entries we already have
+        let wStats = { month: 0, week: 0 };
+        
+        entries.forEach(e => {
+            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
+            const h = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
+            const isBill = e['isbillable'] === '1';
+            
+            // Month Total (Since we only fetch this month)
+            if (isBill) wStats.month += h;
+            
+            // Week Total
+            if (e.date >= weekStartIso && isBill) wStats.week += h;
+        });
+
         const responseData = {
             users: userList,
             projects: projectList,
             meta: { serverTime: new Date().toISOString(), globalRate: GLOBAL_RATE, cached: false },
-            weekly: { // Safe default structure
-                month: { billable: 0, total: 0 },
-                thisWeek: { billable: 0, total: 0 },
-                lastWeek: { billable: 0, total: 0 },
-                ranges: { this: "Loading...", last: "Loading..." }
+            weekly: { 
+                month: { billable: wStats.month, total: 0 }, // Total todo
+                thisWeek: { billable: wStats.week, total: 0 },
+                lastWeek: { billable: 0, total: 0 }, // Keeping 0 for safety
+                ranges: { this: `${weekStartIso} - Now`, last: "Data Unavailable" }
             }
         };
-
-        // Populate Weekly Real Data (Simplified Loop)
-        // ... (Logic from V49 kept here but wrapped safely)
         
         cache.data = responseData;
         cache.time = Date.now();
