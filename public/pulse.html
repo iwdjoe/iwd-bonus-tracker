@@ -42,7 +42,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Team Bonus Tracker <span class="text-xs font-normal opacity-50 ml-1">Pulse v99</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v100</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE API</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11">Last Updated: <span id="time-updated">Just now</span></div>
@@ -127,7 +127,7 @@
     </div>
 
     <script>
-        const API_URL = '/.netlify/functions/get-stats?v=' + Date.now(); 
+        const API_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
 
         let isDark = true; 
         function toggleTheme() { isDark = !isDark; applyTheme(); }
