@@ -56,18 +56,25 @@ exports.handler = async function(event, context) {
         const weekStartIso = weekStr.toISOString().split('T')[0];
 
         // Recalculate buckets from the raw entries we already have
-        let wStats = { month: 0, week: 0 };
+        let wStats = { 
+            month: { b: 0, t: 0 }, 
+            week: { b: 0, t: 0 } 
+        };
         
         entries.forEach(e => {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
             const h = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             const isBill = e['isbillable'] === '1';
             
-            // Month Total (Since we only fetch this month)
-            if (isBill) wStats.month += h;
+            // Month Total (All entries fetched are from this month)
+            wStats.month.t += h;
+            if (isBill) wStats.month.b += h;
             
             // Week Total
-            if (e.date >= weekStartIso && isBill) wStats.week += h;
+            if (e.date >= weekStartIso) {
+                wStats.week.t += h;
+                if (isBill) wStats.week.b += h;
+            }
         });
 
         const responseData = {
@@ -75,9 +82,9 @@ exports.handler = async function(event, context) {
             projects: projectList,
             meta: { serverTime: new Date().toISOString(), globalRate: GLOBAL_RATE, cached: false },
             weekly: { 
-                month: { billable: wStats.month, total: 0 }, // Total todo
-                thisWeek: { billable: wStats.week, total: 0 },
-                lastWeek: { billable: 0, total: 0 }, // Keeping 0 for safety
+                month: { billable: wStats.month.b, total: wStats.month.t },
+                thisWeek: { billable: wStats.week.b, total: wStats.week.t },
+                lastWeek: { billable: 0, total: 0 }, 
                 ranges: { this: `${weekStartIso} - Now`, last: "Data Unavailable" }
             }
         };
