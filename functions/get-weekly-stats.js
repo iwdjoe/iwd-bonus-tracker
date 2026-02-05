@@ -1,23 +1,19 @@
+// WEEKLY DASHBOARD BACKEND (Dedicated File)
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
     const TOKEN = process.env.TEAMWORK_API_TOKEN || 'dryer498desert';
-    const DOMAIN = 'iwdagency.teamwork.com';
     const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
 
     const now = new Date();
-    // OPTIMIZATION: Only fetch last 35 days (covers this month + last week comparison)
-    // Reduce page size to 250 to ensure fast response (pagination would be needed for perfect accuracy but speed is priority for dashboard)
+    // Fetch last 40 days to be safe
     const startFetch = new Date(now);
-    startFetch.setDate(now.getDate() - 35);
-    
+    startFetch.setDate(now.getDate() - 40);
     const fmt = (d) => d.toISOString().split('T')[0].replace(/-/g, '');
 
     try {
-        const url = `https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fmt(startFetch)}&toDate=${fmt(now)}`;
+        const url = `https://iwdagency.teamwork.com/time_entries.json?page=1&pageSize=500&fromDate=${fmt(startFetch)}&toDate=${fmt(now)}`;
         const res = await fetch(url, { headers: { 'Authorization': AUTH } });
-        
-        if(!res.ok) throw new Error("API Error " + res.status);
-        
+        if(!res.ok) throw new Error("API " + res.status);
         const data = await res.json();
         const entries = data['time-entries'] || [];
 
@@ -42,13 +38,19 @@ exports.handler = async function(event, context) {
         };
 
         entries.forEach(e => {
-            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return; 
+            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
             
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
-            const date = new Date(e.date);
+            const dateStr = e.date; // YYYY-MM-DD
             const isBillable = e['isbillable'] === '1';
+            
+            // String Comparison is safer than Date Obj for buckets
+            const monthStr = startOfMonth.toISOString().split('T')[0];
+            const weekStr = startOfWeek.toISOString().split('T')[0];
+            const lastStartStr = startLastWeek.toISOString().split('T')[0];
+            const lastEndStr = endLastWeek.toISOString().split('T')[0];
 
-            if (date >= startOfMonth) {
+            if (dateStr >= monthStr) {
                 stats.month.total += hours;
                 if (isBillable) {
                     stats.month.billable += hours;
@@ -59,10 +61,10 @@ exports.handler = async function(event, context) {
                 }
             }
 
-            if (date >= startOfWeek) {
+            if (dateStr >= weekStr) {
                 stats.thisWeek.total += hours;
                 if (isBillable) stats.thisWeek.billable += hours;
-            } else if (date >= startLastWeek && date <= endLastWeek) {
+            } else if (dateStr >= lastStartStr && dateStr <= lastEndStr) {
                 stats.lastWeek.total += hours;
                 if (isBillable) stats.lastWeek.billable += hours;
             }
@@ -72,7 +74,6 @@ exports.handler = async function(event, context) {
 
         return {
             statusCode: 200,
-            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
             body: JSON.stringify({
                 month: { 
                     billable: stats.month.billable, 
