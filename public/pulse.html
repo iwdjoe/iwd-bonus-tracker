@@ -44,7 +44,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v110</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v111</span></h1>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -85,7 +85,7 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
                 <!-- This Week (Fixed BG) -->
-                <div class="p-8 text-center bg-gray-100 dark:bg-[#111827] flex flex-col justify-center items-center border-r border-gray-200 dark:border-gray-800">
+                <div id="this-week-box" class="p-8 text-center bg-gray-100 dark:bg-gray-800 flex flex-col justify-center items-center border-r border-gray-200 dark:border-gray-800 transition-colors duration-200">
                     <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs">
                         <div class="text-center">
@@ -291,14 +291,24 @@
             // Weekly
             document.getElementById('week-billable').innerText = Math.round(stats.thisWeek.b);
             const wPct = stats.thisWeek.t_adj > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t_adj) * 100) : 0;
-            document.getElementById('week-pct').innerText = wPct + '%';
+            const wPctEl = document.getElementById('week-pct');
+            wPctEl.innerText = wPct + '%';
+            wPctEl.className = `text-4xl font-bold mb-1 opacity-60 ${wPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
 
             document.getElementById('last-billable').innerText = Math.round(stats.lastWeek.b);
             const lPct = stats.lastWeek.t_adj > 0 ? Math.round((stats.lastWeek.b / stats.lastWeek.t_adj) * 100) : 0;
-            document.getElementById('last-pct').innerText = lPct + '%';
+            const lPctEl = document.getElementById('last-pct');
+            lPctEl.innerText = lPct + '%';
+            lPctEl.className = `text-3xl font-bold mb-1 opacity-60 ${lPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
+
+            // Save/Load Goal
+            const goalInput = document.getElementById('goal-input');
+            const savedGoal = localStorage.getItem('pulse_goal');
+            if (savedGoal) goalInput.value = savedGoal;
 
             const updatePace = () => {
-                const goal = parseFloat(document.getElementById('goal-input').value) || 200;
+                const goal = parseFloat(goalInput.value) || 200;
+                localStorage.setItem('pulse_goal', goal); // Persist
                 const billable = stats.thisWeek.b || 0;
                 const pace = Math.round((billable / goal) * 100);
                 const el = document.getElementById('week-pace');
@@ -308,7 +318,7 @@
                 else el.style.color = "inherit";
             };
             updatePace();
-            document.getElementById('goal-input').addEventListener('input', updatePace);
+            goalInput.addEventListener('input', updatePace);
 
             const renderList = (id, listObj) => {
                 const el = document.getElementById(id);
