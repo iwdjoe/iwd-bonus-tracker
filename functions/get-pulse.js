@@ -54,7 +54,8 @@ exports.handler = async function(event, context) {
         ];
         
         const cleanEntries = entries.map(e => {
-            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return null;
+            // DO NOT FILTER INTERNAL PROJECTS
+            // We need them for the Total Hours denominator to match Teamwork's 37% calculation
             
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
@@ -62,13 +63,17 @@ exports.handler = async function(event, context) {
             // Special Flag for Isah Ramos (Robust Check: Contains Isah AND Ramos)
             const isExcludedUser = user.match(/Isah/i) && user.match(/Ramos/i);
 
+            // Is Internal Project? (IWD/Runners/Dominate)
+            const isInternal = e['project-name'].match(/IWD|Runners|Dominate/i);
+
             return {
                 u: user,
                 p: e['project-name'],
                 pid: e['project-name'].replace(/[^a-z0-9]/gi, ''),
                 d: e.date,
                 h: hours,
-                b: e['isbillable'] === '1',
+                // Billable Logic: Must be marked billable AND NOT internal (safety check)
+                b: e['isbillable'] === '1' && !isInternal,
                 x: !!isExcludedUser // Excluded flag
             };
         }).filter(Boolean);
