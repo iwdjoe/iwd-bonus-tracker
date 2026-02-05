@@ -59,7 +59,11 @@ exports.handler = async function(event, context) {
         const responseData = {
             users: userList,
             projects: projectList,
-            meta: { serverTime: new Date().toISOString(), cached: false }
+            meta: { 
+                serverTime: new Date().toISOString(), 
+                cached: false,
+                globalRate: 155 // Restore this field so frontend calc() doesn't crash
+            }
         };
 
         // Update Cache
