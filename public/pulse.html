@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (V91 Debug)</title>
+    <title>Weekly Pulse (V94 Client)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -33,7 +33,7 @@
 
     <!-- STATUS BAR -->
     <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Connecting to V91 API...
+        Connecting to V94 API...
     </div>
 
     <!-- DASHBOARD -->
@@ -43,7 +43,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold" id="title-text">Weekly Pulse <span class="text-xs font-normal opacity-50">v93 (Double Barrel)</span></h1>
+                    <h1 class="text-2xl font-bold" id="title-text">Weekly Pulse <span class="text-xs font-normal opacity-50">v94 (Client Calc)</span></h1>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -130,19 +130,14 @@
     </div>
 
     <script>
+        // CLIENT SIDE LOGIC (V94)
         const API_URL = '/.netlify/functions/get-stats?v=' + Date.now(); 
 
         let isDark = true; 
-
-        function toggleTheme() {
-            isDark = !isDark;
-            applyTheme();
-        }
-
+        function toggleTheme() { isDark = !isDark; applyTheme(); }
         function applyTheme() {
             const body = document.getElementById('body');
             const cards = document.querySelectorAll('.card');
-            
             if (isDark) {
                 body.className = "bg-black text-white min-h-screen p-4 md:p-8 transition-colors duration-200";
                 cards.forEach(c => c.className = c.className.replace('light-card', 'dark-card').replace('bg-white', '').replace('bg-gray-900', '') + ' dark-card');
@@ -155,7 +150,6 @@
                 document.querySelectorAll('.border-b').forEach(el => el.classList.remove('border-gray-800'));
             }
         }
-
         setTimeout(() => { isDark = true; applyTheme(); }, 100);
 
         window.addEventListener('DOMContentLoaded', init);
@@ -166,21 +160,14 @@
                 const res = await fetch(API_URL);
                 const data = await res.json();
                 
-                // Debug Output
-                const debugInfo = {
-                    entries: data.meta.debug.entriesProcessed,
-                    thisWeekStart: data.meta.debug.thisWeekStart,
-                    lastWeekStart: data.meta.debug.lastWeekStart,
-                    monthStart: data.meta.debug.monthStartStr,
-                    sample: data.meta.debug.sampleEntries
-                };
-                document.getElementById('debug-pre').innerText = JSON.stringify(debugInfo, null, 2);
+                status.innerText = "Processing " + data.meta.count + " entries...";
+                status.className = "fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50";
                 
-                status.innerText = "Loaded (" + debugInfo.entries + " entries)";
+                processData(data);
+                
+                status.innerText = "Loaded";
                 status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
-                setTimeout(() => status.classList.add('hidden'), 3000);
-                
-                render(data);
+                setTimeout(() => status.classList.add('hidden'), 2000);
             } catch (e) {
                 console.error(e);
                 status.innerText = "Error: " + e.message;
@@ -188,13 +175,88 @@
             }
         }
 
-        function render(data) {
-            const p = data.pulse;
-            const users = data.users || [];
-            const projects = data.projects || [];
+        function processData(data) {
+            const entries = data.entries || [];
+            const rates = data.rates || {};
+            const globalRate = data.globalRate || 155;
 
-            const totalRev = projects.reduce((s, x) => s + (x.hours * (x.rate || 155)), 0);
+            // 1. DATE BOUNDARIES (Client Side = Correct Timezone)
+            const now = new Date();
             
+            // This Week (Monday)
+            const d = new Date(now);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day == 0 ? -6 : 1);
+            const thisMon = new Date(d.setDate(diff));
+            thisMon.setHours(0,0,0,0);
+            
+            const lastMon = new Date(thisMon);
+            lastMon.setDate(lastMon.getDate() - 7);
+            
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            // Comparison Helper
+            const toInt = (d) => parseInt(d.toISOString().split('T')[0].replace(/-/g, ''));
+            const thisWeekInt = toInt(thisMon);
+            const lastWeekInt = toInt(lastMon);
+            const monthStartInt = toInt(monthStart);
+
+            // 2. AGGREGATE
+            let stats = {
+                month: { b: 0, t: 0, rev: 0 },
+                thisWeek: { b: 0, t: 0 },
+                lastWeek: { b: 0, t: 0 }
+            };
+            
+            let users = {};
+            let projects = {};
+
+            entries.forEach(e => {
+                const dateInt = parseInt(e.d.replace(/-/g, ''));
+                
+                // MONTHLY
+                if (dateInt >= monthStartInt) {
+                    stats.month.t += e.h;
+                    if (e.b) stats.month.b += e.h;
+                    
+                    // Calc Revenue
+                    const rate = rates[e.pid] || rates[e.p] || globalRate;
+                    stats.month.rev += e.h * rate;
+
+                    // Users (Billable Only)
+                    if (e.b) {
+                        if (!users[e.u]) users[e.u] = 0;
+                        users[e.u] += e.h;
+                    }
+                    
+                    // Projects (Total)
+                    if (!projects[e.p]) projects[e.p] = { hours: 0 };
+                    projects[e.p].hours += e.h;
+                }
+
+                // WEEKLY
+                if (dateInt >= thisWeekInt) {
+                    stats.thisWeek.t += e.h;
+                    if (e.b) stats.thisWeek.b += e.h;
+                } else if (dateInt >= lastWeekInt && dateInt < thisWeekInt) {
+                    stats.lastWeek.t += e.h;
+                    if (e.b) stats.lastWeek.b += e.h;
+                }
+            });
+
+            // 3. RENDER
+            render(stats, users, projects);
+            
+            // Debug Panel
+            document.getElementById('debug-pre').innerText = JSON.stringify({
+                thisWeekStart: thisMon.toISOString().split('T')[0],
+                entries: entries.length,
+                firstEntry: entries[0]
+            }, null, 2);
+        }
+
+        function render(stats, users, projects) {
+            // Monthly
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), 1);
             let daysPassed = 0;
@@ -205,23 +267,43 @@
             }
             if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
             const totalDays = 20; 
-            const projRev = (totalRev / daysPassed) * totalDays;
+            const projRev = (stats.month.rev / daysPassed) * totalDays;
 
-            document.getElementById('month-rev').innerText = '$' + Math.round(totalRev).toLocaleString();
+            document.getElementById('month-rev').innerText = '$' + Math.round(stats.month.rev).toLocaleString();
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
-            document.getElementById('month-total-main').innerText = Math.round(p.month.t) + 'h';
+            document.getElementById('month-total-main').innerText = Math.round(stats.month.t) + 'h';
 
-            document.getElementById('week-billable').innerText = Math.round(p.thisWeek.b);
-            const wPct = p.thisWeek.t > 0 ? Math.round((p.thisWeek.b / p.thisWeek.t) * 100) : 0;
+            // Weekly
+            document.getElementById('week-billable').innerText = Math.round(stats.thisWeek.b);
+            const wPct = stats.thisWeek.t > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t) * 100) : 0;
             document.getElementById('week-pct').innerText = wPct + '%';
 
-            document.getElementById('last-billable').innerText = Math.round(p.lastWeek.b);
-            const lPct = p.lastWeek.t > 0 ? Math.round((p.lastWeek.b / p.lastWeek.t) * 100) : 0;
+            document.getElementById('last-billable').innerText = Math.round(stats.lastWeek.b);
+            const lPct = stats.lastWeek.t > 0 ? Math.round((stats.lastWeek.b / stats.lastWeek.t) * 100) : 0;
             document.getElementById('last-pct').innerText = lPct + '%';
 
+            // Lists
+            const renderList = (id, listObj) => {
+                const el = document.getElementById(id);
+                el.innerHTML = '';
+                const sorted = Object.keys(listObj).map(k => ({ name: k, hours: listObj[k].hours || listObj[k] }));
+                sorted.sort((a,b) => b.hours - a.hours).slice(0,5).forEach((item, i) => {
+                    el.innerHTML += `
+                        <tr class="hover:bg-white hover:bg-opacity-10 border-b border-gray-200 dark:border-gray-800">
+                            <td class="px-6 py-3 w-10 text-xs font-mono opacity-50">0${i+1}</td>
+                            <td class="px-6 py-3 font-medium">${item.name}</td>
+                            <td class="px-6 py-3 text-right font-mono opacity-80">${Math.round(item.hours)}h</td>
+                        </tr>`;
+                });
+            };
+            
+            renderList('top-users', users);
+            renderList('top-clients', projects);
+            
+            // Pace
             const updatePace = () => {
                 const goal = parseFloat(document.getElementById('goal-input').value) || 200;
-                const billable = p.thisWeek.b || 0;
+                const billable = stats.thisWeek.b || 0;
                 const pace = Math.round((billable / goal) * 100);
                 const el = document.getElementById('week-pace');
                 el.innerText = `Pace: ${pace}%`;
@@ -231,22 +313,5 @@
             };
             updatePace();
             document.getElementById('goal-input').addEventListener('input', updatePace);
-
-            const renderList = (id, list) => {
-                const el = document.getElementById(id);
-                el.innerHTML = '';
-                list.sort((a,b) => (b.hours || 0) - (a.hours || 0)).slice(0,5).forEach((item, i) => {
-                    el.innerHTML += `
-                        <tr class="hover:bg-white hover:bg-opacity-10 border-b border-gray-200 dark:border-gray-800">
-                            <td class="px-6 py-3 w-10 text-xs font-mono opacity-50">0${i+1}</td>
-                            <td class="px-6 py-3 font-medium">${item.name}</td>
-                            <td class="px-6 py-3 text-right font-mono opacity-80">${Math.round(item.hours)}h</td>
-                        </tr>`;
-                });
-            };
-            renderList('top-users', users);
-            renderList('top-clients', projects);
         }
     </script>
-</body>
-</html>

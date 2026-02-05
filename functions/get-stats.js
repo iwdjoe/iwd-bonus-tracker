@@ -1,5 +1,5 @@
-// MAIN BACKEND (V93 - DOUBLE BARREL FETCH)
-// Fetches 1000 entries (Page 1 + Page 2) to overcome the chronological sort issue
+// MAIN BACKEND (V94 - PASSTHROUGH)
+// Send Raw Data to Client. Let the Browser handle the date math.
 
 let cache = { data: null, time: 0 };
 
@@ -17,36 +17,7 @@ exports.handler = async function(event, context) {
 
     try {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
-        const toInt = (dateStr) => parseInt(dateStr.replace(/-/g, ''), 10);
         const now = new Date();
-        
-        // DATE LOGIC
-        const dayOfWeek = now.getDay();
-        const daysFromMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
-        const thisMonday = new Date(now);
-        thisMonday.setDate(now.getDate() - daysFromMonday);
-        thisMonday.setHours(0, 0, 0, 0);
-        
-        const lastMonday = new Date(thisMonday);
-        lastMonday.setDate(thisMonday.getDate() - 7);
-        
-        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        monthStart.setHours(0, 0, 0, 0);
-        
-        const formatDate = (d) => {
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${y}-${m}-${day}`;
-        };
-        
-        const thisWeekStart = formatDate(thisMonday);
-        const lastWeekStart = formatDate(lastMonday);
-        const monthStartStr = formatDate(monthStart);
-        
-        const thisWeekInt = toInt(thisWeekStart);
-        const lastWeekInt = toInt(lastWeekStart);
-        const monthStartInt = toInt(monthStartStr);
         
         // FETCH RANGE: Last 45 Days
         const fetchStart = new Date(now);
@@ -54,10 +25,15 @@ exports.handler = async function(event, context) {
         const fetchEnd = new Date(now);
         fetchEnd.setDate(now.getDate() + 1);
         
-        const fetchStartStr = formatDate(fetchStart).replace(/-/g, '');
-        const fetchEndStr = formatDate(fetchEnd).replace(/-/g, '');
+        const formatDate = (d) => {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}${m}${day}`;
+        };
 
-        console.log(`[GET-STATS] Fetching ${fetchStartStr} → ${fetchEndStr}`);
+        const fetchStartStr = formatDate(fetchStart);
+        const fetchEndStr = formatDate(fetchEnd);
 
         // DOUBLE FETCH (Page 1 & 2)
         const [p1, p2, ratesRes] = await Promise.all([
@@ -72,86 +48,32 @@ exports.handler = async function(event, context) {
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
         // Combine entries
-        const entries = [
+        const rawEntries = [
             ...(d1['time-entries'] || []),
             ...(d2['time-entries'] || [])
         ];
         
-        console.log(`[GET-STATS] Found ${entries.length} entries (Merged P1+P2)`);
-        
-        let users = {};
-        let projects = {};
-        let stats = { 
-            thisWeek: { b: 0, t: 0 }, 
-            lastWeek: { b: 0, t: 0 },
-            month: { b: 0, t: 0 }
-        };
-
-        const sampleEntries = [];
-
-        entries.forEach((e, idx) => {
-            const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
-            const isBill = e['isbillable'] === '1';
-            const dateStr = e.date; 
-            const dateInt = toInt(dateStr);
-
-            // Debug first/last entries to see range
-            if (idx === 0 || idx === entries.length - 1) {
-                sampleEntries.push({ idx, date: dateStr });
-            }
-
-            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
-            
-            // MONTHLY
-            if (dateInt >= monthStartInt) {
-                const user = e['person-first-name'] + ' ' + e['person-last-name'];
-                const project = e['project-name'];
-                
-                if (isBill) {
-                    if (!users[user]) users[user] = 0;
-                    users[user] += hours;
-                }
-                
-                if (!projects[project]) projects[project] = { hours: 0 };
-                projects[project].hours += hours;
-
-                stats.month.t += hours;
-                if (isBill) stats.month.b += hours;
-            }
-
-            // WEEKLY
-            if (dateInt >= thisWeekInt) {
-                stats.thisWeek.t += hours;
-                if (isBill) stats.thisWeek.b += hours;
-            } else if (dateInt >= lastWeekInt && dateInt < thisWeekInt) {
-                stats.lastWeek.t += hours;
-                if (isBill) stats.lastWeek.b += hours;
-            }
-        });
-
-        const userList = Object.keys(users).map(name => ({ name, hours: users[name] }));
-        const projectList = Object.keys(projects).map(name => {
-            const id = name.replace(/[^a-z0-9]/gi, '');
-            const rate = savedRates[id] || savedRates[name] || GLOBAL_RATE;
-            return { id, name, hours: projects[name].hours, rate: parseInt(rate), def: 155 };
-        });
+        // MINIMAL PROCESSING
+        // We just extract what the frontend needs to do the math
+        const cleanEntries = rawEntries.map(e => {
+            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return null;
+            return {
+                u: e['person-first-name'] + ' ' + e['person-last-name'], // User
+                p: e['project-name'], // Project
+                pid: e['project-name'].replace(/[^a-z0-9]/gi, ''), // Project ID
+                d: e.date, // Date YYYY-MM-DD
+                h: parseFloat(e.hours) + (parseFloat(e.minutes) / 60), // Hours
+                b: e['isbillable'] === '1' // Billable
+            };
+        }).filter(Boolean);
 
         const responseData = {
-            users: userList,
-            projects: projectList,
+            entries: cleanEntries, // SEND RAW LIST
+            rates: savedRates,
+            globalRate: GLOBAL_RATE,
             meta: { 
-                serverTime: new Date().toISOString(), 
-                globalRate: GLOBAL_RATE, 
-                cached: false,
-                debug: {
-                    entriesProcessed: entries.length,
-                    rangeCovered: sampleEntries
-                }
-            },
-            pulse: {
-                thisWeek: { b: Math.round(stats.thisWeek.b), t: Math.round(stats.thisWeek.t) },
-                lastWeek: { b: Math.round(stats.lastWeek.b), t: Math.round(stats.lastWeek.t) },
-                month: { b: Math.round(stats.month.b), t: Math.round(stats.month.t) }
+                count: cleanEntries.length,
+                serverTime: new Date().toISOString()
             }
         };
         
