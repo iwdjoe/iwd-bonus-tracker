@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse | IWD Agency</title>
+    <title>Weekly Pulse v64</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -46,7 +46,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse</h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v64</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase" id="live-indicator">Ready</span>
                 </div>
             </div>
@@ -80,7 +80,44 @@
             </div>
         </div>
 
-        <!-- BOTTOM: LISTS (We hide Weekly Comp because we lack daily data in Main Endpoint) -->
+        <!-- MIDDLE ROW: WEEKLY COMPARISON (Restored) -->
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 mb-8 overflow-hidden">
+            <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 border-b border-gray-200 dark:border-gray-800 flex justify-between">
+                <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300">📅 Weekly Comparison</h3>
+                <span class="text-xs text-gray-500 font-mono" id="week-range"></span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-800">
+                <div class="p-8 text-center bg-blue-50/50 dark:bg-blue-900/10">
+                    <div class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full bg-white dark:bg-black border border-blue-100 dark:border-blue-900">This Week</div>
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-8 text-center">
+                    <div class="text-xs text-gray-400 font-bold uppercase mb-6 inline-block px-3 py-1">Last Week</div>
+                    <div class="grid grid-cols-2 gap-8 opacity-60">
+                        <div>
+                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-[10px] text-red-400 italic">(Partial Data: Feb Only)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM: LISTS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"><h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">🏆 Top Contributors</h3></div>
@@ -138,7 +175,14 @@
         function render(data) {
             const projects = data.projects || [];
             const users = data.users || [];
-            const meta = data.meta || {};
+            // Use the pre-calculated weekly data from V51 backend if available
+            const w = data.weekly || { 
+                thisWeek: { billable: 0, total: 0 }, 
+                lastWeek: { billable: 0, total: 0 },
+                ranges: { this: "Calculating...", last: "" }
+            };
+            
+            const num = (n) => Math.round(n);
             
             // Calculate Totals
             const totalHours = projects.reduce((s,p) => s + p.hours, 0);
@@ -153,7 +197,20 @@
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
             document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
             
-            // Lists
+            // --- Weekly Render ---
+            document.getElementById('week-range').innerText = w.ranges.this;
+            document.getElementById('week-billable').innerText = num(w.thisWeek.billable);
+            document.getElementById('week-total').innerText = num(w.thisWeek.total);
+            
+            document.getElementById('last-billable').innerText = num(w.lastWeek.billable);
+            document.getElementById('last-total').innerText = num(w.lastWeek.total);
+
+            renderPace(200, w.thisWeek.billable);
+
+            // Lists (Sorted by Billable Hours if available, else Total)
+            // Note: Main API only sends 'hours' (Total) for users currently. 
+            // To fix "Top Billable", we need the backend to send billable breakdown.
+            // For now, we sort by the hours we have.
             const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
