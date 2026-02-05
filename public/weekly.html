@@ -21,19 +21,19 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
         
-        /* CARD STYLES */
-        .card { @apply bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6; }
-        .stat-label { @apply text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1; }
-        .stat-value { @apply text-2xl font-bold text-gray-900 dark:text-white; }
+        .stat-card { @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-between h-full relative overflow-hidden; }
+        .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(147,51,234,0.05) 100%); }
+        .dark .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.1) 100%); }
         
-        /* PULSE HEART */
-        .heart-beat { animation: beat 1.5s infinite; display: inline-block; }
-        @keyframes beat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        /* Loading Spinner */
+        .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        .dark .spinner { border-color: rgba(255,255,255,0.1); border-left-color: #60a5fa; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 transition-colors duration-300">
 
-    <!-- LOGIN SCREEN (Reused Clean Logic) -->
+    <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 bg-gray-50 dark:bg-black flex flex-col items-center justify-center z-50">
         <img src="iwd-logo-new.png" class="w-24 h-auto mb-6">
         <h1 class="text-2xl font-bold mb-2">IWD Weekly Pulse</h1>
@@ -45,95 +45,107 @@
     <!-- DASHBOARD -->
     <div id="dashboard" class="max-w-6xl mx-auto hidden">
         
-        <!-- HEADER -->
-        <div class="flex justify-between items-center mb-8">
-            <div class="flex items-center gap-3">
-                <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                    Weekly Pulse <span class="heart-beat text-red-500">❤️</span>
-                </h1>
-                <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300 uppercase" id="live-indicator">Loading...</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="text-right mr-4 hidden md:block">
-                    <div class="text-[10px] text-gray-400 uppercase">Last Updated</div>
-                    <div class="text-xs font-mono" id="last-updated">--:--</div>
+        <!-- HEADER (Identical to Main Report) -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <div class="flex items-center gap-3">
+                    <img src="iwd-logo-new.png" class="w-8 h-8 object-contain" alt="IWD">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse</h1>
+                    <div id="loader" class="spinner ml-2"></div>
                 </div>
-                <button onclick="toggleTheme()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition">
+                <div class="flex items-center gap-2 mt-1 ml-1 text-xs text-gray-400">
+                    <span id="last-updated">Updating...</span>
+                    <button onclick="init()" class="hover:text-blue-500 transition" title="Refresh">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition" title="Toggle Theme">
                     <span class="dark:hidden">🌙</span><span class="hidden dark:inline">☀️</span>
                 </button>
-                <button onclick="netlifyIdentity.logout()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 text-red-500 hover:text-red-600 transition">
+                <button onclick="netlifyIdentity.logout()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-red-500 transition" title="Logout">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 </button>
             </div>
         </div>
 
-        <!-- TOP ROW: MONTHLY PROJECTIONS (Synced with Bonus Report) -->
+        <!-- TOP ROW: KEY METRICS -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 relative overflow-hidden">
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
-                <h3 class="stat-label">Projected Billable (Month)</h3>
-                <div class="stat-value text-green-600 dark:text-green-400" id="month-proj">$0</div>
-                <div class="text-xs text-gray-400 mt-1" id="month-tier">Current Tier: --</div>
-            </div>
-            <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800">
-                <h3 class="stat-label">Current Billable Revenue</h3>
-                <div class="stat-value" id="month-rev">$0</div>
-                <div class="text-xs text-gray-500 mt-1" id="month-hours">0 Hrs</div>
-            </div>
-            <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800">
-                <h3 class="stat-label">Weekly Goal (2026)</h3>
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-400 font-bold">🎯</span>
-                    <input type="number" id="goal-input" value="200" class="bg-transparent border-b border-gray-300 dark:border-gray-700 text-2xl font-bold w-20 focus:outline-none focus:border-blue-500" onchange="saveGoal(this.value)">
+            <!-- Monthly Projection -->
+            <div class="stat-card funky-bg border-blue-500/20">
+                <div>
+                    <h3 class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">Monthly Projection</h3>
+                    <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-proj">$0</div>
+                    <div class="text-xs text-gray-500 mt-1" id="month-rev">Current: $0</div>
                 </div>
-                <div class="text-xs text-gray-400 mt-1">Click to Edit (Auto-Saves)</div>
+                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <div class="text-xs text-gray-400 uppercase">Estimated Bonus Pool</div>
+                    <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="month-pool">$0</div>
+                </div>
+            </div>
+
+            <!-- Weekly Goal -->
+            <div class="stat-card border-purple-500/20">
+                <h3 class="text-[10px] font-bold text-purple-500 uppercase tracking-wider mb-1">Weekly Billable Goal</h3>
+                <div class="flex items-end gap-2">
+                    <input type="number" id="goal-input" value="200" class="bg-transparent text-4xl font-black text-gray-900 dark:text-white w-24 border-b border-gray-200 dark:border-gray-700 focus:outline-none focus:border-purple-500" onchange="saveGoal(this.value)">
+                    <span class="text-sm text-gray-400 mb-2">Hrs</span>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                    <span class="text-xs text-gray-400 uppercase">Pace</span>
+                    <span class="text-lg font-bold text-purple-600 dark:text-purple-400" id="week-pace">0%</span>
+                </div>
+            </div>
+
+            <!-- Efficiency -->
+            <div class="stat-card">
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Month Efficiency</h3>
+                <div class="text-4xl font-black text-gray-900 dark:text-white" id="month-pct">0%</div>
+                <div class="text-xs text-gray-500 mt-1" id="month-total">0 Total Hrs Logged</div>
+                
+                <div class="w-full bg-gray-100 dark:bg-gray-800 h-2 rounded-full mt-4 overflow-hidden">
+                    <div id="eff-bar" class="bg-green-500 h-full w-0 transition-all duration-1000"></div>
+                </div>
             </div>
         </div>
 
         <!-- MIDDLE ROW: WEEKLY COMPARISON -->
         <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 mb-8 overflow-hidden">
             <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 border-b border-gray-200 dark:border-gray-800 flex justify-between">
-                <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300">📅 Weekly Performance</h3>
-                <span class="text-xs text-gray-500 font-mono" id="week-range">Range: --</span>
+                <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300">📅 Weekly Comparison</h3>
+                <span class="text-xs text-gray-500 font-mono" id="week-range"></span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-800">
                 
                 <!-- THIS WEEK -->
-                <div class="p-8 text-center">
-                    <div class="text-xs text-blue-500 font-bold uppercase mb-6 bg-blue-50 dark:bg-blue-900/30 inline-block px-3 py-1 rounded-full">This Week</div>
+                <div class="p-8 text-center bg-blue-50/50 dark:bg-blue-900/10">
+                    <div class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full bg-white dark:bg-black border border-blue-100 dark:border-blue-900">This Week</div>
                     <div class="grid grid-cols-2 gap-8">
                         <div>
                             <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">0</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable Hrs</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
                         </div>
                         <div>
-                            <div class="text-4xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="week-total">0</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total Logged</div>
+                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">0</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
                         </div>
-                    </div>
-                    <div class="mt-6">
-                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="week-pct">0%</div>
-                        <div class="text-[10px] text-gray-400 uppercase font-bold">Efficiency</div>
                     </div>
                 </div>
 
                 <!-- LAST WEEK -->
-                <div class="p-8 text-center bg-gray-50/50 dark:bg-black/20">
+                <div class="p-8 text-center">
                     <div class="text-xs text-gray-400 font-bold uppercase mb-6 inline-block px-3 py-1">Last Week</div>
-                    <div class="grid grid-cols-2 gap-8 opacity-75">
+                    <div class="grid grid-cols-2 gap-8 opacity-60">
                         <div>
                             <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">0</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable Hrs</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
                         </div>
                         <div>
                             <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">0</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total Logged</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
                         </div>
-                    </div>
-                    <div class="mt-6 opacity-75">
-                        <div class="text-xl font-bold text-gray-500 dark:text-gray-400" id="last-pct">0%</div>
-                        <div class="text-[10px] text-gray-400 uppercase font-bold">Efficiency</div>
                     </div>
                 </div>
 
@@ -142,20 +154,18 @@
 
         <!-- BOTTOM ROW: TOP LISTS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- TOP CONTRIBUTORS -->
             <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300">🏆 Top Contributors (This Month)</h3>
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">🏆 Top Contributors (Month)</h3>
                 </div>
                 <table class="w-full text-sm">
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800" id="top-users"></tbody>
                 </table>
             </div>
 
-            <!-- TOP CLIENTS -->
             <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300">💼 Top Clients (This Month)</h3>
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">💼 Top Clients (Month)</h3>
                 </div>
                 <table class="w-full text-sm">
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800" id="top-clients"></tbody>
@@ -166,7 +176,6 @@
     </div>
 
     <script>
-        // AUTH GATE
         netlifyIdentity.on('init', user => {
             if (!user) document.getElementById('login-screen').classList.remove('hidden');
             else if (user.email.endsWith('@iwdagency.com')) {
@@ -178,30 +187,31 @@
         netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
         netlifyIdentity.init();
 
-        // LOGIC
         async function init() {
+            document.getElementById('loader').style.display = 'block';
             try {
                 const res = await fetch('/.netlify/functions/get-weekly-stats');
+                if(!res.ok) throw new Error("API Fail");
                 const data = await res.json();
                 
-                document.getElementById('live-indicator').innerText = 'LIVE';
-                document.getElementById('live-indicator').className = "text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase";
+                document.getElementById('loader').style.display = 'none';
                 const t = new Date();
                 document.getElementById('last-updated').innerText = t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
                 render(data);
             } catch (e) {
                 console.error("Error", e);
+                document.getElementById('last-updated').innerText = "Offline";
             }
         }
 
         async function saveGoal(val) {
-            // Save to shared DB
             try {
                 await fetch('/.netlify/functions/save-rate', {
                     method: 'POST',
                     body: JSON.stringify({ projectId: '__WEEKLY_GOAL__', rate: val })
                 });
+                renderPace(val, parseFloat(document.getElementById('week-billable').innerText));
             } catch(e) {}
         }
 
@@ -209,72 +219,79 @@
             const num = (n) => Math.round(n);
             const pct = (b, t) => t > 0 ? Math.round((b/t)*100) : 0;
             
-            // --- Monthly Projections (Simplified Logic) ---
-            const rate = 155; // Base Rate Estimate
+            // --- Monthly Logic ---
+            const rate = 155; 
             const rev = data.month.billable * rate;
             const now = new Date();
-            // Smart Days Logic
-            let daysPassed = getWorkDays(new Date(now.getFullYear(), now.getMonth(), 1), now);
+            const start = new Date(now.getFullYear(), now.getMonth(), 1);
+            let daysPassed = 0; 
+            let cur = new Date(start);
+            while(cur <= now) { if(cur.getDay()!==0 && cur.getDay()!==6) daysPassed++; cur.setDate(cur.getDate()+1); }
             if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
+            
             const totalDays = 20; 
             const projRev = (rev / daysPassed) * totalDays;
 
-            document.getElementById('month-rev').innerText = '$' + rev.toLocaleString();
-            document.getElementById('month-hours').innerText = num(data.month.billable) + ' Hrs';
+            document.getElementById('month-rev').innerText = 'Current: $' + Math.round(rev).toLocaleString();
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
+            document.getElementById('month-total').innerText = num(data.month.total) + ' Total Hrs Logged';
             
-            // Tier Logic
-            const tiers = [85000, 100000, 115000, 130000, 145000, 160000];
-            const nextTier = tiers.find(t => t > projRev) || 160000;
-            document.getElementById('month-tier').innerText = projRev >= 160000 ? "TOP TIER!" : `Next Goal: $${(nextTier/1000)}k`;
+            const efficiency = pct(data.month.billable, data.month.total);
+            document.getElementById('month-pct').innerText = efficiency + '%';
+            document.getElementById('eff-bar').style.width = efficiency + '%';
 
-            // --- Weekly Comparison ---
+            // Pool Logic
+            const getPool = (r) => {
+                if (r >= 160000) return 6000;
+                if (r >= 145000) return 5000;
+                if (r >= 130000) return 4000;
+                if (r >= 115000) return 3000;
+                if (r >= 100000) return 2000;
+                if (r >= 85000) return 1000;
+                return 0;
+            };
+            document.getElementById('month-pool').innerText = '$' + getPool(projRev).toLocaleString();
+
+            // --- Weekly ---
             document.getElementById('week-range').innerText = data.meta.thisWeekRange;
-            
             document.getElementById('week-billable').innerText = num(data.thisWeek.billable);
             document.getElementById('week-total').innerText = num(data.thisWeek.total);
-            document.getElementById('week-pct').innerText = pct(data.thisWeek.billable, data.thisWeek.total) + '%';
-
+            
             document.getElementById('last-billable').innerText = num(data.lastWeek.billable);
             document.getElementById('last-total').innerText = num(data.lastWeek.total);
-            document.getElementById('last-pct').innerText = pct(data.lastWeek.billable, data.lastWeek.total) + '%';
 
-            // --- Top Lists ---
-            const renderList = (id, list, icon) => {
+            // Goal Pace
+            renderPace(200, data.thisWeek.billable); // Default 200, should fetch from saved
+
+            // --- Lists ---
+            const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
                 list.forEach((item, i) => {
+                    const color = i === 0 ? 'text-yellow-500' : (i===1 ? 'text-gray-400' : (i===2 ? 'text-orange-400' : 'text-gray-300'));
+                    const icon = i < 3 ? '★' : '';
                     el.innerHTML += `
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                            <td class="px-6 py-3 w-10 text-gray-400 font-mono text-xs">#${i+1}</td>
+                            <td class="px-6 py-3 w-10 text-xs font-bold ${color}">${i+1} ${icon}</td>
                             <td class="px-6 py-3 font-medium text-gray-900 dark:text-white">${item.name}</td>
                             <td class="px-6 py-3 text-right font-bold text-gray-700 dark:text-gray-300">${num(item.hours)}h</td>
                         </tr>`;
                 });
             };
             
-            if(data.topUsers) renderList('top-users', data.topUsers);
-            if(data.topClients) renderList('top-clients', data.topClients);
+            if(data.month.topUsers) renderList('top-users', data.month.topUsers);
+            if(data.month.topClients) renderList('top-clients', data.month.topClients);
         }
 
-        function getWorkDays(start, end) {
-            let count = 0;
-            let cur = new Date(start);
-            while (cur <= end) {
-                const day = cur.getDay();
-                if (day !== 0 && day !== 6) count++;
-                cur.setDate(cur.getDate() + 1);
-            }
-            return count;
+        function renderPace(goal, current) {
+            const pace = Math.round((current / goal) * 100);
+            document.getElementById('week-pace').innerText = pace + '%';
         }
 
         function toggleTheme() { 
             document.documentElement.classList.toggle('dark'); 
             localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); 
         }
-        
-        // Load Saved Goal if exists (Optional fetch logic for V33)
-        // For now, it saves but defaults to 200 on load until we wire up the read.
     </script>
 </body>
 </html>
