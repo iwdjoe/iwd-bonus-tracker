@@ -1,7 +1,5 @@
-// MAIN BACKEND (V90 - THE CLEANER)
-// Single source of truth for both dashboards
-// FETCH STRATEGY: Last 45 days to guarantee data availability
-// FILTER LOGIC: Strict JavaScript filtering using YYYYMMDD integers
+// MAIN BACKEND (V93 - DOUBLE BARREL FETCH)
+// Fetches 1000 entries (Page 1 + Page 2) to overcome the chronological sort issue
 
 let cache = { data: null, time: 0 };
 
@@ -19,26 +17,19 @@ exports.handler = async function(event, context) {
 
     try {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
-        
-        // ========================================
-        // DATE LOGIC
-        // ========================================
         const toInt = (dateStr) => parseInt(dateStr.replace(/-/g, ''), 10);
-        
         const now = new Date();
         
-        // Monday of current week
+        // DATE LOGIC
         const dayOfWeek = now.getDay();
         const daysFromMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
         const thisMonday = new Date(now);
         thisMonday.setDate(now.getDate() - daysFromMonday);
         thisMonday.setHours(0, 0, 0, 0);
         
-        // Monday of last week
         const lastMonday = new Date(thisMonday);
         lastMonday.setDate(thisMonday.getDate() - 7);
         
-        // Start of current month
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         monthStart.setHours(0, 0, 0, 0);
         
@@ -57,9 +48,7 @@ exports.handler = async function(event, context) {
         const lastWeekInt = toInt(lastWeekStart);
         const monthStartInt = toInt(monthStartStr);
         
-        // ========================================
-        // FETCH RANGE: Last 45 Days → Tomorrow
-        // ========================================
+        // FETCH RANGE: Last 45 Days
         const fetchStart = new Date(now);
         fetchStart.setDate(now.getDate() - 45);
         const fetchEnd = new Date(now);
@@ -70,31 +59,26 @@ exports.handler = async function(event, context) {
 
         console.log(`[GET-STATS] Fetching ${fetchStartStr} → ${fetchEndStr}`);
 
-        // SORT: Date Descending (Newest First) to ensure we capture today's data within the 500 limit
-        const twRes = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { 
-            headers: { 'Authorization': AUTH } 
-        });
-        
-        if(!twRes.ok) throw new Error("Teamwork API " + twRes.status);
-        const twData = await twRes.json();
-        
-        // Fetch rates
-        const ratesRes = await fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { 
-            headers: { 
-                "Authorization": `token ${GH_TOKEN}`, 
-                "Accept": "application/vnd.github.v3.raw" 
-            } 
-        });
+        // DOUBLE FETCH (Page 1 & 2)
+        const [p1, p2, ratesRes] = await Promise.all([
+            fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}`, { headers: { 'Authorization': AUTH } }),
+            fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}`, { headers: { 'Authorization': AUTH } }),
+            fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
+        ]);
+
+        const d1 = p1.ok ? await p1.json() : {};
+        const d2 = p2.ok ? await p2.json() : {};
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
-        const entries = twData['time-entries'] || [];
+        // Combine entries
+        const entries = [
+            ...(d1['time-entries'] || []),
+            ...(d2['time-entries'] || [])
+        ];
         
-        console.log(`[GET-STATS] Found ${entries.length} entries`);
+        console.log(`[GET-STATS] Found ${entries.length} entries (Merged P1+P2)`);
         
-        // ========================================
-        // FILTER & AGGREGATE
-        // ========================================
         let users = {};
         let projects = {};
         let stats = { 
@@ -106,48 +90,28 @@ exports.handler = async function(event, context) {
         const sampleEntries = [];
 
         entries.forEach((e, idx) => {
-            const dateStr = e.date; // "YYYY-MM-DD"
-
-            // Debug: Capture first 5 RAW entries (Before Filtering)
-            if (idx < 5) {
-                sampleEntries.push({
-                    project: e['project-name'],
-                    date: dateStr,
-                    hours: e.hours,
-                    billable: e['isbillable']
-                });
-            }
-
-            // Skip internal projects
-            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
-            
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             const isBill = e['isbillable'] === '1';
-            const dateStr = e.date; // "YYYY-MM-DD"
+            const dateStr = e.date; 
             const dateInt = toInt(dateStr);
 
-            // Debug: Capture first 3 entries
-            if (idx < 3) {
-                sampleEntries.push({
-                    name: e['person-first-name'] + ' ' + e['person-last-name'],
-                    date: dateStr,
-                    hours: hours.toFixed(2),
-                    billable: isBill
-                });
+            // Debug first/last entries to see range
+            if (idx === 0 || idx === entries.length - 1) {
+                sampleEntries.push({ idx, date: dateStr });
             }
 
-            // MONTHLY STATS (for main dashboard)
+            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
+            
+            // MONTHLY
             if (dateInt >= monthStartInt) {
                 const user = e['person-first-name'] + ' ' + e['person-last-name'];
                 const project = e['project-name'];
                 
-                // Only billable hours count for user leaderboard
                 if (isBill) {
                     if (!users[user]) users[user] = 0;
                     users[user] += hours;
                 }
                 
-                // All hours count for project totals
                 if (!projects[project]) projects[project] = { hours: 0 };
                 projects[project].hours += hours;
 
@@ -155,7 +119,7 @@ exports.handler = async function(event, context) {
                 if (isBill) stats.month.b += hours;
             }
 
-            // WEEKLY STATS (for pulse)
+            // WEEKLY
             if (dateInt >= thisWeekInt) {
                 stats.thisWeek.t += hours;
                 if (isBill) stats.thisWeek.b += hours;
@@ -165,27 +129,11 @@ exports.handler = async function(event, context) {
             }
         });
 
-        console.log(`[GET-STATS] This Week: ${stats.thisWeek.b}h billable / ${stats.thisWeek.t}h total`);
-        console.log(`[GET-STATS] Last Week: ${stats.lastWeek.b}h billable / ${stats.lastWeek.t}h total`);
-
-        // ========================================
-        // BUILD RESPONSE
-        // ========================================
-        const userList = Object.keys(users).map(name => ({ 
-            name, 
-            hours: users[name] 
-        }));
-        
+        const userList = Object.keys(users).map(name => ({ name, hours: users[name] }));
         const projectList = Object.keys(projects).map(name => {
             const id = name.replace(/[^a-z0-9]/gi, '');
             const rate = savedRates[id] || savedRates[name] || GLOBAL_RATE;
-            return { 
-                id, 
-                name, 
-                hours: projects[name].hours, 
-                rate: parseInt(rate), 
-                def: 155 
-            };
+            return { id, name, hours: projects[name].hours, rate: parseInt(rate), def: 155 };
         });
 
         const responseData = {
@@ -196,49 +144,23 @@ exports.handler = async function(event, context) {
                 globalRate: GLOBAL_RATE, 
                 cached: false,
                 debug: {
-                    thisWeekStart,
-                    lastWeekStart,
-                    monthStartStr,
                     entriesProcessed: entries.length,
-                    sampleEntries: sampleEntries
+                    rangeCovered: sampleEntries
                 }
             },
             pulse: {
-                thisWeek: { 
-                    b: Math.round(stats.thisWeek.b * 10) / 10, 
-                    t: Math.round(stats.thisWeek.t * 10) / 10 
-                },
-                lastWeek: { 
-                    b: Math.round(stats.lastWeek.b * 10) / 10, 
-                    t: Math.round(stats.lastWeek.t * 10) / 10 
-                },
-                month: {
-                    b: Math.round(stats.month.b * 10) / 10,
-                    t: Math.round(stats.month.t * 10) / 10
-                }
+                thisWeek: { b: Math.round(stats.thisWeek.b), t: Math.round(stats.thisWeek.t) },
+                lastWeek: { b: Math.round(stats.lastWeek.b), t: Math.round(stats.lastWeek.t) },
+                month: { b: Math.round(stats.month.b), t: Math.round(stats.month.t) }
             }
         };
         
         cache.data = responseData;
         cache.time = Date.now();
 
-        return { 
-            statusCode: 200, 
-            body: JSON.stringify(responseData),
-            headers: { 
-                'Content-Type': 'application/json',
-                'Cache-Control': 'public, max-age=60'
-            }
-        };
+        return { statusCode: 200, body: JSON.stringify(responseData) };
 
     } catch (error) {
-        console.error('[GET-STATS] ERROR:', error);
-        return { 
-            statusCode: 500, 
-            body: JSON.stringify({ 
-                error: error.message,
-                stack: error.stack 
-            }) 
-        };
+        return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
 };
