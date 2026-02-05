@@ -19,14 +19,14 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
+        body { font-family: 'Inter', sans-serif; }
         
         .stat-card { @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-between h-full relative overflow-hidden; }
         .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(147,51,234,0.05) 100%); }
         .dark .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.1) 100%); }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 transition-colors duration-300">
+<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8">
 
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 bg-gray-50 dark:bg-black flex flex-col items-center justify-center z-50">
@@ -46,10 +46,10 @@
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain" alt="IWD">
                     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse</h1>
-                    <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300 uppercase" id="live-indicator">Loading...</span>
+                    <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300 uppercase" id="live-indicator">Ready</span>
                 </div>
                 <div class="flex items-center gap-2 mt-1 ml-1 text-xs text-gray-400">
-                    <span id="last-updated">Updating...</span>
+                    <span id="last-updated">Waiting...</span>
                     <button onclick="init()" class="hover:text-blue-500 transition" title="Refresh">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </button>
@@ -101,7 +101,7 @@
                 <div class="text-xs text-gray-500 mt-1" id="month-total">0 Total Hrs Logged</div>
                 
                 <div class="w-full bg-gray-100 dark:bg-gray-800 h-2 rounded-full mt-4 overflow-hidden">
-                    <div id="eff-bar" class="bg-green-500 h-full w-0 transition-all duration-1000"></div>
+                    <div id="eff-bar" class="bg-green-500 h-full w-0"></div>
                 </div>
             </div>
         </div>
@@ -184,7 +184,6 @@
 
         async function init() {
             try {
-                // Point to the MAIN endpoint which now includes .weekly data
                 const res = await fetch('/.netlify/functions/get-stats');
                 if(!res.ok) throw new Error("API " + res.status);
                 const data = await res.json();
@@ -194,7 +193,9 @@
                 const t = new Date();
                 document.getElementById('last-updated').innerText = t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-                render(data);
+                if (data.weekly) render(data);
+                else throw new Error("Missing Weekly Data");
+
             } catch (e) {
                 console.error("Error", e);
                 document.getElementById('last-updated').innerText = "ERROR";
@@ -214,10 +215,8 @@
         }
 
         function render(data) {
-            // Note: data structure is now merged. Access via data.weekly
             const w = data.weekly;
             const meta = data.meta;
-            
             const num = (n) => Math.round(n);
             const pct = (b, t) => t > 0 ? Math.round((b/t)*100) : 0;
             
@@ -266,7 +265,6 @@
             document.getElementById('last-billable').innerText = num(w.lastWeek.billable);
             document.getElementById('last-total').innerText = num(w.lastWeek.total);
 
-            // Goal Pace
             renderPace(200, w.thisWeek.billable); 
 
             // --- Lists ---
