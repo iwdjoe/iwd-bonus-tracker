@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse v75</title>
+    <title>Weekly Pulse v76</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -45,7 +45,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v75</span></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v76</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase" id="live-indicator">Ready</span>
                 </div>
             </div>
@@ -129,15 +129,19 @@
     </div>
     
     <!-- DEBUG BOX -->
-    <div id="debug-box" class="fixed bottom-0 left-0 right-0 bg-red-900 text-white p-2 text-xs font-mono hidden z-50"></div>
+    <div id="debug-box" class="fixed bottom-0 left-0 right-0 bg-red-900 text-white p-4 font-mono text-xs z-50 hidden"></div>
 
     <script>
+        // Force init regardless of auth state for debugging data flow
+        window.addEventListener('DOMContentLoaded', () => {
+            init();
+        });
+
         netlifyIdentity.on('init', user => {
             if (!user) document.getElementById('login-screen').classList.remove('hidden');
             else {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
-                init();
             }
         });
         netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
@@ -145,28 +149,30 @@
 
         async function init() {
             try {
-                // BYPASS: Use the known-good Main API
                 const res = await fetch('/.netlify/functions/get-stats'); 
-                if(!res.ok) throw new Error("API Status: " + res.status);
                 const data = await res.json();
                 
-                // Show DEBUG info if user list empty
-                if (!data.users || data.users.length === 0) {
-                    document.getElementById('debug-box').classList.remove('hidden');
-                    document.getElementById('debug-box').innerText = "DEBUG: API OK but User List Empty. Raw keys: " + Object.keys(data).join(", ");
+                // DEBUG: Check if projects exist
+                if (!data.projects || data.projects.length === 0) {
+                    showDebug("API returned 0 projects. Raw: " + JSON.stringify(data).substring(0, 100) + "...");
+                } else {
+                    render(data);
                 }
-
-                render(data);
             } catch (e) {
                 console.error("Error", e);
-                document.getElementById('month-proj').innerText = "OFFLINE";
-                document.getElementById('debug-box').classList.remove('hidden');
-                document.getElementById('debug-box').innerText = "CRITICAL ERROR: " + e.message;
+                showDebug("Fetch Error: " + e.message);
+                document.getElementById('month-proj').innerText = "ERR";
             }
+        }
+        
+        function showDebug(msg) {
+            const el = document.getElementById('debug-box');
+            el.innerText = msg;
+            el.classList.remove('hidden');
         }
 
         function render(data) {
-            console.log("Rendering V75 Data:", data);
+            console.log("Rendering V76 Data:", data);
             
             // 1. DATA SOURCES
             const projects = data.projects || [];
@@ -178,7 +184,6 @@
             
             projects.forEach(p => {
                 totalHours += (p.hours || 0);
-                // Use project specific rate if available, else 155
                 const r = (p.rate === undefined) ? 155 : p.rate;
                 rev += (p.hours || 0) * r;
             });
@@ -201,7 +206,7 @@
             document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
             document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
-            document.getElementById('month-pct').innerText = "100%"; // Main API is Billable-Only
+            document.getElementById('month-pct').innerText = "100%"; 
 
             // 5. WEEKLY ROW (Placeholder)
             document.getElementById('week-range').innerText = "Syncing...";
@@ -211,7 +216,6 @@
             const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
-                // Ensure we sort numbers correctly
                 list.sort((a,b) => (b.hours || 0) - (a.hours || 0)).slice(0,5).forEach((item, i) => {
                     el.innerHTML += `
                         <tr class="hover:bg-white/5">
