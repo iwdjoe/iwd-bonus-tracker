@@ -39,8 +39,8 @@
         </button>
     </div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboard" class="max-w-6xl mx-auto hidden">
+    <!-- DASHBOARD (Visible by default for debugging) -->
+    <div id="dashboard" class="max-w-6xl mx-auto">
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
@@ -94,16 +94,11 @@
     </div>
 
     <script>
-        netlifyIdentity.on('init', user => {
-            if (!user) document.getElementById('login-screen').classList.remove('hidden');
-            else {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
-                init();
-            }
-        });
-        netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
-        netlifyIdentity.init();
+        // BYPASS AUTH GATE FOR DEBUGGING
+        // netlifyIdentity.on('init', user => { ... });
+        
+        // Auto-Init
+        setTimeout(init, 500);
 
         async function init() {
             try {
