@@ -172,22 +172,59 @@
 
         async function init() {
             try {
-                // Fetch Main Endpoint (V51 Logic)
+                // Fetch Main Endpoint
                 const res = await fetch('/.netlify/functions/get-stats');
                 const data = await res.json();
                 
+                // STOP SPINNER
                 document.getElementById('live-indicator').innerText = 'LIVE';
                 document.getElementById('live-indicator').className = "text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase";
                 const t = new Date();
                 document.getElementById('last-updated').innerText = t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-                if (data.weekly) render(data);
-                else throw new Error("Missing Weekly Data");
+                if (data.weekly && data.weekly.month) {
+                    render(data);
+                } else {
+                    console.warn("Weekly Object Missing - Using Fallback");
+                    renderFallback(data);
+                }
 
             } catch (e) {
                 console.error("Error", e);
-                document.getElementById('month-proj').innerText = "ERROR";
+                document.getElementById('month-proj').innerText = "ERR";
             }
+        }
+
+        // FALLBACK: Calculate Month Totals from Main Project List if Weekly Object Fails
+        function renderFallback(data) {
+            const projects = data.projects || [];
+            const users = data.users || [];
+            
+            // Calc Totals
+            const totalHrs = projects.reduce((s,p)=>s+p.hours, 0);
+            const rate = 155;
+            const rev = totalHrs * rate;
+            
+            // Render Top Row
+            document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
+            document.getElementById('month-total').innerText = Math.round(totalHrs) + ' Hrs (Month)';
+            document.getElementById('month-proj').innerText = 'Syncing...'; // Placeholder
+            
+            // Render Lists from Main Data
+            const renderList = (id, list) => {
+                const el = document.getElementById(id);
+                el.innerHTML = '';
+                list.sort((a,b)=>b.hours-a.hours).slice(0,5).forEach((item, i) => {
+                    el.innerHTML += `
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                            <td class="px-6 py-3 w-10 text-xs font-bold text-gray-400">${i+1}</td>
+                            <td class="px-6 py-3 font-medium text-gray-900 dark:text-white">${item.name}</td>
+                            <td class="px-6 py-3 text-right font-bold text-gray-700 dark:text-gray-300">${Math.round(item.hours)}h</td>
+                        </tr>`;
+                });
+            };
+            renderList('top-users', users);
+            renderList('top-clients', projects);
         }
 
         async function saveGoal(val) {
