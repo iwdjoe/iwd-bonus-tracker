@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse v52 (Restored)</title>
+    <title>Weekly Pulse v54 (Client-Side)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -19,9 +19,9 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
+        body { font-family: 'Inter', sans-serif; }
         
-        /* NO ANIMATIONS */
+        /* NUCLEAR ANIMATION KILLER */
         *, ::before, ::after { animation: none !important; transition: none !important; }
         
         .stat-card { @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-between h-full relative overflow-hidden; }
@@ -48,14 +48,8 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v52</span></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v54</span></h1>
                     <span class="text-[10px] font-bold bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full dark:bg-gray-800 dark:text-gray-300 uppercase" id="live-indicator">Ready</span>
-                </div>
-                <div class="flex items-center gap-2 mt-1 ml-1 text-xs text-gray-400">
-                    <span id="last-updated">Waiting...</span>
-                    <button onclick="init()" class="hover:text-blue-500" title="Refresh">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                    </button>
                 </div>
             </div>
             
@@ -72,36 +66,22 @@
         <!-- TOP ROW -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="stat-card funky-bg border-blue-500/20">
-                <div>
-                    <h3 class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">Monthly Projection</h3>
-                    <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-proj">--</div>
-                    <div class="text-xs text-gray-500 mt-1" id="month-rev">Current: --</div>
-                </div>
-                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-                    <div class="text-xs text-gray-400 uppercase">Estimated Bonus Pool</div>
-                    <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="month-pool">--</div>
-                </div>
+                <h3 class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">Monthly Projection</h3>
+                <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-proj">--</div>
+                <div class="text-xs text-gray-500 mt-1" id="month-rev">Current: --</div>
             </div>
-
             <div class="stat-card border-purple-500/20">
                 <h3 class="text-[10px] font-bold text-purple-500 uppercase tracking-wider mb-1">Weekly Goal</h3>
-                <div class="flex items-end gap-2">
-                    <input type="number" id="goal-input" value="200" class="bg-transparent text-4xl font-black text-gray-900 dark:text-white w-24 border-b border-gray-200 dark:border-gray-700 focus:outline-none focus:border-purple-500" onchange="saveGoal(this.value)">
-                    <span class="text-sm text-gray-400 mb-2">Hrs</span>
-                </div>
+                <input type="number" id="goal-input" value="200" class="bg-transparent text-4xl font-black text-gray-900 dark:text-white w-24 border-b border-gray-200 dark:border-gray-700 focus:outline-none focus:border-purple-500" onchange="renderPace(this.value)">
                 <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
                     <span class="text-xs text-gray-400 uppercase">Pace</span>
                     <span class="text-lg font-bold text-purple-600 dark:text-purple-400" id="week-pace">--%</span>
                 </div>
             </div>
-
             <div class="stat-card">
                 <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Month Efficiency</h3>
-                <div class="text-4xl font-black text-gray-900 dark:text-white" id="month-pct">--%</div>
+                <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-pct">--%</div>
                 <div class="text-xs text-gray-500 mt-1" id="month-total">-- Total Hrs Logged</div>
-                <div class="w-full bg-gray-100 dark:bg-gray-800 h-2 rounded-full mt-4 overflow-hidden">
-                    <div id="eff-bar" class="bg-green-500 h-full w-0"></div>
-                </div>
             </div>
         </div>
 
@@ -115,27 +95,15 @@
                 <div class="p-8 text-center bg-blue-50/50 dark:bg-blue-900/10">
                     <div class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full bg-white dark:bg-black border border-blue-100 dark:border-blue-900">This Week</div>
                     <div class="grid grid-cols-2 gap-8">
-                        <div>
-                            <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
-                        </div>
-                        <div>
-                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
-                        </div>
+                        <div><div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">--</div><div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div></div>
+                        <div><div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">--</div><div class="text-[10px] text-gray-400 uppercase font-bold">Total</div></div>
                     </div>
                 </div>
                 <div class="p-8 text-center">
                     <div class="text-xs text-gray-400 font-bold uppercase mb-6 inline-block px-3 py-1">Last Week</div>
                     <div class="grid grid-cols-2 gap-8 opacity-60">
-                        <div>
-                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
-                        </div>
-                        <div>
-                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
-                        </div>
+                        <div><div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">--</div><div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div></div>
+                        <div><div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">--</div><div class="text-[10px] text-gray-400 uppercase font-bold">Total</div></div>
                     </div>
                 </div>
             </div>
@@ -144,15 +112,11 @@
         <!-- BOTTOM ROW -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">🏆 Top Contributors (Month)</h3>
-                </div>
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"><h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">🏆 Top Contributors</h3></div>
                 <table class="w-full text-sm"><tbody class="divide-y divide-gray-100 dark:divide-gray-800" id="top-users"></tbody></table>
             </div>
             <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">💼 Top Clients (Month)</h3>
-                </div>
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"><h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">💼 Top Clients</h3></div>
                 <table class="w-full text-sm"><tbody class="divide-y divide-gray-100 dark:divide-gray-800" id="top-clients"></tbody></table>
             </div>
         </div>
@@ -172,135 +136,94 @@
 
         async function init() {
             try {
-                // Fetch Main Endpoint
-                const res = await fetch('/.netlify/functions/get-stats');
+                // NEW LIGHT ENDPOINT
+                const res = await fetch('/.netlify/functions/get-daily-stats');
                 const data = await res.json();
                 
-                // STOP SPINNER
                 document.getElementById('live-indicator').innerText = 'LIVE';
                 document.getElementById('live-indicator').className = "text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase";
-                const t = new Date();
-                document.getElementById('last-updated').innerText = t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-                if (data.weekly && data.weekly.month) {
-                    render(data);
-                } else {
-                    console.warn("Weekly Object Missing - Using Fallback");
-                    renderFallback(data);
-                }
-
+                
+                processData(data);
             } catch (e) {
-                console.error("Error", e);
-                document.getElementById('month-proj').innerText = "ERR";
+                console.error(e);
+                document.getElementById('month-proj').innerText = "OFFLINE";
             }
         }
 
-        // FALLBACK: Calculate Month Totals from Main Project List if Weekly Object Fails
-        function renderFallback(data) {
-            const projects = data.projects || [];
-            const users = data.users || [];
+        function processData(data) {
+            // Client-Side Calculation
+            const timeline = data.timeline || [];
             
-            // Calc Totals
-            const totalHrs = projects.reduce((s,p)=>s+p.hours, 0);
-            const rate = 155;
-            const rev = totalHrs * rate;
+            // Dates
+            const now = new Date();
+            const startMonthStr = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
             
-            // Render Top Row
-            document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
-            document.getElementById('month-total').innerText = Math.round(totalHrs) + ' Hrs (Month)';
-            document.getElementById('month-proj').innerText = 'Syncing...'; // Placeholder
+            const weekStart = new Date(now);
+            weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7)); // Mon
+            const thisWeekStr = weekStart.toISOString().split('T')[0];
             
-            // Render Lists from Main Data
-            const renderList = (id, list) => {
-                const el = document.getElementById(id);
-                el.innerHTML = '';
-                list.sort((a,b)=>b.hours-a.hours).slice(0,5).forEach((item, i) => {
-                    el.innerHTML += `
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                            <td class="px-6 py-3 w-10 text-xs font-bold text-gray-400">${i+1}</td>
-                            <td class="px-6 py-3 font-medium text-gray-900 dark:text-white">${item.name}</td>
-                            <td class="px-6 py-3 text-right font-bold text-gray-700 dark:text-gray-300">${Math.round(item.hours)}h</td>
-                        </tr>`;
-                });
-            };
-            renderList('top-users', users);
-            renderList('top-clients', projects);
-        }
+            const lastWeekStart = new Date(weekStart);
+            lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+            const lastWeekEnd = new Date(lastWeekStart);
+            lastWeekEnd.setDate(lastWeekEnd.getDate() + 6);
+            
+            const lastWeekStartStr = lastWeekStart.toISOString().split('T')[0];
+            const lastWeekEndStr = lastWeekEnd.toISOString().split('T')[0];
 
-        async function saveGoal(val) {
-            try {
-                await fetch('/.netlify/functions/save-rate', {
-                    method: 'POST',
-                    body: JSON.stringify({ projectId: '__WEEKLY_GOAL__', rate: val })
-                });
-                renderPace(val, parseFloat(document.getElementById('week-billable').innerText));
-            } catch(e) {}
-        }
+            let m = { b: 0, t: 0 };
+            let w = { b: 0, t: 0 };
+            let l = { b: 0, t: 0 };
 
-        function render(data) {
-            const w = data.weekly;
-            const meta = data.meta;
+            timeline.forEach(d => {
+                const date = d.date;
+                // Month
+                if (date >= startMonthStr) { m.b += d.billable; m.t += d.total; }
+                // This Week
+                if (date >= thisWeekStr) { w.b += d.billable; w.t += d.total; }
+                // Last Week
+                if (date >= lastWeekStartStr && date <= lastWeekEndStr) { l.b += d.billable; l.t += d.total; }
+            });
+
+            // Render
             const num = (n) => Math.round(n);
             const pct = (b, t) => t > 0 ? Math.round((b/t)*100) : 0;
+
+            // Month
+            document.getElementById('month-total').innerText = num(m.t) + ' Total Hrs';
+            document.getElementById('month-pct').innerText = pct(m.b, m.t) + '%';
             
-            // --- Monthly Logic ---
             const rate = 155; 
-            const rev = w.month.billable * rate;
-            const now = new Date();
-            const start = new Date(now.getFullYear(), now.getMonth(), 1);
-            let daysPassed = 0;
-            let cur = new Date(start);
-            while(cur <= now) { if(cur.getDay()!==0 && cur.getDay()!==6) daysPassed++; cur.setDate(cur.getDate()+1); }
-            if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
-            const totalDays = 20; 
-            const projRev = (rev / daysPassed) * totalDays;
-
-            document.getElementById('month-rev').innerText = 'Current: $' + Math.round(rev).toLocaleString();
+            const rev = m.b * rate;
+            const daysPassed = Math.max(new Date().getDate() - 1, 1);
+            const projRev = (rev / daysPassed) * 20; // Approx 20 days
+            document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
-            document.getElementById('month-total').innerText = num(w.month.total) + ' Total Hrs Logged';
+
+            // Week
+            document.getElementById('week-range').innerText = `${thisWeekStr} - Now`;
+            document.getElementById('week-billable').innerText = num(w.b);
+            document.getElementById('week-total').innerText = num(w.t);
             
-            const efficiency = pct(w.month.billable, w.month.total);
-            document.getElementById('month-pct').innerText = efficiency + '%';
-            document.getElementById('eff-bar').style.width = efficiency + '%';
+            document.getElementById('last-billable').innerText = num(l.b);
+            document.getElementById('last-total').innerText = num(l.t);
 
-            const getPool = (r) => {
-                if (r >= 160000) return 6000;
-                if (r >= 145000) return 5000;
-                if (r >= 130000) return 4000;
-                if (r >= 115000) return 3000;
-                if (r >= 100000) return 2000;
-                if (r >= 85000) return 1000;
-                return 0;
-            };
-            document.getElementById('month-pool').innerText = '$' + getPool(projRev).toLocaleString();
+            renderPace(200, w.b);
 
-            // --- Weekly ---
-            document.getElementById('week-range').innerText = w.ranges.this;
-            document.getElementById('week-billable').innerText = num(w.thisWeek.billable);
-            document.getElementById('week-total').innerText = num(w.thisWeek.total);
-            document.getElementById('last-billable').innerText = num(w.lastWeek.billable);
-            document.getElementById('last-total').innerText = num(w.lastWeek.total);
-
-            renderPace(meta.globalGoal || 200, w.thisWeek.billable); 
-
-            // --- Lists ---
+            // Lists
             const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
                 list.forEach((item, i) => {
-                    const color = i === 0 ? 'text-yellow-500' : (i===1 ? 'text-gray-400' : (i===2 ? 'text-orange-400' : 'text-gray-300'));
-                    const icon = i < 3 ? '★' : '';
                     el.innerHTML += `
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                            <td class="px-6 py-3 w-10 text-xs font-bold ${color}">${i+1} ${icon}</td>
+                            <td class="px-6 py-3 w-10 text-xs font-bold text-gray-400">${i+1}</td>
                             <td class="px-6 py-3 font-medium text-gray-900 dark:text-white">${item.name}</td>
                             <td class="px-6 py-3 text-right font-bold text-gray-700 dark:text-gray-300">${num(item.hours)}h</td>
                         </tr>`;
                 });
             };
-            
-            if(w.month.topUsers) renderList('top-users', w.month.topUsers);
-            if(w.month.topClients) renderList('top-clients', w.month.topClients);
+            if(data.topUsers) renderList('top-users', data.topUsers);
+            if(data.topClients) renderList('top-clients', data.topClients);
         }
 
         function renderPace(goal, current) {
