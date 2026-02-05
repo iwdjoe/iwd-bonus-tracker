@@ -48,7 +48,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v57</span></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v58</span></h1>
                     <span class="text-[10px] font-bold bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full dark:bg-gray-800 dark:text-gray-300 uppercase" id="live-indicator">Ready</span>
                 </div>
             </div>
@@ -151,37 +151,36 @@
         }
 
         function processData(data) {
+            console.log("Received Data:", data); // Debug
+            
             // Client-Side Calculation
             const timeline = data.timeline || [];
             
-            // Dates
-            const now = new Date();
-            const startMonthStr = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-            
-            const weekStart = new Date(now);
-            weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7)); // Mon
-            const thisWeekStr = weekStart.toISOString().split('T')[0];
-            
-            const lastWeekStart = new Date(weekStart);
-            lastWeekStart.setDate(lastWeekStart.getDate() - 7);
-            const lastWeekEnd = new Date(lastWeekStart);
-            lastWeekEnd.setDate(lastWeekEnd.getDate() + 6);
-            
-            const lastWeekStartStr = lastWeekStart.toISOString().split('T')[0];
-            const lastWeekEndStr = lastWeekEnd.toISOString().split('T')[0];
-
             let m = { b: 0, t: 0 };
             let w = { b: 0, t: 0 };
             let l = { b: 0, t: 0 };
 
+            // Dates for comparison
+            const now = new Date();
+            const weekStart = new Date(now);
+            weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
+            const thisWeekStr = weekStart.toISOString().split('T')[0];
+
             timeline.forEach(d => {
-                const date = d.date;
-                // Month
-                if (date >= startMonthStr) { m.b += d.billable; m.t += d.total; }
-                // This Week
-                if (date >= thisWeekStr) { w.b += d.billable; w.t += d.total; }
-                // Last Week
-                if (date >= lastWeekStartStr && date <= lastWeekEndStr) { l.b += d.billable; l.t += d.total; }
+                // BRUTE FORCE: If backend sent it, count it as "Month/Current" for now
+                // This proves data exists.
+                m.b += d.billable; 
+                m.t += d.total;
+
+                // Simple Week Check
+                if (d.date >= thisWeekStr) { 
+                    w.b += d.billable; 
+                    w.t += d.total; 
+                } else {
+                    // Assume anything else is "Last Week" for this test
+                    l.b += d.billable; 
+                    l.t += d.total; 
+                }
             });
 
             // Render
