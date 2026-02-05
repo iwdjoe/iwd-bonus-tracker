@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse v73</title>
+    <title>Weekly Pulse v75</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -45,7 +45,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v73</span></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v75</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase" id="live-indicator">Ready</span>
                 </div>
             </div>
@@ -127,6 +127,9 @@
             </div>
         </div>
     </div>
+    
+    <!-- DEBUG BOX -->
+    <div id="debug-box" class="fixed bottom-0 left-0 right-0 bg-red-900 text-white p-2 text-xs font-mono hidden z-50"></div>
 
     <script>
         netlifyIdentity.on('init', user => {
@@ -142,60 +145,83 @@
 
         async function init() {
             try {
+                // BYPASS: Use the known-good Main API
                 const res = await fetch('/.netlify/functions/get-stats'); 
                 if(!res.ok) throw new Error("API Status: " + res.status);
                 const data = await res.json();
+                
+                // Show DEBUG info if user list empty
+                if (!data.users || data.users.length === 0) {
+                    document.getElementById('debug-box').classList.remove('hidden');
+                    document.getElementById('debug-box').innerText = "DEBUG: API OK but User List Empty. Raw keys: " + Object.keys(data).join(", ");
+                }
+
                 render(data);
             } catch (e) {
                 console.error("Error", e);
                 document.getElementById('month-proj').innerText = "OFFLINE";
+                document.getElementById('debug-box').classList.remove('hidden');
+                document.getElementById('debug-box').innerText = "CRITICAL ERROR: " + e.message;
             }
         }
 
         function render(data) {
-            // FIX: Access the data where it actually is (root), not nested
+            console.log("Rendering V75 Data:", data);
+            
+            // 1. DATA SOURCES
             const projects = data.projects || [];
             const users = data.users || [];
-            const weekly = data.weekly || {};
             
-            // --- Monthly Totals (Recalculated) ---
-            const totalHours = projects.reduce((s,p) => s + p.hours, 0);
-            const rate = 155; 
-            const rev = projects.reduce((s,p) => s + (p.hours * (p.rate || 155)), 0);
-            const daysPassed = Math.max(new Date().getDate() - 1, 1); 
-            const projRev = (rev / daysPassed) * 20;
+            // 2. CALCULATE MONTHLY TOTALS (Client-Side Logic from Main Dashboard)
+            let totalHours = 0;
+            let rev = 0;
+            
+            projects.forEach(p => {
+                totalHours += (p.hours || 0);
+                // Use project specific rate if available, else 155
+                const r = (p.rate === undefined) ? 155 : p.rate;
+                rev += (p.hours || 0) * r;
+            });
 
+            // 3. PROJECTIONS
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth(), 1);
+            let daysPassed = 0;
+            let cur = new Date(start);
+            while(cur <= now) {
+                if(cur.getDay()!==0 && cur.getDay()!==6) daysPassed++;
+                cur.setDate(cur.getDate()+1);
+            }
+            if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
+            
+            const totalDays = 20; 
+            const projRev = (rev / daysPassed) * totalDays;
+
+            // 4. UPDATE DOM (Monthly)
             document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
             document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
+            document.getElementById('month-pct').innerText = "100%"; // Main API is Billable-Only
+
+            // 5. WEEKLY ROW (Placeholder)
+            document.getElementById('week-range').innerText = "Syncing...";
+            document.getElementById('week-billable').innerText = "--";
             
-            // --- Weekly Data (From Object) ---
-            // Ensure we handle undefined gracefully
-            const w = weekly.thisWeek || { billable: 0, total: 0 };
-            const l = weekly.lastWeek || { billable: 0, total: 0 };
-            const r = weekly.ranges || { this: "--", last: "" };
-
-            document.getElementById('week-range').innerText = r.this;
-            document.getElementById('week-billable').innerText = Math.round(w.billable);
-            document.getElementById('week-total').innerText = Math.round(w.total);
-            document.getElementById('last-billable').innerText = Math.round(l.billable);
-            document.getElementById('last-total').innerText = Math.round(l.total);
-
-            // --- Lists ---
-            // Use the ROOT LISTS because they are populated
+            // 6. LISTS
             const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
-                list.sort((a,b)=>b.hours-a.hours).slice(0,5).forEach((item, i) => {
+                // Ensure we sort numbers correctly
+                list.sort((a,b) => (b.hours || 0) - (a.hours || 0)).slice(0,5).forEach((item, i) => {
                     el.innerHTML += `
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                        <tr class="hover:bg-white/5">
                             <td class="px-6 py-3 w-10 text-xs font-mono text-gray-500">0${i+1}</td>
-                            <td class="px-6 py-3 font-medium text-gray-900 dark:text-white">${item.name}</td>
-                            <td class="px-6 py-3 text-right font-mono text-gray-700 dark:text-gray-300">${Math.round(item.hours)}h</td>
+                            <td class="px-6 py-3 font-medium text-white">${item.name}</td>
+                            <td class="px-6 py-3 text-right font-mono text-gray-300">${Math.round(item.hours)}h</td>
                         </tr>`;
                 });
             };
-            // FIX: Pass the correct root arrays
+            
             renderList('top-users', users);
             renderList('top-clients', projects);
         }
