@@ -1,8 +1,7 @@
-// LIGHTWEIGHT DAILY FEED (Fast & Cacheable)
+// LIGHTWEIGHT DAILY FEED (Fixed V56)
 let cache = { data: null, time: 0 };
 
 exports.handler = async function(event, context) {
-    // 1 minute cache
     if (cache.data && (Date.now() - cache.time < 60000)) {
         return { statusCode: 200, body: JSON.stringify(cache.data) };
     }
@@ -14,40 +13,40 @@ exports.handler = async function(event, context) {
     try {
         const now = new Date();
         const startFetch = new Date(now);
-        startFetch.setDate(now.getDate() - 40); // Last 40 Days
+        startFetch.setDate(now.getDate() - 45); // Go back 45 days
         const fmt = (d) => d.toISOString().split('T')[0].replace(/-/g, '');
 
+        // Fetch wide range
         const url = `https://iwdagency.teamwork.com/time_entries.json?page=1&pageSize=1000&fromDate=${fmt(startFetch)}&toDate=${fmt(now)}`;
         const res = await fetch(url, { headers: { 'Authorization': AUTH } });
         const data = await res.json();
         
-        // AGGREGATE BY DATE
-        let days = {};
+        let timeline = [];
         let users = {};
         let clients = {};
+        
+        const entries = data['time-entries'] || [];
+        const debugFirst = entries.length > 0 ? entries[0].date : "Empty";
 
-        (data['time-entries'] || []).forEach(e => {
+        entries.forEach(e => {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
             
-            const date = e.date; // YYYY-MM-DD
-            const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
-            const isBillable = e['isbillable'] === '1';
-
-            if (!days[date]) days[date] = { date, total: 0, billable: 0 };
+            // Normalize Date
+            let d = e.date;
+            // Handle YYYYMMDD -> YYYY-MM-DD conversion if needed
+            if (d.length === 8 && !d.includes('-')) d = `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
             
-            days[date].total += hours;
-            if (isBillable) {
-                days[date].billable += hours;
-                
-                // Track Top Lists (Month Only)
-                // Check if date is in current month
-                const isCurrentMonth = date.startsWith(now.toISOString().slice(0, 7));
-                if (isCurrentMonth) {
-                    const u = e['person-first-name'] + ' ' + e['person-last-name'];
-                    users[u] = (users[u] || 0) + hours;
-                    const c = e['project-name'];
-                    clients[c] = (clients[c] || 0) + hours;
-                }
+            const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
+            const isBill = e['isbillable'] === '1';
+
+            timeline.push({ date: d, hours, billable: isBill ? hours : 0 });
+
+            // Top Lists (Rough Approx for last 45 days)
+            if (isBill) {
+                const u = e['person-first-name'] + ' ' + e['person-last-name'];
+                users[u] = (users[u] || 0) + hours;
+                const c = e['project-name'];
+                clients[c] = (clients[c] || 0) + hours;
             }
         });
 
@@ -55,10 +54,12 @@ exports.handler = async function(event, context) {
         const topUsers = Object.entries(users).sort(([,a], [,b]) => b - a).slice(0, 5).map(([n, h]) => ({ name: n, hours: h }));
         const topClients = Object.entries(clients).sort(([,a], [,b]) => b - a).slice(0, 5).map(([n, h]) => ({ name: n, hours: h }));
 
-        // Convert Days to Sorted Array
-        const timeline = Object.values(days).sort((a,b) => a.date.localeCompare(b.date));
-
-        const response = { timeline, topUsers, topClients, meta: { serverTime: new Date().toISOString() } };
+        const response = { 
+            timeline, 
+            topUsers, 
+            topClients, 
+            meta: { serverTime: new Date().toISOString(), firstDate: debugFirst } 
+        };
         
         cache.data = response;
         cache.time = Date.now();
