@@ -27,34 +27,48 @@ exports.handler = async function(event, context) {
     // 4. Year to Date (For Avg)
     const startYear = new Date(now.getFullYear(), 0, 1);
 
-    // Format YYYYMMDD
-    const fmt = (d) => d.toISOString().split('T')[0].replace(/-/g, '');
-
-    // Helper: Fetch & Aggregate
+    // Helper: Fetch & Aggregate with TOP LISTS
     async function getStats(start, end) {
-        const url = `https://${DOMAIN}/time_entries.json?page=1&pageSize=1000&fromDate=${fmt(start)}&toDate=${fmt(end)}`;
-        try {
-            const res = await fetch(url, { headers: { 'Authorization': AUTH } });
-            const data = await res.json();
-            const entries = data['time-entries'] || [];
-            
-            let billable = 0;
-            let total = 0;
+        // ... (existing fetch logic) ...
+        const entries = data['time-entries'] || [];
+        
+        let billable = 0;
+        let total = 0;
+        let users = {};
+        let clients = {};
 
-            entries.forEach(e => {
-                const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
-                // Exclude Internal? (Optional: keeping logic consistent with bonus report)
-                if (e['project-name'].match(/IWD|Runners|Dominate/i)) return; 
+        entries.forEach(e => {
+            const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
+            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return; 
 
-                total += hours;
-                if (e['isbillable'] === '1') billable += hours;
-            });
+            total += hours;
+            if (e['isbillable'] === '1') {
+                billable += hours;
+                
+                // Track Contributors
+                const user = e['person-first-name'] + ' ' + e['person-last-name'];
+                if (!users[user]) users[user] = 0;
+                users[user] += hours;
 
-            return { billable, total, nonBillable: total - billable };
-        } catch (e) {
-            console.error(e);
-            return { billable: 0, total: 0, nonBillable: 0 };
-        }
+                // Track Clients
+                const client = e['project-name']; // Or company name if available
+                if (!clients[client]) clients[client] = 0;
+                clients[client] += hours;
+            }
+        });
+
+        // Sort Top Lists
+        const topUsers = Object.entries(users)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 5)
+            .map(([name, hours]) => ({ name, hours }));
+
+        const topClients = Object.entries(clients)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 5)
+            .map(([name, hours]) => ({ name, hours }));
+
+        return { billable, total, nonBillable: total - billable, topUsers, topClients };
     }
 
     try {
