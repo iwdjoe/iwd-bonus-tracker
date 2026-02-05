@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (V124)</title>
+    <title>Weekly Pulse (V125)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -34,7 +34,7 @@
 
     <!-- STATUS BAR -->
     <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Syncing V124...
+        Syncing V125...
     </div>
 
     <!-- DASHBOARD -->
@@ -45,7 +45,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v124</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v125</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE API</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
@@ -143,13 +143,15 @@
     </div>
 
     <script>
-        // CLIENT SIDE LOGIC (V124 - Progressive Loading)
+        // CLIENT SIDE LOGIC (V125 - Pro Tier Fetch)
         const API_BASE = '/.netlify/functions/get-pulse'; 
         
         netlifyIdentity.on('init', user => { if(user) document.getElementById('user-email').innerText = user.email; });
         netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
         netlifyIdentity.on('logout', () => { location.reload(); });
         netlifyIdentity.init();
+
+        function log(msg) { console.log(msg); } 
 
         let isDark = true; 
 
@@ -191,52 +193,37 @@
 
         window.addEventListener('DOMContentLoaded', init);
 
-        let allEntries = [];
-        let rates = {};
-        let globalRate = 155;
-
         async function init() {
             const status = document.getElementById('status-bar');
             status.innerText = "Connecting...";
-            
-            // FETCH PAGE 1 (Immediate)
-            await fetchPage(1);
-            
-            // FETCH PAGE 2 & 3 (Background)
-            // We fetch sequentially to avoid hammering the API all at once
-            fetchPage(2).then(() => fetchPage(3));
-            
-            status.innerText = "Live";
-            status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
-            setTimeout(() => status.classList.add('hidden'), 2000);
-            
-            const date = new Date();
-            document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        }
-
-        async function fetchPage(pageNum) {
-            const status = document.getElementById('status-bar');
             try {
-                // Only show loading for page 1 or if explicit
-                if(pageNum === 1) status.innerText = `Fetching Data (Page ${pageNum})...`;
-                
-                const res = await fetch(`${API_BASE}?page=${pageNum}&v=${Date.now()}`);
+                // SINGLE ROBUST FETCH (Possible due to Pro Tier 26s Timeout)
+                const res = await fetch(`${API_BASE}?v=${Date.now()}`);
+                if (!res.ok) throw new Error("API Timeout");
+
                 const data = await res.json();
                 
-                if (data.entries) {
-                    allEntries = [...allEntries, ...data.entries];
-                    rates = data.rates || rates;
-                    globalRate = data.globalRate || globalRate;
-                    
-                    // RE-RENDER with new data
-                    processData(allEntries, rates, globalRate);
-                }
+                status.innerText = "Loaded (" + (data.meta ? data.meta.count : 0) + " entries)";
+                status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
+                setTimeout(() => status.classList.add('hidden'), 3000);
+                
+                const date = new Date();
+                document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                processData(data);
             } catch (e) {
-                console.warn("Page fetch failed:", e);
+                console.error(e);
+                status.innerText = "Retrying... (" + e.message + ")";
+                status.className = "fixed top-0 left-0 right-0 bg-orange-500 text-white text-xs font-bold text-center py-1 z-50";
+                setTimeout(() => location.reload(), 5000);
             }
         }
 
-        function processData(entries, rates, globalRate) {
+        function processData(data) {
+            const entries = data.entries || [];
+            const rates = data.rates || {};
+            const globalRate = data.globalRate || 155;
+
             const now = new Date();
             const toStr = (d) => {
                 const y = d.getFullYear();
@@ -259,11 +246,6 @@
             lastSun.setDate(lastMon.getDate() + 6);
             
             const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-            
-            const thisWeekStart = toStr(thisMon);
-            const thisWeekEnd = toStr(thisSun);
-            const lastWeekStart = toStr(lastMon);
-            const lastWeekEnd = toStr(lastSun);
             const monthStartStr = toStr(monthStart);
 
             document.getElementById('week-range').innerText = ""; 

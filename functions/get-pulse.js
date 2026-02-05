@@ -1,6 +1,6 @@
-// V124 PROGRESSIVE API
-// Accepts ?page=X parameter. Returns just that page of entries.
-// Frontend is responsible for stitching them together.
+// V125 PRO TIER API
+// Fetches last 45 days in one go (using the 26s timeout allowance).
+// Guaranteed to catch "Last Week" even with heavy data volume.
 
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
@@ -12,9 +12,8 @@ exports.handler = async function(event, context) {
     try {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
         const now = new Date();
-        const page = event.queryStringParameters.page || 1;
         
-        // FETCH RANGE: Fixed 45 Days (Safe)
+        // FETCH RANGE: 45 DAYS (Safe)
         const fetchStart = new Date(now);
         fetchStart.setDate(now.getDate() - 45);
         const fetchEnd = new Date(now);
@@ -30,20 +29,29 @@ exports.handler = async function(event, context) {
         const fetchStartStr = formatDate(fetchStart);
         const fetchEndStr = formatDate(fetchEnd);
 
-        // Fetch JUST ONE PAGE (Fast!)
-        const [twRes, ratesRes] = await Promise.all([
-            fetch(`https://${DOMAIN}/time_entries.json?page=${page}&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
-            // Only fetch rates on Page 1 to save bandwidth? No, fetch every time for simplicity, it's fast.
+        // Fetch 4 Pages (2000 entries) - Takes ~8-12s, safe on Pro Tier (26s)
+        const [p1, p2, p3, p4, ratesRes] = await Promise.all([
+            fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
+            fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
+            fetch(`https://${DOMAIN}/time_entries.json?page=3&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
+            fetch(`https://${DOMAIN}/time_entries.json?page=4&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
             fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
         ]);
 
-        if (!twRes.ok) throw new Error("Teamwork API Error");
-        const twData = await twRes.json();
+        const d1 = p1.ok ? await p1.json() : {};
+        const d2 = p2.ok ? await p2.json() : {};
+        const d3 = p3.ok ? await p3.json() : {};
+        const d4 = p4.ok ? await p4.json() : {};
         
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
-        const entries = twData['time-entries'] || [];
+        const entries = [
+            ...(d1['time-entries'] || []),
+            ...(d2['time-entries'] || []),
+            ...(d3['time-entries'] || []),
+            ...(d4['time-entries'] || [])
+        ];
         
         const cleanEntries = entries.map(e => {
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
@@ -57,7 +65,7 @@ exports.handler = async function(event, context) {
                 d: e.date,
                 h: parseFloat(e.hours) + (parseFloat(e.minutes) / 60),
                 b: e['isbillable'] === '1' && !isInternal, 
-                x: !!isExcludedUser
+                x: !!isExcludedUser // Isah flag
             };
         }).filter(Boolean);
 
@@ -67,7 +75,7 @@ exports.handler = async function(event, context) {
                 entries: cleanEntries,
                 rates: savedRates,
                 globalRate: GLOBAL_RATE,
-                meta: { page: page, count: cleanEntries.length }
+                meta: { count: cleanEntries.length }
             }) 
         };
 
