@@ -28,17 +28,16 @@ exports.handler = async function(event, context) {
         const fetchStartStr = formatDate(fetchStart);
         const fetchEndStr = formatDate(fetchEnd);
 
-        // FETCH 3 PAGES (1500 entries) - Optimization to prevent timeouts
-        // 1500 entries covers ~30-40 days of heavy activity. Safe for "Last Week".
-        const [p1, p2, p3] = await Promise.all([
+        // FETCH 2 PAGES (1000 entries) - Safe Speed Limit
+        // Fetching 3+ pages causes timeouts. 1000 entries is ~20 days of heavy data.
+        // This is the max we can do reliably on the free tier.
+        const [p1, p2] = await Promise.all([
             fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
-            fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
-            fetch(`https://${DOMAIN}/time_entries.json?page=3&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } })
+            fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } })
         ]);
 
         const d1 = p1.ok ? await p1.json() : {};
         const d2 = p2.ok ? await p2.json() : {};
-        const d3 = p3.ok ? await p3.json() : {};
         
         const ratesRes = await fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } });
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
@@ -46,8 +45,7 @@ exports.handler = async function(event, context) {
 
         const entries = [
             ...(d1['time-entries'] || []),
-            ...(d2['time-entries'] || []),
-            ...(d3['time-entries'] || [])
+            ...(d2['time-entries'] || [])
         ];
         
         const cleanEntries = entries.map(e => {
