@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse v47</title>
+    <title>Weekly Pulse v48 (Robust)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -31,42 +31,41 @@
         .dark .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.1) 100%); }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 transition-colors duration-300">
+<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8">
 
     <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="fixed inset-0 bg-gray-50 dark:bg-black flex flex-col items-center justify-center z-50 transition-opacity duration-500">
-        <img src="iwd-logo-new.png" class="w-24 h-auto mb-6" alt="IWD Agency">
-        <h1 class="text-2xl font-bold mb-2">IWD Weekly Pulse</h1>
+    <div id="login-screen" class="fixed inset-0 bg-gray-50 dark:bg-black flex flex-col items-center justify-center z-50">
+        <img src="iwd-logo-new.png" class="w-24 h-auto mb-6">
+        <h1 class="text-2xl font-bold mb-2">IWD Weekly Pulse v48</h1>
         <button onclick="netlifyIdentity.open('login')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-md mt-4">
-            <span>🔒</span> Login with Google
+            <span>🔒</span> Login
         </button>
-        <p id="auth-error" class="text-red-500 mt-4 text-xs font-bold hidden">Access Denied: Please use your @iwdagency.com email.</p>
     </div>
 
-    <!-- DASHBOARD CONTENT -->
-    <div id="dashboard-content" class="max-w-5xl mx-auto hidden">
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="max-w-6xl mx-auto hidden">
         
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain" alt="IWD">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v47</span></h1>
-                    <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300 uppercase" id="live-indicator">Loading...</span>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v48</span></h1>
+                    <span class="text-[10px] font-bold bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full dark:bg-gray-800 dark:text-gray-300 uppercase" id="live-indicator">Ready</span>
                 </div>
                 <div class="flex items-center gap-2 mt-1 ml-1 text-xs text-gray-400">
-                    <span id="last-updated">Waiting...</span>
-                    <button onclick="init()" class="hover:text-blue-500 transition" title="Refresh">
+                    <span id="last-updated">--:--</span>
+                    <button onclick="init()" class="hover:text-blue-500" title="Refresh">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </button>
                 </div>
             </div>
             
             <div class="flex items-center gap-4">
-                <button onclick="toggleTheme()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition" title="Toggle Theme">
+                <button onclick="toggleTheme()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800" title="Toggle Theme">
                     <span class="dark:hidden">🌙</span><span class="hidden dark:inline">☀️</span>
                 </button>
-                <button onclick="netlifyIdentity.logout()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-red-500 transition" title="Logout">
+                <button onclick="netlifyIdentity.logout()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-red-500" title="Logout">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 </button>
             </div>
@@ -78,12 +77,12 @@
             <div class="stat-card funky-bg border-blue-500/20">
                 <div>
                     <h3 class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">Monthly Projection</h3>
-                    <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-proj">$0</div>
-                    <div class="text-xs text-gray-500 mt-1" id="month-rev">Current: $0</div>
+                    <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-proj">--</div>
+                    <div class="text-xs text-gray-500 mt-1" id="month-rev">Current: --</div>
                 </div>
                 <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
                     <div class="text-xs text-gray-400 uppercase">Estimated Bonus Pool</div>
-                    <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="month-pool">$0</div>
+                    <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="month-pool">--</div>
                 </div>
             </div>
 
@@ -96,18 +95,18 @@
                 </div>
                 <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
                     <span class="text-xs text-gray-400 uppercase">Pace</span>
-                    <span class="text-lg font-bold text-purple-600 dark:text-purple-400" id="week-pace">0%</span>
+                    <span class="text-lg font-bold text-purple-600 dark:text-purple-400" id="week-pace">--%</span>
                 </div>
             </div>
 
             <!-- Efficiency -->
             <div class="stat-card">
                 <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Month Efficiency</h3>
-                <div class="text-4xl font-black text-gray-900 dark:text-white" id="month-pct">0%</div>
-                <div class="text-xs text-gray-500 mt-1" id="month-total">0 Total Hrs Logged</div>
+                <div class="text-4xl font-black text-gray-900 dark:text-white" id="month-pct">--%</div>
+                <div class="text-xs text-gray-500 mt-1" id="month-total">-- Total Hrs Logged</div>
                 
                 <div class="w-full bg-gray-100 dark:bg-gray-800 h-2 rounded-full mt-4 overflow-hidden">
-                    <div id="eff-bar" class="bg-green-500 h-full w-0 transition-all duration-1000"></div>
+                    <div id="eff-bar" class="bg-green-500 h-full w-0"></div>
                 </div>
             </div>
         </div>
@@ -125,11 +124,11 @@
                     <div class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full bg-white dark:bg-black border border-blue-100 dark:border-blue-900">This Week</div>
                     <div class="grid grid-cols-2 gap-8">
                         <div>
-                            <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">0</div>
+                            <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">--</div>
                             <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
                         </div>
                         <div>
-                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">0</div>
+                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">--</div>
                             <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
                         </div>
                     </div>
@@ -140,11 +139,11 @@
                     <div class="text-xs text-gray-400 font-bold uppercase mb-6 inline-block px-3 py-1">Last Week</div>
                     <div class="grid grid-cols-2 gap-8 opacity-60">
                         <div>
-                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">0</div>
+                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">--</div>
                             <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
                         </div>
                         <div>
-                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">0</div>
+                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">--</div>
                             <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
                         </div>
                     </div>
@@ -177,7 +176,6 @@
     </div>
 
     <script>
-        // AUTH GATE
         netlifyIdentity.on('init', user => {
             if (!user) document.getElementById('login-screen').classList.remove('hidden');
             else if (user.email.endsWith('@iwdagency.com')) {
@@ -190,9 +188,20 @@
         netlifyIdentity.init();
 
         async function init() {
+            document.getElementById('live-indicator').innerText = 'Syncing...';
+            document.getElementById('live-indicator').className = "text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase";
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+
             try {
-                const res = await fetch('/.netlify/functions/get-week-stats?t=' + Date.now());
+                // Fetch Separate WEEKLY Endpoint
+                const res = await fetch('/.netlify/functions/get-week-stats?t=' + Date.now(), {
+                    signal: controller.signal
+                });
                 
+                clearTimeout(timeoutId);
+
                 if(!res.ok) throw new Error("API " + res.status);
                 const data = await res.json();
                 
@@ -201,11 +210,14 @@
                 const t = new Date();
                 document.getElementById('last-updated').innerText = t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-                render(data);
+                if (data.month) render(data);
+                else throw new Error("No Data");
+
             } catch (e) {
                 console.error("Error", e);
-                document.getElementById('last-updated').innerText = "ERROR";
-                document.getElementById('live-indicator').innerText = 'OFFLINE';
+                document.getElementById('last-updated').innerText = "FAILED";
+                document.getElementById('live-indicator').innerText = 'ERROR';
+                document.getElementById('live-indicator').className = "text-[10px] font-bold bg-red-100 text-red-800 px-2 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300 uppercase";
             }
         }
 
@@ -220,14 +232,14 @@
         }
 
         function render(data) {
-            const w = data.month; // Mapping month data first for safety
+            const w = data; // V48 Flattened Structure
             const meta = data.meta;
             const num = (n) => Math.round(n);
             const pct = (b, t) => t > 0 ? Math.round((b/t)*100) : 0;
             
             // --- Monthly Logic ---
             const rate = 155; 
-            const rev = w.billable * rate;
+            const rev = w.month.billable * rate;
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), 1);
             
@@ -244,9 +256,9 @@
 
             document.getElementById('month-rev').innerText = 'Current: $' + Math.round(rev).toLocaleString();
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
-            document.getElementById('month-total').innerText = num(w.total) + ' Total Hrs Logged';
+            document.getElementById('month-total').innerText = num(w.month.total) + ' Total Hrs Logged';
             
-            const efficiency = pct(w.billable, w.total);
+            const efficiency = pct(w.month.billable, w.month.total);
             document.getElementById('month-pct').innerText = efficiency + '%';
             document.getElementById('eff-bar').style.width = efficiency + '%';
 
@@ -263,14 +275,13 @@
 
             // --- Weekly ---
             document.getElementById('week-range').innerText = meta.thisWeekRange;
-            document.getElementById('week-billable').innerText = num(data.thisWeek.billable);
-            document.getElementById('week-total').innerText = num(data.thisWeek.total);
+            document.getElementById('week-billable').innerText = num(w.thisWeek.billable);
+            document.getElementById('week-total').innerText = num(w.thisWeek.total);
             
-            document.getElementById('last-billable').innerText = num(data.lastWeek.billable);
-            document.getElementById('last-total').innerText = num(data.lastWeek.total);
+            document.getElementById('last-billable').innerText = num(w.lastWeek.billable);
+            document.getElementById('last-total').innerText = num(w.lastWeek.total);
 
-            // Goal Pace
-            renderPace(meta.globalGoal || 200, data.thisWeek.billable); 
+            renderPace(meta.globalGoal || 200, w.thisWeek.billable); 
 
             // --- Lists ---
             const renderList = (id, list) => {
@@ -288,8 +299,8 @@
                 });
             };
             
-            if(w.topUsers) renderList('top-users', w.topUsers);
-            if(w.topClients) renderList('top-clients', w.topClients);
+            if(w.month.topUsers) renderList('top-users', w.month.topUsers);
+            if(w.month.topClients) renderList('top-clients', w.month.topClients);
         }
 
         function renderPace(goal, current) {

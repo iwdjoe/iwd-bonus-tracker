@@ -1,4 +1,4 @@
-// WEEKLY BACKEND V47 (Debug + Fix)
+// WEEKLY BACKEND V48 (Debug + Fix)
 let cache = { data: null, time: 0 };
 
 exports.handler = async function(event, context) {
@@ -8,11 +8,13 @@ exports.handler = async function(event, context) {
     const REPO = "iwdjoe/iwd-bonus-tracker";
     const GH_TOKEN = process.env.GITHUB_PAT;
 
+    if (cache.data && (Date.now() - cache.time < 60000)) {
+        return { statusCode: 200, body: JSON.stringify(cache.data) };
+    }
+
     try {
         const now = new Date();
         const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        
-        // Format YYYYMMDD for API
         const fmt = (d) => d.toISOString().split('T')[0].replace(/-/g, '');
         
         // Fetch This Month
@@ -26,26 +28,28 @@ exports.handler = async function(event, context) {
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
 
         const entries = data['time-entries'] || [];
-        
-        // DEBUG: Check first entry format
-        const firstDate = entries.length > 0 ? entries[0].date : "No Entries";
+        const debugFirst = entries.length > 0 ? entries[0].date : "Empty Array";
 
-        // Stats Buckets
+        const startOfWeek = new Date(now);
+        const day = startOfWeek.getDay() || 7; 
+        if (day !== 1) startOfWeek.setHours(-24 * (day - 1)); else startOfWeek.setHours(0,0,0,0);
+        
+        const startLastWeek = new Date(startOfWeek);
+        startLastWeek.setDate(startLastWeek.getDate() - 7);
+        const endLastWeek = new Date(startLastWeek);
+        endLastWeek.setDate(endLastWeek.getDate() + 6);
+
         const stats = {
             month: { billable: 0, total: 0, users: {}, clients: {} },
             thisWeek: { billable: 0, total: 0 },
             lastWeek: { billable: 0, total: 0 }
         };
 
-        // Date Helpers
-        const startOfWeek = new Date(now);
-        const day = startOfWeek.getDay() || 7; 
-        if (day !== 1) startOfWeek.setHours(-24 * (day - 1)); else startOfWeek.setHours(0,0,0,0);
-        
-        // Convert to YYYY-MM-DD Strings for robust comparison
         const toStr = (d) => d.toISOString().split('T')[0];
         const monthStr = toStr(startMonth);
         const weekStr = toStr(startOfWeek);
+        const lastStartStr = toStr(startLastWeek);
+        const lastEndStr = toStr(endLastWeek);
 
         entries.forEach(e => {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
@@ -53,10 +57,12 @@ exports.handler = async function(event, context) {
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             const isBillable = e['isbillable'] === '1';
             
-            // Teamwork returns YYYY-MM-DD usually, let's normalize just in case
-            const dateStr = e.date; 
+            let dateStr = e.date;
+            if (dateStr.length === 8 && !dateStr.includes('-')) {
+                dateStr = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
+            }
+            dateStr = dateStr.split('T')[0];
 
-            // Month
             if (dateStr >= monthStr) {
                 stats.month.total += hours;
                 if (isBillable) {
@@ -68,10 +74,12 @@ exports.handler = async function(event, context) {
                 }
             }
 
-            // This Week
             if (dateStr >= weekStr) {
                 stats.thisWeek.total += hours;
                 if (isBillable) stats.thisWeek.billable += hours;
+            } else if (dateStr >= lastStartStr && dateStr <= lastEndStr) {
+                stats.lastWeek.total += hours;
+                if (isBillable) stats.lastWeek.billable += hours;
             }
         });
 
@@ -80,13 +88,17 @@ exports.handler = async function(event, context) {
         const responseData = {
             month: { ...stats.month, topUsers: sortMap(stats.month.users), topClients: sortMap(stats.month.clients) },
             thisWeek: stats.thisWeek,
-            lastWeek: stats.lastWeek, // 0 for safety
+            lastWeek: stats.lastWeek,
             meta: {
                 thisWeekRange: `${startOfWeek.toLocaleDateString()} - Now`,
+                lastWeekRange: `${startLastWeek.toLocaleDateString()} - ${endLastWeek.toLocaleDateString()}`,
                 globalGoal: parseInt(savedRates['__WEEKLY_GOAL__'] || 200),
-                debug: { firstDate, monthStr, weekStr, count: entries.length }
+                debug: { firstDate: debugFirst, monthTarget: monthStr }
             }
         };
+
+        cache.data = responseData;
+        cache.time = Date.now();
 
         return { statusCode: 200, body: JSON.stringify(responseData) };
 
