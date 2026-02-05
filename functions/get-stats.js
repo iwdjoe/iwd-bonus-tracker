@@ -1,4 +1,4 @@
-// MAIN BACKEND (V83 - OPTIMIZED RANGE FETCH)
+// MAIN BACKEND (V85 - DATE FIX & SAFETY)
 let cache = { data: null, time: 0 };
 
 exports.handler = async function(event, context) {
@@ -8,8 +8,8 @@ exports.handler = async function(event, context) {
     const GH_TOKEN = process.env.GITHUB_PAT; 
     const REPO = "iwdjoe/iwd-bonus-tracker";
     
-    // CACHE: 2 Minutes (Balance freshness vs speed)
-    if (cache.data && (Date.now() - cache.time < 120000)) {
+    // CACHE: 1 Minute (Short cache for fast debugging)
+    if (cache.data && (Date.now() - cache.time < 60000)) {
         return { statusCode: 200, body: JSON.stringify(cache.data) };
     }
 
@@ -17,33 +17,25 @@ exports.handler = async function(event, context) {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
         const now = new Date();
 
-        // 1. DATE MATH (Crucial for "Last Week" crossing month boundaries)
-        const ONE_DAY = 24 * 60 * 60 * 1000;
-        
-        // This Week (Mon-Sun)
+        // 1. DATE SETUP (V85 FIX)
         const thisWeekStart = new Date(now);
         thisWeekStart.setDate(now.getDate() - ((now.getDay() + 6) % 7)); 
         thisWeekStart.setHours(0,0,0,0);
         
-        // Last Week (Mon-Sun)
         const lastWeekStart = new Date(thisWeekStart);
         lastWeekStart.setDate(lastWeekStart.getDate() - 7);
-        const lastWeekEnd = new Date(thisWeekStart); // Ends when this week starts
-        
-        // Fetch Range: Start from Last Week's Monday to Today
-        // This is much smaller than "Current Month" if we are early in the month!
-        // But to be safe for "Monthly Stats", we need MAX(StartOfMonth, LastWeekStart)
-        // Actually, we need BOTH. Let's just fetch from the EARLIER of the two.
         
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const fetchStart = (lastWeekStart < startOfMonth) ? lastWeekStart : startOfMonth;
         
-        const fetchStartStr = fetchStart.toISOString().split('T')[0].replace(/-/g, '');
-        const todayStr = now.toISOString().split('T')[0].replace(/-/g, '');
+        // FETCH RANGE: From (Earliest needed date) to (Tomorrow - to be safe)
+        const fetchStart = (lastWeekStart < startOfMonth) ? lastWeekStart : startOfMonth;
+        const fetchEnd = new Date(now);
+        fetchEnd.setDate(now.getDate() + 1); // Fetch until tomorrow to catch all of today in any timezone
 
-        // 2. FETCH (Optimized Range)
-        // We only fetch what we strictly need for the dashboard
-        const twRes = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${todayStr}`, { headers: { 'Authorization': AUTH } });
+        const fetchStartStr = fetchStart.toISOString().split('T')[0].replace(/-/g, '');
+        const fetchEndStr = fetchEnd.toISOString().split('T')[0].replace(/-/g, '');
+
+        const twRes = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}`, { headers: { 'Authorization': AUTH } });
         if(!twRes.ok) throw new Error("Teamwork API " + twRes.status);
         const twData = await twRes.json();
         
@@ -53,7 +45,6 @@ exports.handler = async function(event, context) {
 
         const entries = twData['time-entries'] || [];
         
-        // 3. AGGREGATE
         let users = {};
         let projects = {};
         let wStats = { 
@@ -61,6 +52,7 @@ exports.handler = async function(event, context) {
             lastWeek: { b: 0, t: 0 } 
         };
 
+        // ISO Strings for Comparison
         const thisWeekIso = thisWeekStart.toISOString().split('T')[0];
         const lastWeekIso = lastWeekStart.toISOString().split('T')[0];
         const monthStartIso = startOfMonth.toISOString().split('T')[0];
@@ -70,33 +62,29 @@ exports.handler = async function(event, context) {
             
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             const isBill = e['isbillable'] === '1';
-            const date = e.date; // YYYY-MM-DD format
-            
-            // --- MAIN DASHBOARD & LISTS (Current Month Only) ---
+            const date = e.date; 
+
+            // MAIN STATS & LISTS (Current Month Only)
             if (date >= monthStartIso) {
                 const user = e['person-first-name'] + ' ' + e['person-last-name'];
                 const project = e['project-name'];
                 
-                // USER LIST: Only count BILLABLE hours if requested? 
-                // User asked: "Top contributors should be only using the billable hours."
                 if (isBill) {
                     if (!users[user]) users[user] = 0;
                     users[user] += hours;
                 }
                 
-                // PROJECT LIST: Keep Total Hours for now (standard practice), or switch to billable?
-                // Keeping Total for Projects to match Main Dashboard unless asked otherwise.
                 if (!projects[project]) projects[project] = { hours: 0 };
                 projects[project].hours += hours;
             }
 
-            // --- WEEKLY PULSE (Range Independent) ---
+            // PULSE STATS (Range Independent)
             // This Week
             if (date >= thisWeekIso) {
                 wStats.thisWeek.t += hours;
                 if (isBill) wStats.thisWeek.b += hours;
             }
-            // Last Week
+            // Last Week (Strictly before this week starts)
             else if (date >= lastWeekIso && date < thisWeekIso) {
                 wStats.lastWeek.t += hours;
                 if (isBill) wStats.lastWeek.b += hours;
