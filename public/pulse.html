@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (Robust)</title>
+    <title>Weekly Pulse (Clean Slate)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -21,16 +21,22 @@
         body { font-family: 'Inter', sans-serif; }
         *, ::before, ::after { animation: none !important; transition: none !important; }
         
-        .stat-card { @apply rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-between h-full relative overflow-hidden; }
-        .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(147,51,234,0.05) 100%); }
-        .dark .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.1) 100%); }
+        /* HARDCODED COLORS - NO DARK MODE MAGIC */
+        .light-card { background: white; border: 1px solid #e5e7eb; color: #111827; }
+        .dark-card { background: #111827; border: 1px solid #1f2937; color: white; }
+        
+        .light-text-sub { color: #6b7280; }
+        .dark-text-sub { color: #9ca3af; }
+
+        .light-bg { background: #f9fafb; }
+        .dark-bg { background: #000000; }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 dark">
+<body class="light-bg min-h-screen p-4 md:p-8 transition-colors duration-200" id="body">
 
     <!-- STATUS BAR -->
-    <div id="status-bar" class="fixed top-0 left-0 right-0 bg-gray-600 text-white text-xs font-bold text-center py-1 z-50">
-        Initializing...
+    <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
+        Connecting to New V87 API...
     </div>
 
     <!-- DASHBOARD -->
@@ -40,66 +46,72 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v85</span></h1>
-                    <span id="mode-badge" class="hidden text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase">CACHED MODE</span>
+                    <h1 class="text-2xl font-bold" id="title-text">Weekly Pulse <span class="text-xs font-normal opacity-50">v87 (Clean)</span></h1>
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="document.documentElement.classList.toggle('dark')" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800">
-                    <span class="dark:hidden">🌙</span><span class="hidden dark:inline">☀️</span>
+                <button onclick="toggleTheme()" class="text-lg p-2 rounded hover:opacity-80 bg-gray-200 dark:bg-gray-800">
+                    <span>🌗 Theme</span>
                 </button>
             </div>
         </div>
 
         <!-- TOP ROW -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="stat-card bg-white dark:bg-gray-900 border-blue-500/20">
-                <h3 class="text-[10px] font-bold text-blue-600 dark:text-blue-500 uppercase tracking-wider mb-1">Monthly Projection</h3>
-                <div class="text-3xl font-black text-blue-900 dark:text-white" id="month-proj">--</div>
-                <div class="text-xs text-gray-600 dark:text-gray-400 mt-1" id="month-rev">Current: --</div>
+            <!-- Monthly Proj -->
+            <div class="card p-6 rounded-xl shadow-sm flex flex-col justify-between h-full">
+                <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 text-blue-600">Monthly Projection</h3>
+                <div class="text-3xl font-black text-blue-800" id="month-proj">--</div>
+                <div class="text-xs mt-1 opacity-60" id="month-rev">Current: --</div>
             </div>
-            <div class="stat-card bg-white dark:bg-gray-900 border-purple-500/20">
-                <h3 class="text-[10px] font-bold text-purple-600 dark:text-purple-500 uppercase tracking-wider mb-1">Weekly Goal</h3>
-                <input type="number" id="goal-input" value="200" class="bg-transparent text-4xl font-black text-gray-900 dark:text-white w-24 border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:border-purple-500">
-                <div class="text-xs text-gray-600 dark:text-gray-400 mt-2" id="week-pace">Pace: --%</div>
+            
+            <!-- Goal -->
+            <div class="card p-6 rounded-xl shadow-sm flex flex-col justify-between h-full">
+                <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 text-purple-600">Weekly Goal</h3>
+                <input type="number" id="goal-input" value="200" class="bg-transparent text-4xl font-black w-24 border-b border-gray-300 focus:outline-none">
+                <div class="text-xs mt-2 font-bold" id="week-pace">Pace: --%</div>
             </div>
-            <div class="stat-card bg-white dark:bg-gray-900">
-                <h3 class="text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">Month Efficiency</h3>
-                <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-pct">100%</div>
-                <div class="text-xs text-gray-600 dark:text-gray-400 mt-1" id="month-total">-- Hrs Logged</div>
+            
+            <!-- Month Efficiency -->
+            <div class="card p-6 rounded-xl shadow-sm flex flex-col justify-between h-full">
+                <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 opacity-60">Month Total</h3>
+                <div class="text-3xl font-black" id="month-total-main">--</div>
+                <div class="text-xs mt-1 opacity-60" id="month-pct">100% Billable</div>
             </div>
         </div>
 
-        <!-- MIDDLE ROW (WEEKLY) -->
-        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 mb-8 overflow-hidden">
-            <div class="bg-gray-100 dark:bg-gray-800/50 px-6 py-3 border-b border-gray-200 dark:border-gray-800 flex justify-between">
-                <h3 class="font-bold text-sm text-gray-800 dark:text-gray-300">📅 Weekly Comparison</h3>
-                <span class="text-xs text-gray-500 font-mono" id="week-range"></span>
+        <!-- WEEKLY ROW -->
+        <div class="card rounded-lg shadow-sm mb-8 overflow-hidden">
+            <div class="px-6 py-3 border-b flex justify-between bg-opacity-50">
+                <h3 class="font-bold text-sm">📅 Weekly Comparison</h3>
+                <span class="text-xs font-mono opacity-50" id="week-range"></span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-800">
-                <div class="p-8 text-center bg-blue-50 dark:bg-blue-900/10">
-                    <div class="text-xs text-blue-700 dark:text-blue-400 font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full bg-white dark:bg-black border border-blue-200 dark:border-blue-900">This Week</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
+                <!-- This Week -->
+                <div class="p-8 text-center bg-blue-50 bg-opacity-20">
+                    <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white">This Week</div>
                     <div class="grid grid-cols-2 gap-8">
                         <div>
-                            <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">--</div>
-                            <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">Billable</div>
+                            <div class="text-4xl font-black mb-1" id="week-billable">--</div>
+                            <div class="text-[10px] uppercase font-bold opacity-50">Billable</div>
                         </div>
                         <div>
-                            <div class="text-4xl font-bold text-gray-600 dark:text-gray-400 mb-1" id="week-pct">--%</div>
-                            <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">% Billable</div>
+                            <div class="text-4xl font-bold mb-1 opacity-60" id="week-pct">--%</div>
+                            <div class="text-[10px] uppercase font-bold opacity-50">% Billable</div>
                         </div>
                     </div>
                 </div>
+                <!-- Last Week -->
                 <div class="p-8 text-center">
-                    <div class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase mb-6 inline-block px-3 py-1">Last Week</div>
+                    <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 opacity-50">Last Week</div>
                     <div class="grid grid-cols-2 gap-8 opacity-60">
                         <div>
-                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">--</div>
-                            <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">Billable</div>
+                            <div class="text-3xl font-bold mb-1" id="last-billable">--</div>
+                            <div class="text-[10px] uppercase font-bold opacity-50">Billable</div>
                         </div>
                         <div>
-                            <div class="text-3xl font-bold text-gray-500 dark:text-gray-600 mb-1" id="last-pct">--%</div>
-                            <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">% Billable</div>
+                            <div class="text-3xl font-bold mb-1 opacity-60" id="last-pct">--%</div>
+                            <div class="text-[10px] uppercase font-bold opacity-50">% Billable</div>
                         </div>
                     </div>
                 </div>
@@ -108,80 +120,86 @@
 
         <!-- LISTS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800/50"><h3 class="text-xs font-bold text-gray-600 dark:text-gray-500 uppercase tracking-wider">🏆 Top Contributors</h3></div>
-                <table class="w-full text-sm"><tbody class="divide-y divide-gray-100 dark:divide-gray-800" id="top-users"></tbody></table>
+            <div class="card rounded-lg shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">🏆 Top Contributors (Billable)</h3></div>
+                <table class="w-full text-sm"><tbody class="divide-y" id="top-users"></tbody></table>
             </div>
-            <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800/50"><h3 class="text-xs font-bold text-gray-600 dark:text-gray-500 uppercase tracking-wider">💼 Top Clients</h3></div>
-                <table class="w-full text-sm"><tbody class="divide-y divide-gray-100 dark:divide-gray-800" id="top-clients"></tbody></table>
+            <div class="card rounded-lg shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">💼 Top Clients (Total)</h3></div>
+                <table class="w-full text-sm"><tbody class="divide-y" id="top-clients"></tbody></table>
             </div>
         </div>
     </div>
 
     <script>
-        // Force fresh API fetch
-        const API_URL = '/.netlify/functions/get-stats?v=' + Date.now(); 
-        const BACKUP_URL = 'backup-stats.json';
-        const TIMEOUT_MS = 8000; 
+        // NEW API ENDPOINT
+        const API_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
+
+        let isDark = true; // Default to Dark
+
+        function toggleTheme() {
+            isDark = !isDark;
+            applyTheme();
+        }
+
+        function applyTheme() {
+            const body = document.getElementById('body');
+            const cards = document.querySelectorAll('.card');
+            const title = document.getElementById('title-text');
+
+            if (isDark) {
+                body.className = "bg-black text-white min-h-screen p-4 md:p-8 transition-colors duration-200";
+                cards.forEach(c => c.className = c.className.replace('light-card', 'dark-card').replace('bg-white', '').replace('bg-gray-900', '') + ' dark-card');
+                // Ensure border colors match dark theme
+                document.querySelectorAll('.divide-y').forEach(el => el.classList.add('divide-gray-800'));
+                document.querySelectorAll('.border-b').forEach(el => el.classList.add('border-gray-800'));
+                document.querySelectorAll('.border-r').forEach(el => el.classList.add('border-gray-800'));
+            } else {
+                body.className = "bg-gray-50 text-gray-900 min-h-screen p-4 md:p-8 transition-colors duration-200";
+                cards.forEach(c => c.className = c.className.replace('dark-card', 'light-card').replace('bg-white', '').replace('bg-gray-900', '') + ' light-card');
+                
+                document.querySelectorAll('.divide-y').forEach(el => el.classList.remove('divide-gray-800'));
+                document.querySelectorAll('.border-b').forEach(el => el.classList.remove('border-gray-800'));
+                document.querySelectorAll('.border-r').forEach(el => el.classList.remove('border-gray-800'));
+            }
+        }
+
+        // Init Theme
+        setTimeout(() => {
+            isDark = true;
+            applyTheme();
+        }, 100);
+
 
         window.addEventListener('DOMContentLoaded', init);
 
         async function init() {
-            updateStatus("Connecting...", "bg-yellow-600");
-            
+            const status = document.getElementById('status-bar');
             try {
-                // RACE: Live API vs Timeout
-                const data = await Promise.race([
-                    fetch(API_URL).then(res => {
-                        if (!res.ok) throw new Error("API " + res.status);
-                        return res.json();
-                    }),
-                    new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error("TIMEOUT")), TIMEOUT_MS)
-                    )
-                ]);
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                
+                status.innerText = "Loaded (" + (data.meta.debugEntriesFound || 0) + " entries)";
+                status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
+                setTimeout(() => status.classList.add('hidden'), 3000);
                 
                 render(data);
-                updateStatus("LIVE DATA", "bg-green-600");
-                setTimeout(() => document.getElementById('status-bar').classList.add('hidden'), 2000);
-
             } catch (e) {
-                console.warn("Live API Failed:", e);
-                updateStatus("API Slow. Loading Backup...", "bg-orange-600");
-                
-                // FALLBACK: Load static backup
-                try {
-                    const backup = await fetch(BACKUP_URL).then(r => r.json());
-                    render(backup);
-                    document.getElementById('mode-badge').classList.remove('hidden');
-                    updateStatus("⚠ CACHED MODE (Live API Failed)", "bg-red-900");
-                } catch (backupErr) {
-                    updateStatus("FATAL: " + backupErr.message, "bg-red-600");
-                }
+                console.error(e);
+                status.innerText = "Error: " + e.message;
+                status.className = "fixed top-0 left-0 right-0 bg-red-600 text-white text-xs font-bold text-center py-1 z-50";
             }
-        }
-        
-        function updateStatus(msg, colorClass) {
-            const el = document.getElementById('status-bar');
-            el.innerText = msg;
-            el.className = `fixed top-0 left-0 right-0 text-white text-xs font-bold text-center py-1 z-50 ${colorClass}`;
         }
 
         function render(data) {
-            const projects = data.projects || [];
+            const p = data.pulse;
             const users = data.users || [];
-            
-            let totalHours = 0;
-            let rev = 0;
-            
-            projects.forEach(p => {
-                totalHours += (p.hours || 0);
-                const r = (p.rate === undefined) ? 155 : p.rate;
-                rev += (p.hours || 0) * r;
-            });
+            const projects = data.projects || [];
 
+            // 1. MONTHLY
             // Projections
+            const totalRev = projects.reduce((s, x) => s + (x.hours * (x.rate || 155)), 0);
+            
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), 1);
             let daysPassed = 0;
@@ -191,63 +209,49 @@
                 cur.setDate(cur.getDate()+1);
             }
             if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
-            
             const totalDays = 20; 
-            const projRev = (rev / daysPassed) * totalDays;
+            const projRev = (totalRev / daysPassed) * totalDays;
 
-            document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
-            
-            const projEl = document.getElementById('month-proj');
-            projEl.innerText = '$' + Math.round(projRev).toLocaleString();
-            projEl.className = "text-3xl font-black text-blue-900 dark:text-white";
+            document.getElementById('month-rev').innerText = '$' + Math.round(totalRev).toLocaleString();
+            document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
+            document.getElementById('month-total-main').innerText = Math.round(p.month.t);
 
-            document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
+            // 2. WEEKLY
+            document.getElementById('week-billable').innerText = Math.round(p.thisWeek.b);
+            const wPct = p.thisWeek.t > 0 ? Math.round((p.thisWeek.b / p.thisWeek.t) * 100) : 0;
+            document.getElementById('week-pct').innerText = wPct + '%';
 
-            // --- WEEKLY DATA FIX ---
-            const w = (data.weekly && data.weekly.thisWeek) ? data.weekly.thisWeek : { billable: 0, total: 0 };
-            const l = (data.weekly && data.weekly.lastWeek) ? data.weekly.lastWeek : { billable: 0, total: 0 };
-            const ranges = (data.weekly && data.weekly.ranges) ? data.weekly.ranges : { this: "Syncing...", last: "" };
-
-            // CALC %
-            const wPct = w.total > 0 ? Math.round((w.billable / w.total) * 100) : 0;
-            const lPct = l.total > 0 ? Math.round((l.billable / l.total) * 100) : 0;
-
-            document.getElementById('week-range').innerText = ranges.this;
-            document.getElementById('week-billable').innerText = Math.round(w.billable);
-            document.getElementById('week-pct').innerText = wPct + '%'; 
-            
-            document.getElementById('last-billable').innerText = Math.round(l.billable);
+            document.getElementById('last-billable').innerText = Math.round(p.lastWeek.b);
+            const lPct = p.lastWeek.t > 0 ? Math.round((p.lastWeek.b / p.lastWeek.t) * 100) : 0;
             document.getElementById('last-pct').innerText = lPct + '%';
 
-            // PACE CALCULATION
+            // 3. PACE
             const updatePace = () => {
                 const goal = parseFloat(document.getElementById('goal-input').value) || 200;
-                const billable = w.billable || 0;
+                const billable = p.thisWeek.b || 0;
                 const pace = Math.round((billable / goal) * 100);
                 const el = document.getElementById('week-pace');
                 el.innerText = `Pace: ${pace}%`;
-                if (pace >= 100) el.className = "text-xs font-bold text-green-600 dark:text-green-400 mt-2";
-                else if (pace >= 80) el.className = "text-xs font-bold text-yellow-600 dark:text-yellow-400 mt-2";
-                else el.className = "text-xs text-gray-600 dark:text-gray-400 mt-2";
+                if (pace >= 100) el.style.color = "#10b981"; // Green
+                else if (pace >= 80) el.style.color = "#d97706"; // Yellow
+                else el.style.color = "inherit";
             };
-            
             updatePace();
             document.getElementById('goal-input').addEventListener('input', updatePace);
 
-            // Lists
+            // 4. LISTS
             const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
                 list.sort((a,b) => (b.hours || 0) - (a.hours || 0)).slice(0,5).forEach((item, i) => {
                     el.innerHTML += `
-                        <tr class="hover:bg-white/5">
-                            <td class="px-6 py-3 w-10 text-xs font-mono text-gray-500">0${i+1}</td>
-                            <td class="px-6 py-3 font-medium text-gray-900 dark:text-white">${item.name}</td>
-                            <td class="px-6 py-3 text-right font-mono text-gray-700 dark:text-gray-300">${Math.round(item.hours)}h</td>
+                        <tr class="hover:bg-white hover:bg-opacity-10 border-b border-gray-200 dark:border-gray-800">
+                            <td class="px-6 py-3 w-10 text-xs font-mono opacity-50">0${i+1}</td>
+                            <td class="px-6 py-3 font-medium">${item.name}</td>
+                            <td class="px-6 py-3 text-right font-mono opacity-80">${Math.round(item.hours)}h</td>
                         </tr>`;
                 });
             };
-            
             renderList('top-users', users);
             renderList('top-clients', projects);
         }
