@@ -34,7 +34,7 @@
 
     <!-- STATUS BAR -->
     <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Syncing V115...
+        Connecting...
     </div>
 
     <!-- DASHBOARD -->
@@ -45,7 +45,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v115</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v116</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE API</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
@@ -202,23 +202,27 @@
 
         async function init() {
             const status = document.getElementById('status-bar');
+            status.innerText = "Connecting...";
             try {
                 const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("API Error " + res.status);
                 const data = await res.json();
                 
                 status.innerText = "Loaded (" + (data.meta ? data.meta.count : 0) + " entries)";
                 status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
                 setTimeout(() => status.classList.add('hidden'), 3000);
                 
-                // Set Last Updated Time
+                // Update Time
                 const date = new Date();
                 document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 
                 processData(data);
             } catch (e) {
                 console.error(e);
-                status.innerText = "Error: " + e.message;
-                status.className = "fixed top-0 left-0 right-0 bg-red-600 text-white text-xs font-bold text-center py-1 z-50";
+                status.innerText = "Retrying... (" + e.message + ")";
+                status.className = "fixed top-0 left-0 right-0 bg-orange-500 text-white text-xs font-bold text-center py-1 z-50";
+                // Retry once after 2s
+                setTimeout(() => location.reload(), 2000);
             }
         }
 
