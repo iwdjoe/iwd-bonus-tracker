@@ -59,8 +59,8 @@ exports.handler = async function(event, context) {
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             
-            // Special Flag for Isah Ramos (to exclude from denominator if needed)
-            const isExcludedUser = user.match(/Isah Ramos/i);
+            // Special Flag for Isah Ramos (Robust Check: Contains Isah AND Ramos)
+            const isExcludedUser = user.match(/Isah/i) && user.match(/Ramos/i);
 
             return {
                 u: user,
