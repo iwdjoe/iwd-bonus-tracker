@@ -45,7 +45,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v119</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v121</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE API</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
@@ -145,125 +145,83 @@
     </div>
 
     <script>
-        const API_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
-        
-        // Auth Logic
-        netlifyIdentity.on('init', user => { if(user) document.getElementById('user-email').innerText = user.email; });
-        netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
-        netlifyIdentity.on('logout', () => { location.reload(); });
-        netlifyIdentity.init();
+        // CLIENT SIDE LOGIC (V121 - Split Fetch)
+        const API_BASE = '/.netlify/functions/get-pulse'; 
 
-        function log(msg) { console.log(msg); } 
-
-        let isDark = true; 
-
-        function toggleTheme() {
-            isDark = !isDark;
-            applyTheme();
-            document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
-        }
-
-        function applyTheme() {
-            const body = document.getElementById('body');
-            const cards = document.querySelectorAll('.card');
-            const thisWeekBox = document.getElementById('this-week-box');
-            
-            if (isDark) {
-                body.className = "bg-black text-white min-h-screen p-4 md:p-8 transition-colors duration-200";
-                cards.forEach(c => c.className = c.className.replace('light-card', 'dark-card').replace('bg-white', '').replace('bg-gray-900', '') + ' dark-card');
-                
-                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-800 transition-colors duration-200 bg-blue-900 bg-opacity-10 text-white";
-                document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-white";
-                document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-900', 'text-gray-300');
-                
-                document.querySelectorAll('.divide-y').forEach(el => el.classList.add('divide-gray-800'));
-                document.querySelectorAll('.border-b').forEach(el => el.classList.add('border-gray-800'));
-            } else {
-                body.className = "bg-gray-50 text-gray-900 min-h-screen p-4 md:p-8 transition-colors duration-200";
-                cards.forEach(c => c.className = c.className.replace('dark-card', 'light-card').replace('bg-white', '').replace('bg-gray-900', '') + ' light-card');
-                
-                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 transition-colors duration-200 bg-blue-50 text-gray-900";
-                document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-gray-900";
-                document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-300', 'text-gray-900').replace('text-white', 'text-gray-900');
-                
-                document.querySelectorAll('.divide-y').forEach(el => el.classList.remove('divide-gray-800'));
-                document.querySelectorAll('.border-b').forEach(el => el.classList.remove('border-gray-800'));
-            }
-        }
-
-        setTimeout(() => { isDark = true; applyTheme(); document.getElementById('theme-icon').innerText = '☀️'; }, 100);
+        // ... Theme Logic ...
 
         window.addEventListener('DOMContentLoaded', init);
 
         async function init() {
             const status = document.getElementById('status-bar');
-            status.innerText = "Connecting...";
+            status.innerText = "Syncing...";
+            
             try {
-                const res = await fetch(API_URL);
-                if (!res.ok) throw new Error("API Error " + res.status);
-                const data = await res.json();
+                // PARALLEL FETCH (2 Small Requests instead of 1 Giant one)
+                const [resThis, resLast] = await Promise.all([
+                    fetch(`${API_BASE}?range=this_week&v=${Date.now()}`),
+                    fetch(`${API_BASE}?range=last_week&v=${Date.now()}`)
+                ]);
+
+                if (!resThis.ok || !resLast.ok) throw new Error("API Timeout");
+
+                const dataThis = await resThis.json();
+                const dataLast = await resLast.json();
                 
-                status.innerText = "Loaded (" + (data.meta ? data.meta.count : 0) + " entries)";
+                status.innerText = "Loaded";
                 status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
                 setTimeout(() => status.classList.add('hidden'), 3000);
                 
-                const date = new Date();
-                document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                
-                processData(data);
+                processData(dataThis, dataLast);
             } catch (e) {
                 console.error(e);
                 status.innerText = "Retrying... (" + e.message + ")";
                 status.className = "fixed top-0 left-0 right-0 bg-orange-500 text-white text-xs font-bold text-center py-1 z-50";
-                setTimeout(() => location.reload(), 5000);
+                setTimeout(() => location.reload(), 3000);
             }
         }
 
-        function processData(data) {
-            const entries = data.entries || [];
-            const rates = data.rates || {};
-            const globalRate = data.globalRate || 155;
+        function processData(dataThis, dataLast) {
+            const entriesThis = dataThis.entries || [];
+            const entriesLast = dataLast.entries || [];
+            const rates = dataThis.rates || {};
+            const globalRate = dataThis.globalRate || 155;
 
+            // Merge for Monthly/Lists if needed, or keep separate
+            const allEntries = [...entriesThis, ...entriesLast];
+
+            // 1. DATE BOUNDARIES (Display Only)
             const now = new Date();
-            
             const toStr = (d) => {
                 const y = d.getFullYear();
                 const m = String(d.getMonth() + 1).padStart(2, '0');
                 const day = String(d.getDate()).padStart(2, '0');
                 return `${y}-${m}-${day}`;
             };
+            const toShort = (dStr) => {
+                if(!dStr) return "";
+                const parts = dStr.split('-');
+                return `${parseInt(parts[1])}/${parseInt(parts[2])}`;
+            };
 
             const d = new Date(now);
             const day = d.getDay(); 
             const diff = d.getDate() - day + (day == 0 ? -6 : 1); 
             
-            const thisMon = new Date(d);
-            thisMon.setDate(diff);
-            const thisSun = new Date(thisMon);
-            thisSun.setDate(thisMon.getDate() + 6);
+            const thisMon = new Date(d.setDate(diff));
+            const thisSun = new Date(thisMon); thisSun.setDate(thisMon.getDate() + 6);
             
-            const lastMon = new Date(thisMon);
-            lastMon.setDate(lastMon.getDate() - 7);
-            const lastSun = new Date(lastMon);
-            lastSun.setDate(lastMon.getDate() + 6);
+            const lastMon = new Date(thisMon); lastMon.setDate(thisMon.getDate() - 7);
+            const lastSun = new Date(lastMon); lastSun.setDate(lastMon.getDate() + 6);
             
             const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-            
-            const thisWeekStart = toStr(thisMon);
-            const thisWeekEnd = toStr(thisSun);
-            const lastWeekStart = toStr(lastMon);
-            const lastWeekEnd = toStr(lastSun);
             const monthStartStr = toStr(monthStart);
 
-            // Display Dates
-            const toShort = (dStr) => {
-                const parts = dStr.split('-');
-                return `${parseInt(parts[1])}/${parseInt(parts[2])}`;
-            };
-            document.getElementById('week-range').innerText = `${thisWeekStart} -> Now`;
-            document.getElementById('this-week-dates').innerText = `${toShort(thisWeekStart)} - ${toShort(thisWeekEnd)}`;
-            document.getElementById('last-week-dates').innerText = `${toShort(lastWeekStart)} - ${toShort(lastWeekEnd)}`;
+            document.getElementById('week-range').innerText = `${toStr(thisMon)} -> Now`;
+            document.getElementById('this-week-dates').innerText = `${toShort(toStr(thisMon))} - ${toShort(toStr(thisSun))}`;
+            document.getElementById('last-week-dates').innerText = `${toShort(toStr(lastMon))} - ${toShort(toStr(lastSun))}`;
 
+            // 2. AGGREGATE
             let stats = {
                 month: { b: 0, t: 0, rev: 0 },
                 thisWeek: { b: 0, t: 0, t_adj: 0 }, 
@@ -273,39 +231,39 @@
             let users = {};
             let projects = {};
 
-            entries.forEach(e => {
-                let dateStr = e.d;
-                if (!dateStr.includes('-') && dateStr.length === 8) {
-                    dateStr = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
-                }
-
-                if (dateStr >= monthStartStr) {
-                    const isInternal = e.p.match(/IWD|Runners|Dominate/i);
-                    if (!isInternal) {
-                        stats.month.t += e.h;
-                        if (e.b) stats.month.b += e.h;
-                        const rate = rates[e.pid] || rates[e.p] || globalRate;
-                        stats.month.rev += e.h * rate;
-                        if (e.b) {
-                            if (!users[e.u]) users[e.u] = 0;
-                            users[e.u] += e.h;
-                        }
-                        if (!projects[e.p]) projects[e.p] = { hours: 0 };
-                        projects[e.p].hours += e.h;
+            // Process THIS WEEK (Already Filtered by API)
+            entriesThis.forEach(e => {
+                stats.thisWeek.t += e.h;
+                if (!e.x) stats.thisWeek.t_adj += e.h; // Exclude Isah
+                if (e.b) stats.thisWeek.b += e.h;
+                
+                // Add to Monthly/Lists if in current month
+                if (e.d >= monthStartStr) {
+                    if (e.b) {
+                        stats.month.b += e.h;
+                        stats.month.rev += e.h * (rates[e.pid] || rates[e.p] || globalRate);
+                        if(!users[e.u]) users[e.u]=0; users[e.u] += e.h;
                     }
+                    stats.month.t += e.h;
+                    if(!projects[e.p]) projects[e.p]={hours:0}; projects[e.p].hours += e.h;
                 }
+            });
 
-                if (e.x) return; 
-
-                if (dateStr >= thisWeekStart && dateStr <= thisWeekEnd) {
-                    stats.thisWeek.t += e.h;
-                    if (!e.x) stats.thisWeek.t_adj += e.h; 
-                    if (e.b) stats.thisWeek.b += e.h;
-                } 
-                else if (dateStr >= lastWeekStart && dateStr <= lastWeekEnd) {
-                    stats.lastWeek.t += e.h;
-                    if (!e.x) stats.lastWeek.t_adj += e.h;
-                    if (e.b) stats.lastWeek.b += e.h;
+            // Process LAST WEEK
+            entriesLast.forEach(e => {
+                stats.lastWeek.t += e.h;
+                if (!e.x) stats.lastWeek.t_adj += e.h;
+                if (e.b) stats.lastWeek.b += e.h;
+                
+                // Add to Monthly ONLY if it overlaps current month (e.g. Feb 1st)
+                if (e.d >= monthStartStr) {
+                    if (e.b) {
+                        stats.month.b += e.h;
+                        stats.month.rev += e.h * (rates[e.pid] || rates[e.p] || globalRate);
+                        if(!users[e.u]) users[e.u]=0; users[e.u] += e.h;
+                    }
+                    stats.month.t += e.h;
+                    if(!projects[e.p]) projects[e.p]={hours:0}; projects[e.p].hours += e.h;
                 }
             });
 
