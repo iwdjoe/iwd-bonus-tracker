@@ -105,6 +105,18 @@ exports.handler = async function(event, context) {
         const sampleEntries = [];
 
         entries.forEach((e, idx) => {
+            const dateStr = e.date; // "YYYY-MM-DD"
+
+            // Debug: Capture first 5 RAW entries (Before Filtering)
+            if (idx < 5) {
+                sampleEntries.push({
+                    project: e['project-name'],
+                    date: dateStr,
+                    hours: e.hours,
+                    billable: e['isbillable']
+                });
+            }
+
             // Skip internal projects
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
             
