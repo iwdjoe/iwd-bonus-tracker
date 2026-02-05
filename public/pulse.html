@@ -42,14 +42,14 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v100</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v101</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE API</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11">Last Updated: <span id="time-updated">Just now</span></div>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="toggleTheme()" class="text-sm font-medium px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-800 hover:opacity-80 transition-opacity">
-                    🌗 Theme
+                <button onclick="toggleTheme()" class="text-xl p-2 rounded hover:opacity-80 bg-gray-200 dark:bg-gray-800 transition-opacity" title="Toggle Theme">
+                    <span id="theme-icon">🌙</span>
                 </button>
             </div>
         </div>
@@ -84,27 +84,27 @@
                 <span class="text-xs font-mono opacity-50" id="week-range"></span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
-                <div class="p-8 text-center bg-blue-50 dark:bg-blue-900/20">
+                <div class="p-8 text-center bg-blue-50 dark:bg-blue-900/20 flex flex-col justify-center items-center">
                     <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
-                    <div class="grid grid-cols-2 gap-8">
-                        <div>
+                    <div class="grid grid-cols-2 gap-8 w-full max-w-xs">
+                        <div class="text-center">
                             <div class="text-4xl font-black mb-1" id="week-billable">--</div>
                             <div class="text-[10px] uppercase font-bold opacity-50">Billable</div>
                         </div>
-                        <div>
+                        <div class="text-center">
                             <div class="text-4xl font-bold mb-1 opacity-60" id="week-pct">--%</div>
                             <div class="text-[10px] uppercase font-bold opacity-50">% Billable</div>
                         </div>
                     </div>
                 </div>
-                <div class="p-8 text-center">
+                <div class="p-8 text-center flex flex-col justify-center items-center">
                     <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 opacity-50">Last Week</div>
-                    <div class="grid grid-cols-2 gap-8 opacity-60">
-                        <div>
+                    <div class="grid grid-cols-2 gap-8 w-full max-w-xs opacity-60">
+                        <div class="text-center">
                             <div class="text-3xl font-bold mb-1" id="last-billable">--</div>
                             <div class="text-[10px] uppercase font-bold opacity-50">Billable</div>
                         </div>
-                        <div>
+                        <div class="text-center">
                             <div class="text-3xl font-bold mb-1 opacity-60" id="last-pct">--%</div>
                             <div class="text-[10px] uppercase font-bold opacity-50">% Billable</div>
                         </div>
@@ -130,7 +130,11 @@
         const API_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
 
         let isDark = true; 
-        function toggleTheme() { isDark = !isDark; applyTheme(); }
+        function toggleTheme() {
+            isDark = !isDark;
+            applyTheme();
+            document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
+        }
         function applyTheme() {
             const body = document.getElementById('body');
             const cards = document.querySelectorAll('.card');

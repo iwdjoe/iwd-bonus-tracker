@@ -30,7 +30,7 @@ exports.handler = async function(event, context) {
 
         // Double Fetch to overcome 500 limit if needed, though usually not hit in 45 days unless huge volume
         // We'll stick to Page 1 for speed, usually enough. If zero data, we'll expand.
-        const twRes = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}`, { headers: { 'Authorization': AUTH } });
+        const twRes = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } });
         const twData = await twRes.json();
         
         const ratesRes = await fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } });
