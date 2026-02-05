@@ -40,7 +40,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v80</span></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v82</span></h1>
                     <span id="mode-badge" class="hidden text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase">CACHED MODE</span>
                 </div>
             </div>
@@ -120,9 +120,10 @@
     </div>
 
     <script>
-        const API_URL = '/.netlify/functions/get-stats';
+        // Force fresh API fetch
+        const API_URL = '/.netlify/functions/get-stats?v=' + Date.now(); 
         const BACKUP_URL = 'backup-stats.json';
-        const TIMEOUT_MS = 6000; 
+        const TIMEOUT_MS = 8000; // Gave it 2 extra seconds 
 
         window.addEventListener('DOMContentLoaded', init);
 
