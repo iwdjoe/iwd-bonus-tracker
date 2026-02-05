@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>V120 Diagnostic</h1>
+    <pre id="output">Loading...</pre>
+    <script>
+        fetch('/.netlify/functions/get-pulse')
+            .then(r => r.json())
+            .then(d => document.getElementById('output').innerText = JSON.stringify(d, null, 2))
+            .catch(e => document.getElementById('output').innerText = "FETCH FAIL: " + e.message);
+    </script>
+</body>
+</html>
