@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (Clean)</title>
+    <title>Weekly Pulse (Robust)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -19,7 +19,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        /* NUKE ANIMATIONS */
         *, ::before, ::after { animation: none !important; transition: none !important; }
         
         .stat-card { @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-between h-full relative overflow-hidden; }
@@ -29,9 +28,9 @@
 </head>
 <body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 dark">
 
-    <!-- DEBUG HEADER -->
-    <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Loading API...
+    <!-- STATUS BAR -->
+    <div id="status-bar" class="fixed top-0 left-0 right-0 bg-gray-600 text-white text-xs font-bold text-center py-1 z-50">
+        Initializing...
     </div>
 
     <!-- DASHBOARD -->
@@ -41,12 +40,12 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">vClean</span></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v78</span></h1>
+                    <span id="mode-badge" class="hidden text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase">CACHED MODE</span>
                 </div>
             </div>
-            
             <div class="flex items-center gap-4">
-                <button onclick="document.documentElement.classList.toggle('dark')" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800" title="Toggle Theme">
+                <button onclick="document.documentElement.classList.toggle('dark')" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800">
                     <span class="dark:hidden">🌙</span><span class="hidden dark:inline">☀️</span>
                 </button>
             </div>
@@ -71,43 +70,7 @@
             </div>
         </div>
 
-        <!-- MIDDLE ROW (WEEKLY) -->
-        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 mb-8 overflow-hidden">
-            <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 border-b border-gray-200 dark:border-gray-800 flex justify-between">
-                <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300">📅 Weekly Comparison</h3>
-                <span class="text-xs text-gray-500 font-mono" id="week-range"></span>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-800">
-                <div class="p-8 text-center bg-blue-50/50 dark:bg-blue-900/10">
-                    <div class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full bg-white dark:bg-black border border-blue-100 dark:border-blue-900">This Week</div>
-                    <div class="grid grid-cols-2 gap-8">
-                        <div>
-                            <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
-                        </div>
-                        <div>
-                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-8 text-center">
-                    <div class="text-xs text-gray-400 font-bold uppercase mb-6 inline-block px-3 py-1">Last Week</div>
-                    <div class="grid grid-cols-2 gap-8 opacity-60">
-                        <div>
-                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
-                        </div>
-                        <div>
-                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- BOTTOM: LISTS -->
+        <!-- LISTS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"><h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">🏆 Top Contributors</h3></div>
@@ -119,41 +82,59 @@
             </div>
         </div>
     </div>
-    
+
     <script>
-        // NO AUTH. JUST FETCH.
+        const API_URL = '/.netlify/functions/get-stats';
+        const BACKUP_URL = 'backup-stats.json';
+        const TIMEOUT_MS = 6000; // 6 seconds max for live API
+
         window.addEventListener('DOMContentLoaded', init);
 
         async function init() {
-            const status = document.getElementById('status-bar');
+            updateStatus("Connecting...", "bg-yellow-600");
+            
             try {
-                status.innerText = "Fetching Data...";
-                status.className = "fixed top-0 left-0 right-0 bg-yellow-600 text-white text-xs font-bold text-center py-1 z-50";
-                
-                const res = await fetch('/.netlify/functions/get-stats'); 
-                if(!res.ok) throw new Error("API: " + res.status);
-                
-                const data = await res.json();
-                status.innerText = "Processing...";
+                // RACE: Live API vs Timeout
+                const data = await Promise.race([
+                    fetch(API_URL).then(res => {
+                        if (!res.ok) throw new Error("API " + res.status);
+                        return res.json();
+                    }),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error("TIMEOUT")), TIMEOUT_MS)
+                    )
+                ]);
                 
                 render(data);
-                
-                status.innerText = "LIVE DATA";
-                status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
-                setTimeout(() => status.classList.add('hidden'), 2000);
+                updateStatus("LIVE DATA", "bg-green-600");
+                setTimeout(() => document.getElementById('status-bar').classList.add('hidden'), 2000);
+
             } catch (e) {
-                console.error("Error", e);
-                status.innerText = "ERROR: " + e.message;
-                status.className = "fixed top-0 left-0 right-0 bg-red-600 text-white text-xs font-bold text-center py-1 z-50";
+                console.warn("Live API Failed:", e);
+                updateStatus("API Slow. Loading Backup...", "bg-orange-600");
+                
+                // FALLBACK: Load static backup
+                try {
+                    const backup = await fetch(BACKUP_URL).then(r => r.json());
+                    render(backup);
+                    document.getElementById('mode-badge').classList.remove('hidden');
+                    updateStatus("⚠ CACHED MODE (Live API Failed)", "bg-red-900");
+                } catch (backupErr) {
+                    updateStatus("FATAL: " + backupErr.message, "bg-red-600");
+                }
             }
         }
         
+        function updateStatus(msg, colorClass) {
+            const el = document.getElementById('status-bar');
+            el.innerText = msg;
+            el.className = `fixed top-0 left-0 right-0 text-white text-xs font-bold text-center py-1 z-50 ${colorClass}`;
+        }
+
         function render(data) {
-            // 1. DATA SOURCES
             const projects = data.projects || [];
             const users = data.users || [];
             
-            // 2. CALCULATE MONTHLY TOTALS
             let totalHours = 0;
             let rev = 0;
             
@@ -163,7 +144,7 @@
                 rev += (p.hours || 0) * r;
             });
 
-            // 3. PROJECTIONS
+            // Projections
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), 1);
             let daysPassed = 0;
@@ -177,17 +158,10 @@
             const totalDays = 20; 
             const projRev = (rev / daysPassed) * totalDays;
 
-            // 4. UPDATE DOM (Monthly)
             document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
             document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
-            document.getElementById('month-pct').innerText = "100%"; 
 
-            // 5. WEEKLY ROW (Placeholder)
-            document.getElementById('week-range').innerText = "Syncing...";
-            document.getElementById('week-billable').innerText = "--";
-            
-            // 6. LISTS
             const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
