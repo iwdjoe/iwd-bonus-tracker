@@ -24,11 +24,6 @@
         .stat-card { @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-between h-full relative overflow-hidden; }
         .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(147,51,234,0.05) 100%); }
         .dark .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.1) 100%); }
-        
-        /* Loading Spinner */
-        .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-        .dark .spinner { border-color: rgba(255,255,255,0.1); border-left-color: #60a5fa; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 transition-colors duration-300">
@@ -45,29 +40,29 @@
     <!-- DASHBOARD -->
     <div id="dashboard" class="max-w-6xl mx-auto hidden">
         
-        <!-- HEADER (Identical to Main Report) -->
+        <!-- HEADER (Synced from Main Dashboard) -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
                 <div class="flex items-center gap-3">
-                    <img src="iwd-logo-new.png" class="w-8 h-8 object-contain" alt="IWD">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse</h1>
-                    <div id="loader" class="spinner ml-2"></div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Team Bonus Tracker</h1>
+                    <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300 uppercase" id="live-indicator">Loading...</span>
+                    
+                    <button onclick="toggleTheme()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition ml-2" title="Toggle Theme">
+                        <span class="dark:hidden">🌙</span><span class="hidden dark:inline">☀️</span>
+                    </button>
+                    
+                    <button onclick="netlifyIdentity.logout()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-red-500 transition" title="Logout">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
                 </div>
                 <div class="flex items-center gap-2 mt-1 ml-1 text-xs text-gray-400">
-                    <span id="last-updated">Updating...</span>
+                    <span id="last-updated">Waiting for data...</span>
                     <button onclick="init()" class="hover:text-blue-500 transition" title="Refresh">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </button>
                 </div>
-            </div>
-            
-            <div class="flex items-center gap-4">
-                <button onclick="toggleTheme()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition" title="Toggle Theme">
-                    <span class="dark:hidden">🌙</span><span class="hidden dark:inline">☀️</span>
-                </button>
-                <button onclick="netlifyIdentity.logout()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-red-500 transition" title="Logout">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                </button>
             </div>
         </div>
 
@@ -77,12 +72,12 @@
             <div class="stat-card funky-bg border-blue-500/20">
                 <div>
                     <h3 class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">Monthly Projection</h3>
-                    <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-proj">$0</div>
-                    <div class="text-xs text-gray-500 mt-1" id="month-rev">Current: $0</div>
+                    <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-proj">--</div>
+                    <div class="text-xs text-gray-500 mt-1" id="month-rev">Current: --</div>
                 </div>
                 <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
                     <div class="text-xs text-gray-400 uppercase">Estimated Bonus Pool</div>
-                    <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="month-pool">$0</div>
+                    <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="month-pool">--</div>
                 </div>
             </div>
 
@@ -102,8 +97,8 @@
             <!-- Efficiency -->
             <div class="stat-card">
                 <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Month Efficiency</h3>
-                <div class="text-4xl font-black text-gray-900 dark:text-white" id="month-pct">0%</div>
-                <div class="text-xs text-gray-500 mt-1" id="month-total">0 Total Hrs Logged</div>
+                <div class="text-4xl font-black text-gray-900 dark:text-white" id="month-pct">--%</div>
+                <div class="text-xs text-gray-500 mt-1" id="month-total">-- Total Hrs Logged</div>
                 
                 <div class="w-full bg-gray-100 dark:bg-gray-800 h-2 rounded-full mt-4 overflow-hidden">
                     <div id="eff-bar" class="bg-green-500 h-full w-0 transition-all duration-1000"></div>
@@ -124,11 +119,11 @@
                     <div class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full bg-white dark:bg-black border border-blue-100 dark:border-blue-900">This Week</div>
                     <div class="grid grid-cols-2 gap-8">
                         <div>
-                            <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">0</div>
+                            <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">--</div>
                             <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
                         </div>
                         <div>
-                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">0</div>
+                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">--</div>
                             <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
                         </div>
                     </div>
@@ -139,11 +134,11 @@
                     <div class="text-xs text-gray-400 font-bold uppercase mb-6 inline-block px-3 py-1">Last Week</div>
                     <div class="grid grid-cols-2 gap-8 opacity-60">
                         <div>
-                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">0</div>
+                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">--</div>
                             <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
                         </div>
                         <div>
-                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">0</div>
+                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">--</div>
                             <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
                         </div>
                     </div>
@@ -188,20 +183,29 @@
         netlifyIdentity.init();
 
         async function init() {
-            document.getElementById('loader').style.display = 'block';
             try {
                 const res = await fetch('/.netlify/functions/get-weekly-stats');
-                if(!res.ok) throw new Error("API Fail");
+                
+                if(!res.ok) {
+                    throw new Error("API " + res.status);
+                }
+                
                 const data = await res.json();
                 
-                document.getElementById('loader').style.display = 'none';
+                document.getElementById('live-indicator').innerText = 'LIVE';
+                document.getElementById('live-indicator').className = "text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase";
                 const t = new Date();
                 document.getElementById('last-updated').innerText = t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
                 render(data);
             } catch (e) {
                 console.error("Error", e);
-                document.getElementById('last-updated').innerText = "Offline";
+                document.getElementById('last-updated').innerText = "ERROR";
+                document.getElementById('live-indicator').innerText = 'OFFLINE';
+                document.getElementById('live-indicator').className = "text-[10px] font-bold bg-red-100 text-red-800 px-2 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300 uppercase";
+                
+                // Show manual error message on board
+                document.getElementById('month-proj').innerText = "Error";
             }
         }
 
@@ -224,9 +228,14 @@
             const rev = data.month.billable * rate;
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), 1);
-            let daysPassed = 0; 
+            
+            // Calculate work days passed
+            let daysPassed = 0;
             let cur = new Date(start);
-            while(cur <= now) { if(cur.getDay()!==0 && cur.getDay()!==6) daysPassed++; cur.setDate(cur.getDate()+1); }
+            while(cur <= now) {
+                if(cur.getDay()!==0 && cur.getDay()!==6) daysPassed++;
+                cur.setDate(cur.getDate()+1);
+            }
             if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
             
             const totalDays = 20; 
@@ -261,7 +270,7 @@
             document.getElementById('last-total').innerText = num(data.lastWeek.total);
 
             // Goal Pace
-            renderPace(200, data.thisWeek.billable); // Default 200, should fetch from saved
+            renderPace(200, data.thisWeek.billable); 
 
             // --- Lists ---
             const renderList = (id, list) => {
