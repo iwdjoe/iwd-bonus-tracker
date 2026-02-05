@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse | IWD Agency</title>
+    <title>Weekly Pulse v71 (Fix)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -19,9 +19,8 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
+        body { font-family: 'Inter', sans-serif; }
         
-        /* NO ANIMATIONS */
         *, ::before, ::after { animation: none !important; transition: none !important; }
         
         .stat-card { @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-between h-full relative overflow-hidden; }
@@ -29,7 +28,7 @@
         .dark .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.1) 100%); }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 dark">
+<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8">
 
     <!-- LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-gray-50 dark:bg-black flex flex-col items-center justify-center z-50">
@@ -47,7 +46,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v70</span></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v71</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase" id="live-indicator">Ready</span>
                 </div>
             </div>
@@ -80,41 +79,10 @@
                 <div class="text-xs text-gray-500 mt-1" id="month-total">-- Hrs Logged</div>
             </div>
         </div>
-
-        <!-- MIDDLE ROW (WEEKLY) -->
-        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 mb-8 overflow-hidden">
-            <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 border-b border-gray-200 dark:border-gray-800 flex justify-between">
-                <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300">📅 Weekly Comparison</h3>
-                <span class="text-xs text-gray-500 font-mono" id="week-range"></span>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-800">
-                <div class="p-8 text-center bg-blue-50/50 dark:bg-blue-900/10">
-                    <div class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full bg-white dark:bg-black border border-blue-100 dark:border-blue-900">This Week</div>
-                    <div class="grid grid-cols-2 gap-8">
-                        <div>
-                            <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
-                        </div>
-                        <div>
-                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-8 text-center">
-                    <div class="text-xs text-gray-400 font-bold uppercase mb-6 inline-block px-3 py-1">Last Week</div>
-                    <div class="grid grid-cols-2 gap-8 opacity-60">
-                        <div>
-                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
-                        </div>
-                        <div>
-                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        
+        <!-- MIDDLE: Placeholder -->
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 mb-8 p-8 text-center">
+            <h3 class="text-gray-400 text-sm">Weekly Breakdown Syncing...</h3>
         </div>
 
         <!-- BOTTOM: LISTS -->
@@ -130,8 +98,8 @@
         </div>
     </div>
     
-    <!-- DEBUG BOX -->
-    <div id="debug-box" class="fixed bottom-0 left-0 right-0 bg-red-900 text-white p-2 text-xs font-mono hidden z-50"></div>
+    <!-- DEBUG -->
+    <div id="debug-box" class="fixed bottom-0 left-0 right-0 bg-red-900 text-white p-2 text-xs font-mono hidden"></div>
 
     <script>
         netlifyIdentity.on('init', user => {
@@ -147,72 +115,80 @@
 
         async function init() {
             try {
-                // FORCE FRESH
-                const res = await fetch('/.netlify/functions/get-stats?t=' + Date.now()); 
+                // Fetch Main Endpoint
+                const res = await fetch('/.netlify/functions/get-stats');
                 const data = await res.json();
                 
-                // Show DEBUG info if user list empty
+                // Show DEBUG info if empty
                 if (!data.users || data.users.length === 0) {
                     document.getElementById('debug-box').classList.remove('hidden');
-                    document.getElementById('debug-box').innerText = "DEBUG: API OK but User List Empty. Raw keys: " + Object.keys(data).join(", ");
+                    document.getElementById('debug-box').innerText = "API returned 0 users. Raw: " + JSON.stringify(data);
                 }
 
                 render(data);
             } catch (e) {
                 console.error("Error", e);
                 document.getElementById('month-proj').innerText = "OFFLINE";
-                document.getElementById('debug-box').classList.remove('hidden');
-                document.getElementById('debug-box').innerText = "DEBUG: Fetch Error: " + e.message;
             }
         }
 
         function render(data) {
-            // IGNORE data.weekly. Build it ourselves from users/projects.
-            const projects = data.projects || [];
-            const users = data.users || [];
+            console.log("Rendering Data:", data);
             
-            // Calculate Totals from PROJECTS (Most reliable source for revenue)
-            const totalHours = projects.reduce((s,p) => s + p.hours, 0);
-            const rate = 155;
-            const rev = projects.reduce((s,p) => s + (p.hours * p.rate), 0);
+            // 1. SAFE EXTRACTION
+            const projects = Array.isArray(data.projects) ? data.projects : [];
+            const users = Array.isArray(data.users) ? data.users : [];
             
-            // Projections
-            const now = new Date();
-            let daysPassed = 0;
-            const start = new Date(now.getFullYear(), now.getMonth(), 1);
-            let cur = new Date(start);
-            while(cur <= now) {
-                if(cur.getDay()!==0 && cur.getDay()!==6) daysPassed++;
-                cur.setDate(cur.getDate()+1);
-            }
-            if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
+            // 2. CALC TOTALS
+            let totalHours = 0;
+            let rev = 0;
             
+            projects.forEach(p => {
+                totalHours += (p.hours || 0);
+                rev += (p.hours || 0) * (p.rate || 155);
+            });
+            
+            // 3. UPDATE DOM (Monthly)
+            const daysPassed = Math.max(new Date().getDate() - 1, 1);
             const projRev = (rev / daysPassed) * 20;
 
             document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
-            document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
+            document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs';
+
+            // 4. LISTS (Simple Loop)
+            const userListEl = document.getElementById('top-users');
+            userListEl.innerHTML = '';
             
-            // WEEKLY (Set to "--" because Main API doesn't support daily split yet)
-            document.getElementById('week-range').innerText = "Syncing with Teamwork...";
-            document.getElementById('week-billable').innerText = "--";
-            
-            // LISTS
-            const renderList = (id, list) => {
-                const el = document.getElementById(id);
-                el.innerHTML = '';
-                list.sort((a,b)=>b.hours-a.hours).slice(0,5).forEach((item, i) => {
-                    el.innerHTML += `
-                        <tr class="hover:bg-white/5">
-                            <td class="px-6 py-3 w-10 text-xs font-mono text-gray-500">0${i+1}</td>
-                            <td class="px-6 py-3 font-medium text-white">${item.name}</td>
-                            <td class="px-6 py-3 text-right font-mono text-gray-300">${Math.round(item.hours)}h</td>
+            const sortedUsers = [...users].sort((a,b) => (b.hours||0) - (a.hours||0)).slice(0,5);
+            if (sortedUsers.length === 0) {
+                userListEl.innerHTML = '<tr><td class="p-4 text-gray-500">No Users Found</td></tr>';
+            } else {
+                sortedUsers.forEach((u, i) => {
+                    userListEl.innerHTML += `
+                        <tr class="border-b border-gray-800">
+                            <td class="py-3 px-4 text-gray-400 font-mono">0${i+1}</td>
+                            <td class="py-3 px-4 text-white font-bold">${u.name}</td>
+                            <td class="py-3 px-4 text-right text-gray-300 font-mono">${Math.round(u.hours)}h</td>
                         </tr>`;
                 });
-            };
-            
-            renderList('top-users', users);
-            renderList('top-clients', projects);
+            }
+
+            const clientListEl = document.getElementById('top-clients');
+            clientListEl.innerHTML = '';
+            const sortedClients = [...projects].sort((a,b) => (b.hours||0) - (a.hours||0)).slice(0,5);
+            if (sortedClients.length === 0) {
+                 clientListEl.innerHTML = '<tr><td class="p-4 text-gray-500">No Clients Found</td></tr>';
+            } else {
+                sortedClients.forEach((p, i) => {
+                    clientListEl.innerHTML += `
+                        <tr class="border-b border-gray-800">
+                            <td class="py-3 px-4 text-gray-400 font-mono">0${i+1}</td>
+                            <td class="py-3 px-4 text-white font-bold">${p.name}</td>
+                            <td class="py-3 px-4 text-right text-gray-300 font-mono">${Math.round(p.hours)}h</td>
+                        </tr>`;
+                });
+            }
         }
         
         function toggleTheme() { 
@@ -220,7 +196,6 @@
             localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); 
         }
         
-        // Force Dark Mode
         document.documentElement.classList.add('dark');
     </script>
 </body>
