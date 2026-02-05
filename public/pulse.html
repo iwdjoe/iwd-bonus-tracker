@@ -21,10 +21,13 @@
         body { font-family: 'Inter', sans-serif; }
         *, ::before, ::after { animation: none !important; transition: none !important; }
         
-        .light-card { background: white; border: 1px solid #e5e7eb; color: #111827; }
-        .dark-card { background: #111827; border: 1px solid #1f2937; color: white; }
-        .light-bg { background: #f9fafb; }
+        /* DESIGN MATCH - LIGHT MODE */
+        .light-bg { background: #f3f4f6; } /* Match Bonus Report gray-100 */
+        .light-card { background: white; border: 1px solid #e5e7eb; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); color: #111827; }
+        
+        /* DESIGN MATCH - DARK MODE */
         .dark-bg { background: #000000; }
+        .dark-card { background: #111827; border: 1px solid #1f2937; color: white; } /* Matches Bonus Report */
         
         .flex-center-col { display: flex; flex-direction: column; justify-content: center; align-items: center; }
     </style>
@@ -44,7 +47,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v111</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v112</span></h1>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -84,8 +87,8 @@
                 <span class="text-xs font-mono opacity-50" id="week-range"></span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
-                <!-- This Week (Fixed BG) -->
-                <div id="this-week-box" class="p-8 text-center bg-gray-100 dark:bg-gray-800 flex flex-col justify-center items-center border-r border-gray-200 dark:border-gray-800 transition-colors duration-200">
+                <!-- This Week (Fixed BG to match Dark Card) -->
+                <div id="this-week-box" class="p-8 text-center bg-gray-50 dark:bg-blue-900/10 flex flex-col justify-center items-center border-r border-gray-200 dark:border-gray-800 transition-colors duration-200">
                     <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs">
                         <div class="text-center">
