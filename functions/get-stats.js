@@ -70,7 +70,8 @@ exports.handler = async function(event, context) {
 
         console.log(`[GET-STATS] Fetching ${fetchStartStr} → ${fetchEndStr}`);
 
-        const twRes = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}`, { 
+        // SORT: Date Descending (Newest First) to ensure we capture today's data within the 500 limit
+        const twRes = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { 
             headers: { 'Authorization': AUTH } 
         });
         
