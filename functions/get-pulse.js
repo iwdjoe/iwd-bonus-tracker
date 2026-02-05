@@ -41,13 +41,21 @@ exports.handler = async function(event, context) {
         
         const cleanEntries = entries.map(e => {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return null;
+            
+            const user = e['person-first-name'] + ' ' + e['person-last-name'];
+            const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
+            
+            // Special Flag for Isah Ramos (to exclude from denominator if needed)
+            const isExcludedUser = user.match(/Isah Ramos/i);
+
             return {
-                u: e['person-first-name'] + ' ' + e['person-last-name'],
+                u: user,
                 p: e['project-name'],
                 pid: e['project-name'].replace(/[^a-z0-9]/gi, ''),
                 d: e.date,
-                h: parseFloat(e.hours) + (parseFloat(e.minutes) / 60),
-                b: e['isbillable'] === '1'
+                h: hours,
+                b: e['isbillable'] === '1',
+                x: !!isExcludedUser // Excluded flag
             };
         }).filter(Boolean);
 
