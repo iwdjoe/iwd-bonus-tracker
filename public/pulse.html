@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (V106)</title>
+    <title>Weekly Pulse (V110)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -26,7 +26,6 @@
         .light-bg { background: #f9fafb; }
         .dark-bg { background: #000000; }
         
-        /* Utility for centering vertically */
         .flex-center-col { display: flex; flex-direction: column; justify-content: center; align-items: center; }
     </style>
 </head>
@@ -34,7 +33,7 @@
 
     <!-- STATUS BAR -->
     <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Syncing V106...
+        Syncing V110...
     </div>
 
     <!-- DASHBOARD -->
@@ -45,7 +44,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v109</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v110</span></h1>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -85,8 +84,8 @@
                 <span class="text-xs font-mono opacity-50" id="week-range"></span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
-                <!-- This Week (Fixed BG for Dark Mode) -->
-                <div class="p-8 text-center bg-blue-50 dark:bg-gray-800 flex flex-col justify-center items-center">
+                <!-- This Week (Fixed BG) -->
+                <div class="p-8 text-center bg-gray-100 dark:bg-[#111827] flex flex-col justify-center items-center border-r border-gray-200 dark:border-gray-800">
                     <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs">
                         <div class="text-center">
@@ -127,22 +126,12 @@
                 <table class="w-full text-sm"><tbody class="divide-y" id="top-clients"></tbody></table>
             </div>
         </div>
-        
-        <!-- DEBUG CONSOLE -->
-        <div id="debug-console" class="fixed bottom-0 left-0 right-0 bg-gray-900 text-green-400 font-mono text-[10px] p-2 overflow-auto h-32 border-t border-gray-700 z-50 opacity-90">
-            Initializing Debugger...
-        </div>
     </div>
 
     <script>
         const API_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
         
-        function log(msg) {
-            const el = document.getElementById('debug-console');
-            el.innerText += '\n' + msg;
-            el.scrollTop = el.scrollHeight;
-            console.log(msg);
-        }
+        function log(msg) { console.log(msg); } 
 
         let isDark = true; 
 
@@ -195,19 +184,10 @@
 
         function processData(data) {
             const entries = data.entries || [];
-            log(`Processing ${entries.length} entries...`);
-            
-            if(entries.length > 0) {
-                log(`Sample Entry Date Format: "${entries[0].d}"`);
-            }
-
             const rates = data.rates || {};
             const globalRate = data.globalRate || 155;
 
-            // 1. DATE BOUNDARIES
             const now = new Date();
-            
-            // Helper: YYYY-MM-DD
             const toStr = (d) => {
                 const y = d.getFullYear();
                 const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -217,15 +197,13 @@
 
             const d = new Date(now);
             const day = d.getDay(); 
-            const diff = d.getDate() - day + (day == 0 ? -6 : 1); // Adjust to Monday
+            const diff = d.getDate() - day + (day == 0 ? -6 : 1); 
             
-            // This Week: Monday to Sunday
             const thisMon = new Date(d);
             thisMon.setDate(diff);
             const thisSun = new Date(thisMon);
             thisSun.setDate(thisMon.getDate() + 6);
             
-            // Last Week: Previous Monday to Previous Sunday
             const lastMon = new Date(thisMon);
             lastMon.setDate(thisMon.getDate() - 7);
             const lastSun = new Date(lastMon);
@@ -239,12 +217,10 @@
             const lastWeekEnd = toStr(lastSun);
             const monthStartStr = toStr(monthStart);
 
-            log(`Ranges: \nTW: ${thisWeekStart} -> ${thisWeekEnd} \nLW: ${lastWeekStart} -> ${lastWeekEnd}`);
-
             let stats = {
                 month: { b: 0, t: 0, rev: 0 },
-                thisWeek: { b: 0, t: 0 },
-                lastWeek: { b: 0, t: 0 }
+                thisWeek: { b: 0, t: 0, t_adj: 0 }, 
+                lastWeek: { b: 0, t: 0, t_adj: 0 }
             };
             
             let users = {};
@@ -256,45 +232,40 @@
                     dateStr = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
                 }
 
-                // EXCLUDE ISAH FROM WEEKLY CALCS (Completely)
-                // "Percent billable hours (divided by total amount of hours - employee isah hours)"
-                // This means Isah contributes NOTHING to the Weekly numbers.
-                // We use e.x (excluded flag) to skip him.
-                
-                // MONTHLY (Standard Logic - Isah is included in total revenue/hours usually, unless you want him out there too?)
-                // Assuming standard logic for Monthly to match Bonus Report
+                // MONTHLY: Strict Filter (Exclude Internal)
                 if (dateStr >= monthStartStr) {
-                    stats.month.t += e.h;
-                    if (e.b) stats.month.b += e.h;
+                    const isInternal = e.p.match(/IWD|Runners|Dominate/i);
                     
-                    const rate = rates[e.pid] || rates[e.p] || globalRate;
-                    stats.month.rev += e.h * rate;
+                    if (!isInternal) {
+                        stats.month.t += e.h;
+                        if (e.b) stats.month.b += e.h;
+                        
+                        const rate = rates[e.pid] || rates[e.p] || globalRate;
+                        stats.month.rev += e.h * rate;
 
-                    if (e.b) {
-                        if (!users[e.u]) users[e.u] = 0;
-                        users[e.u] += e.h;
+                        if (e.b) {
+                            if (!users[e.u]) users[e.u] = 0;
+                            users[e.u] += e.h;
+                        }
+                        if (!projects[e.p]) projects[e.p] = { hours: 0 };
+                        projects[e.p].hours += e.h;
                     }
-                    if (!projects[e.p]) projects[e.p] = { hours: 0 };
-                    projects[e.p].hours += e.h;
                 }
 
-                // WEEKLY (Strict Date Range + Isah Exclusion)
-                if (e.x) return; // SKIP ISAH
+                // WEEKLY: Loose Filter (Include Internal, Exclude Isah)
+                if (e.x) return; // SKIP ISAH from Weekly Denominators
 
-                // This Week
                 if (dateStr >= thisWeekStart && dateStr <= thisWeekEnd) {
                     stats.thisWeek.t += e.h;
+                    if (!e.x) stats.thisWeek.t_adj += e.h; 
                     if (e.b) stats.thisWeek.b += e.h;
                 } 
-                // Last Week
                 else if (dateStr >= lastWeekStart && dateStr <= lastWeekEnd) {
                     stats.lastWeek.t += e.h;
+                    if (!e.x) stats.lastWeek.t_adj += e.h;
                     if (e.b) stats.lastWeek.b += e.h;
                 }
             });
-            
-            log(`This Week Total: ${stats.thisWeek.t.toFixed(1)}h`);
-            log(`Last Week Total: ${stats.lastWeek.t.toFixed(1)}h`);
 
             document.getElementById('week-range').innerText = `${thisWeekStart} -> Now`;
             render(stats, users, projects);
@@ -319,11 +290,11 @@
 
             // Weekly
             document.getElementById('week-billable').innerText = Math.round(stats.thisWeek.b);
-            const wPct = stats.thisWeek.t > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t) * 100) : 0;
+            const wPct = stats.thisWeek.t_adj > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t_adj) * 100) : 0;
             document.getElementById('week-pct').innerText = wPct + '%';
 
             document.getElementById('last-billable').innerText = Math.round(stats.lastWeek.b);
-            const lPct = stats.lastWeek.t > 0 ? Math.round((stats.lastWeek.b / stats.lastWeek.t) * 100) : 0;
+            const lPct = stats.lastWeek.t_adj > 0 ? Math.round((stats.lastWeek.b / stats.lastWeek.t_adj) * 100) : 0;
             document.getElementById('last-pct').innerText = lPct + '%';
 
             const updatePace = () => {
