@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (V127)</title>
+    <title>Weekly Pulse (V128)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -33,8 +33,8 @@
 <body class="light-bg min-h-screen p-4 md:p-8 transition-colors duration-200" id="body">
 
     <!-- STATUS BAR -->
-    <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Syncing V127...
+    <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50 hidden">
+        Syncing...
     </div>
 
     <!-- DASHBOARD -->
@@ -45,16 +45,21 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v127</span></h1>
-                    <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE API</span>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v128</span></h1>
+                    <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">CACHED</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
-                    <span>Last Updated: <span id="time-updated">Just now</span></span>
+                    <span>Last Synced: <span id="time-updated">--</span></span>
                     <span id="user-email" class="hidden md:inline">joe@iwdagency.com</span>
                 </div>
             </div>
             
             <div class="flex items-center gap-3">
+                <!-- REFRESH DATA BUTTON -->
+                <button onclick="refreshData()" id="refresh-btn" class="text-sm font-bold px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-2">
+                    <span>↻ Sync Now</span>
+                </button>
+
                 <button onclick="toggleTheme()" class="text-xl p-2 rounded hover:opacity-80 transition-opacity" title="Toggle Theme">
                     <span id="theme-icon">☀️</span>
                 </button>
@@ -91,15 +96,13 @@
         <div class="card rounded-lg shadow-sm mb-8 overflow-hidden">
             <div class="px-6 py-3 border-b flex justify-between items-center bg-opacity-50">
                 <h3 class="font-bold text-sm">📅 Weekly Comparison</h3>
-                <!-- Date removed -->
                 <span class="text-xs font-mono opacity-50" id="week-range"></span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
                 
                 <!-- This Week -->
                 <div id="this-week-box" class="p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 dark:border-gray-800 transition-colors duration-200">
-                    <div class="text-xs font-bold uppercase mb-2 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
-                    <div class="text-[10px] opacity-50 mb-6 font-mono" id="this-week-dates">--</div>
+                    <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
                     
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs">
                         <div class="text-center">
@@ -115,8 +118,7 @@
                 
                 <!-- Last Week -->
                 <div class="p-8 text-center flex flex-col justify-center items-center">
-                    <div class="text-xs font-bold uppercase mb-2 inline-block px-3 py-1 opacity-50">Last Week</div>
-                    <div class="text-[10px] opacity-50 mb-6 font-mono" id="last-week-dates">--</div>
+                    <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 opacity-50">Last Week</div>
                     
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs opacity-60">
                         <div class="text-center">
@@ -146,7 +148,9 @@
     </div>
 
     <script>
-        const API_BASE = '/.netlify/functions/get-pulse'; 
+        // CACHE ARCHITECTURE (V128)
+        const READ_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
+        const UPDATE_URL = '/.netlify/functions/update-pulse';
         
         netlifyIdentity.on('init', user => { if(user) document.getElementById('user-email').innerText = user.email; });
         netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
@@ -196,116 +200,77 @@
         window.addEventListener('DOMContentLoaded', init);
 
         async function init() {
-            const status = document.getElementById('status-bar');
-            status.innerText = "Syncing...";
+            loadCache();
+        }
+
+        async function loadCache() {
             try {
-                // PARALLEL FETCH (3 Requests)
-                const [resThis, resLast, resMonth] = await Promise.all([
-                    fetch(`${API_BASE}?range=this_week&v=${Date.now()}`),
-                    fetch(`${API_BASE}?range=last_week&v=${Date.now()}`),
-                    fetch(`${API_BASE}?range=month&v=${Date.now()}`)
-                ]);
+                const res = await fetch(READ_URL);
+                if (!res.ok) throw new Error("Cache Empty");
+                const data = await res.json();
+                
+                // Check if data is valid
+                if (!data.users || data.users.length === 0) {
+                    document.getElementById('time-updated').innerText = "Empty Cache";
+                    return;
+                }
 
-                if (!resThis.ok || !resLast.ok) throw new Error("API Timeout");
+                // Parse Updated Time
+                if (data.meta && data.meta.updated) {
+                    const date = new Date(data.meta.updated);
+                    document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                }
 
-                const dataThis = await resThis.json();
-                const dataLast = await resLast.json();
-                const dataMonth = await resMonth.json(); 
-                
-                status.innerText = "Loaded";
-                status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
-                setTimeout(() => status.classList.add('hidden'), 3000);
-                
-                const date = new Date();
-                document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                
-                processData(dataThis, dataLast, dataMonth);
+                renderCached(data);
+
             } catch (e) {
                 console.error(e);
-                status.innerText = "Retrying... (" + e.message + ")";
-                status.className = "fixed top-0 left-0 right-0 bg-orange-500 text-white text-xs font-bold text-center py-1 z-50";
-                setTimeout(() => location.reload(), 3000);
+                document.getElementById('time-updated').innerText = "Error Loading";
             }
         }
 
-        function processData(dataThis, dataLast, dataMonth) {
-            const entriesThis = dataThis.entries || [];
-            const entriesLast = dataLast.entries || [];
-            const entriesMonth = dataMonth.entries || [];
-            const rates = dataThis.rates || {};
-            const globalRate = dataThis.globalRate || 155;
-
-            // 1. DATE BOUNDARIES
-            const now = new Date();
-            const toStr = (d) => {
-                const y = d.getFullYear();
-                const m = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                return `${y}-${m}-${day}`;
-            };
-            const toShort = (dStr) => {
-                if(!dStr) return "";
-                const parts = dStr.split('-');
-                return `${parseInt(parts[1])}/${parseInt(parts[2])}`;
-            };
-
-            const d = new Date(now);
-            const day = d.getDay(); 
-            const diff = d.getDate() - day + (day == 0 ? -6 : 1); 
-            const thisMon = new Date(d.setDate(diff));
-            const thisSun = new Date(thisMon); thisSun.setDate(thisMon.getDate() + 6);
+        async function refreshData() {
+            const btn = document.getElementById('refresh-btn');
+            const originalText = btn.innerHTML;
             
-            const lastMon = new Date(thisMon); lastMon.setDate(thisMon.getDate() - 7);
-            const lastSun = new Date(lastMon); lastSun.setDate(lastMon.getDate() + 6);
-            
-            const thisWeekStart = toStr(thisMon);
-            const thisWeekEnd = toStr(thisSun);
-            const lastWeekStart = toStr(lastMon);
-            const lastWeekEnd = toStr(lastSun);
+            try {
+                btn.innerHTML = `<span>⏳ Syncing...</span>`;
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                // Trigger Background Update
+                const res = await fetch(UPDATE_URL);
+                const data = await res.json();
+                
+                if (!res.ok || !data.success) throw new Error("Sync Failed");
+                
+                // Success! Reload Cache
+                await loadCache();
+                
+                btn.innerHTML = `<span>✓ Done</span>`;
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }, 2000);
 
-            // Set Date Labels
-            document.getElementById('week-range').innerText = ""; 
-            document.getElementById('this-week-dates').innerText = `${toShort(thisWeekStart)} - ${toShort(thisWeekEnd)}`;
-            document.getElementById('last-week-dates').innerText = `${toShort(lastWeekStart)} - ${toShort(lastWeekEnd)}`;
-
-            // 2. AGGREGATE
-            let stats = {
-                month: { b: 0, t: 0, rev: 0 },
-                thisWeek: { b: 0, t: 0, t_adj: 0 }, 
-                lastWeek: { b: 0, t: 0, t_adj: 0 }
-            };
-            
-            let users = {};
-            let projects = {};
-
-            // Helper: Filter Logic
-            const processEntry = (e, targetStats, isMonthly) => {
-                if (isMonthly) {
-                    if (!e.i) { // Monthly: No Internal
-                        targetStats.t += e.h;
-                        if (e.b) {
-                            targetStats.b += e.h;
-                            targetStats.rev += e.h * (rates[e.pid] || rates[e.p] || globalRate);
-                            if(!users[e.u]) users[e.u]=0; users[e.u] += e.h;
-                        }
-                        if(!projects[e.p]) projects[e.p]={hours:0}; projects[e.p].hours += e.h;
-                    }
-                } else {
-                    // Weekly: Internal Included, Isah Excluded
-                    targetStats.t += e.h;
-                    if (!e.x) targetStats.t_adj += e.h; 
-                    if (e.b && !e.i) targetStats.b += e.h;
-                }
-            };
-
-            entriesThis.forEach(e => processEntry(e, stats.thisWeek, false));
-            entriesLast.forEach(e => processEntry(e, stats.lastWeek, false));
-            entriesMonth.forEach(e => processEntry(e, stats.month, true));
-
-            render(stats, users, projects);
+            } catch (e) {
+                console.error(e);
+                btn.innerHTML = `<span>❌ Failed</span>`;
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }, 2000);
+            }
         }
 
-        function render(stats, users, projects) {
+        function renderCached(data) {
+            const stats = data.pulse;
+            const users = data.users || [];
+            const projects = data.projects || [];
+
+            // Monthly
             const now = new Date();
             const start = new Date(now.getFullYear(), now.getMonth(), 1);
             let daysPassed = 0;
@@ -322,6 +287,7 @@
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
             document.getElementById('month-total-main').innerText = Math.round(stats.month.t) + 'h';
 
+            // Weekly
             document.getElementById('week-billable').innerText = Math.round(stats.thisWeek.b);
             const wPct = stats.thisWeek.t_adj > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t_adj) * 100) : 0;
             const wPctEl = document.getElementById('week-pct');
@@ -347,11 +313,10 @@
             updatePace();
             document.getElementById('goal-input').addEventListener('input', updatePace);
 
-            const renderList = (id, listObj) => {
+            const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
-                const sorted = Object.keys(listObj).map(k => ({ name: k, hours: listObj[k].hours || listObj[k] }));
-                sorted.sort((a,b) => b.hours - a.hours).slice(0,5).forEach((item, i) => {
+                list.forEach((item, i) => {
                     el.innerHTML += `
                         <tr class="hover:bg-white hover:bg-opacity-10 dark:border-gray-800">
                             <td class="px-6 py-3 w-10 text-xs font-mono opacity-50">0${i+1}</td>
@@ -364,5 +329,3 @@
             renderList('top-clients', projects);
         }
     </script>
-</body>
-</html>

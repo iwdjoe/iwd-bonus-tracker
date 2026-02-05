@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "updated": "1970-01-01T00:00:00.000Z",
+    "status": "initialized"
+  },
+  "pulse": {
+    "month": { "b": 0, "t": 0, "rev": 0 },
+    "thisWeek": { "b": 0, "t": 0, "t_adj": 0 },
+    "lastWeek": { "b": 0, "t": 0, "t_adj": 0 }
+  },
+  "users": [],
+  "projects": []
+}
