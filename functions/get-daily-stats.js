@@ -1,10 +1,9 @@
-// LIGHTWEIGHT DAILY FEED (Fixed V56)
+// LIGHTWEIGHT DAILY FEED (V59 - Clone Main Logic)
 let cache = { data: null, time: 0 };
 
 exports.handler = async function(event, context) {
-    if (cache.data && (Date.now() - cache.time < 60000)) {
-        return { statusCode: 200, body: JSON.stringify(cache.data) };
-    }
+    // Disable cache for debugging this specific issue
+    // if (cache.data && (Date.now() - cache.time < 60000)) ...
 
     const fetch = require('node-fetch');
     const TOKEN = process.env.TEAMWORK_API_TOKEN || 'dryer498desert';
@@ -12,37 +11,37 @@ exports.handler = async function(event, context) {
 
     try {
         const now = new Date();
-        const startFetch = new Date(now);
-        startFetch.setDate(now.getDate() - 45); // Go back 45 days
-        const fmt = (d) => d.toISOString().split('T')[0].replace(/-/g, '');
+        // EXACT LOGIC FROM get-stats.js (Working)
+        const startMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0].replace(/-/g, '');
+        const today = now.toISOString().split('T')[0].replace(/-/g, '');
 
-        // Fetch wide range
-        const url = `https://iwdagency.teamwork.com/time_entries.json?page=1&pageSize=1000&fromDate=${fmt(startFetch)}&toDate=${fmt(now)}`;
+        const url = `https://iwdagency.teamwork.com/time_entries.json?page=1&pageSize=1000&fromDate=${startMonth}&toDate=${today}`;
+        
         const res = await fetch(url, { headers: { 'Authorization': AUTH } });
         const data = await res.json();
         
+        const entries = data['time-entries'] || [];
+        
+        // AGGREGATE
         let timeline = [];
         let users = {};
         let clients = {};
-        
-        const entries = data['time-entries'] || [];
-        const debugFirst = entries.length > 0 ? entries[0].date : "Empty";
+        let rawCount = 0;
 
         entries.forEach(e => {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
             
-            // Normalize Date
-            let d = e.date;
-            // Handle YYYYMMDD -> YYYY-MM-DD conversion if needed
-            if (d.length === 8 && !d.includes('-')) d = `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}`;
+            rawCount++;
+            let date = e.date;
+            // Normalize Date just in case
+            if (date.length === 8 && !date.includes('-')) date = `${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}`;
             
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
-            const isBill = e['isbillable'] === '1';
+            const isBillable = e['isbillable'] === '1';
 
-            timeline.push({ date: d, hours, billable: isBill ? hours : 0 });
+            timeline.push({ date, hours, billable: isBill ? hours : 0 });
 
-            // Top Lists (Rough Approx for last 45 days)
-            if (isBill) {
+            if (isBillable) {
                 const u = e['person-first-name'] + ' ' + e['person-last-name'];
                 users[u] = (users[u] || 0) + hours;
                 const c = e['project-name'];
@@ -50,7 +49,7 @@ exports.handler = async function(event, context) {
             }
         });
 
-        // Sort Top Lists
+        // Top Lists
         const topUsers = Object.entries(users).sort(([,a], [,b]) => b - a).slice(0, 5).map(([n, h]) => ({ name: n, hours: h }));
         const topClients = Object.entries(clients).sort(([,a], [,b]) => b - a).slice(0, 5).map(([n, h]) => ({ name: n, hours: h }));
 
@@ -58,7 +57,12 @@ exports.handler = async function(event, context) {
             timeline, 
             topUsers, 
             topClients, 
-            meta: { serverTime: new Date().toISOString(), firstDate: debugFirst } 
+            meta: { 
+                serverTime: new Date().toISOString(), 
+                debugUrl: url.replace(TOKEN, 'HIDDEN'), // Show us the URL pattern
+                entryCount: entries.length,
+                processedCount: rawCount
+            } 
         };
         
         cache.data = response;
