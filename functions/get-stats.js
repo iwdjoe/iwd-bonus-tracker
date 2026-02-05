@@ -19,9 +19,9 @@ exports.handler = async function(event, context) {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
         const now = new Date();
         
-        // FETCH RANGE: Last 45 Days
+        // FETCH RANGE: Last 14 Days (Shortened to ensure we capture recent data within page limits)
         const fetchStart = new Date(now);
-        fetchStart.setDate(now.getDate() - 45);
+        fetchStart.setDate(now.getDate() - 14);
         const fetchEnd = new Date(now);
         fetchEnd.setDate(now.getDate() + 1);
         
