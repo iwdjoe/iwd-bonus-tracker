@@ -40,7 +40,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v83</span></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v84</span></h1>
                     <span id="mode-badge" class="hidden text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase">CACHED MODE</span>
                 </div>
             </div>
@@ -85,8 +85,9 @@
                             <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
                         </div>
                         <div>
-                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
+                            <!-- ADDED % BILLABLE -->
+                            <div class="text-4xl font-bold text-gray-500 dark:text-gray-400 mb-1" id="week-pct">--%</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">% Billable</div>
                         </div>
                     </div>
                 </div>
@@ -98,8 +99,8 @@
                             <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
                         </div>
                         <div>
-                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">--</div>
-                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
+                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-pct">--%</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">% Billable</div>
                         </div>
                     </div>
                 </div>
@@ -209,11 +210,19 @@
             const l = (data.weekly && data.weekly.lastWeek) ? data.weekly.lastWeek : { billable: 0, total: 0 };
             const ranges = (data.weekly && data.weekly.ranges) ? data.weekly.ranges : { this: "Syncing...", last: "" };
 
+            // CALC %
+            const wPct = w.total > 0 ? Math.round((w.billable / w.total) * 100) : 0;
+            const lPct = l.total > 0 ? Math.round((l.billable / l.total) * 100) : 0;
+
             document.getElementById('week-range').innerText = ranges.this;
             document.getElementById('week-billable').innerText = Math.round(w.billable);
-            document.getElementById('week-total').innerText = Math.round(w.total);
+            document.getElementById('week-pct').innerText = wPct + '%'; // Replaced Total with %
+            
             document.getElementById('last-billable').innerText = Math.round(l.billable);
-            document.getElementById('last-total').innerText = Math.round(l.total);
+            // Replaced Last Total with Last % (Need to update HTML too, doing it dynamically here if ID exists, else skipped)
+            if(document.getElementById('last-pct')) {
+                 document.getElementById('last-pct').innerText = lPct + '%';
+            }
 
             // PACE CALCULATION
             const updatePace = () => {
