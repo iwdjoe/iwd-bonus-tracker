@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (V115)</title>
+    <title>Weekly Pulse (V117)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -40,12 +40,12 @@
     <!-- DASHBOARD -->
     <div id="dashboard" class="max-w-6xl mx-auto pt-6">
         
-        <!-- HEADER (MATCHING MAIN DASHBOARD STYLE EXACTLY) -->
+        <!-- HEADER -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v116</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v117</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE API</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
@@ -55,12 +55,9 @@
             </div>
             
             <div class="flex items-center gap-3">
-                <!-- Theme Toggle (Icon Only) -->
                 <button onclick="toggleTheme()" class="text-xl p-2 rounded hover:opacity-80 transition-opacity" title="Toggle Theme">
                     <span id="theme-icon">☀️</span>
                 </button>
-                
-                <!-- Logout (Icon Only) -->
                 <button onclick="netlifyIdentity.logout()" class="text-xl p-2 rounded hover:opacity-80 transition-opacity text-gray-500 hover:text-red-500" title="Logout">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 </button>
@@ -97,23 +94,29 @@
                 <span class="text-xs font-mono opacity-50" id="week-range"></span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
-                <!-- This Week (JS Controlled BG) -->
+                
+                <!-- This Week -->
                 <div id="this-week-box" class="p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 dark:border-gray-800 transition-colors duration-200">
-                    <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
+                    <div class="text-xs font-bold uppercase mb-2 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
+                    <div class="text-[10px] opacity-50 mb-6 font-mono" id="this-week-dates">--</div>
+                    
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs">
                         <div class="text-center">
-                            <div class="text-4xl font-black mb-1" id="week-billable">--</div>
-                            <div class="text-[10px] uppercase font-bold opacity-50">Billable</div>
+                            <div class="text-4xl font-black mb-1 text-gray-900 dark:text-white" id="week-billable">--</div>
+                            <div class="text-[10px] uppercase font-bold opacity-50 text-gray-600 dark:text-gray-400">Billable</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-4xl font-bold mb-1 opacity-60" id="week-pct">--%</div>
-                            <div class="text-[10px] uppercase font-bold opacity-50">% Billable</div>
+                            <div class="text-4xl font-bold mb-1 opacity-60 text-gray-900 dark:text-gray-300" id="week-pct">--%</div>
+                            <div class="text-[10px] uppercase font-bold opacity-50 text-gray-600 dark:text-gray-400">% Billable</div>
                         </div>
                     </div>
                 </div>
+                
                 <!-- Last Week -->
                 <div class="p-8 text-center flex flex-col justify-center items-center">
-                    <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 opacity-50">Last Week</div>
+                    <div class="text-xs font-bold uppercase mb-2 inline-block px-3 py-1 opacity-50">Last Week</div>
+                    <div class="text-[10px] opacity-50 mb-6 font-mono" id="last-week-dates">--</div>
+                    
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs opacity-60">
                         <div class="text-center">
                             <div class="text-3xl font-bold mb-1" id="last-billable">--</div>
@@ -144,12 +147,10 @@
     <script>
         const API_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
         
-        // Auth Logic to get Email
-        netlifyIdentity.on('init', user => {
-            if(user) document.getElementById('user-email').innerText = user.email;
-        });
+        // Auth Logic
+        netlifyIdentity.on('init', user => { if(user) document.getElementById('user-email').innerText = user.email; });
         netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
-        netlifyIdentity.on('logout', () => { location.reload(); }); // Reload on logout
+        netlifyIdentity.on('logout', () => { location.reload(); });
         netlifyIdentity.init();
 
         function log(msg) { console.log(msg); } 
@@ -171,10 +172,7 @@
                 body.className = "bg-black text-white min-h-screen p-4 md:p-8 transition-colors duration-200";
                 cards.forEach(c => c.className = c.className.replace('light-card', 'dark-card').replace('bg-white', '').replace('bg-gray-900', '') + ' dark-card');
                 
-                // Explicitly set Dark BG + White Text for This Week
                 thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-800 transition-colors duration-200 bg-blue-900 bg-opacity-10 text-white";
-                
-                // Force child text elements to inherit or be white
                 document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-white";
                 document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-900', 'text-gray-300');
                 
@@ -184,10 +182,7 @@
                 body.className = "bg-gray-50 text-gray-900 min-h-screen p-4 md:p-8 transition-colors duration-200";
                 cards.forEach(c => c.className = c.className.replace('dark-card', 'light-card').replace('bg-white', '').replace('bg-gray-900', '') + ' light-card');
                 
-                // Explicitly set Light BG + Dark Text for This Week
                 thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 transition-colors duration-200 bg-blue-50 text-gray-900";
-                
-                // Force child text elements to be dark
                 document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-gray-900";
                 document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-300', 'text-gray-900').replace('text-white', 'text-gray-900');
                 
@@ -212,7 +207,6 @@
                 status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
                 setTimeout(() => status.classList.add('hidden'), 3000);
                 
-                // Update Time
                 const date = new Date();
                 document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 
@@ -221,7 +215,6 @@
                 console.error(e);
                 status.innerText = "Retrying... (" + e.message + ")";
                 status.className = "fixed top-0 left-0 right-0 bg-orange-500 text-white text-xs font-bold text-center py-1 z-50";
-                // Retry once after 2s
                 setTimeout(() => location.reload(), 2000);
             }
         }
@@ -232,6 +225,7 @@
             const globalRate = data.globalRate || 155;
 
             const now = new Date();
+            
             const toStr = (d) => {
                 const y = d.getFullYear();
                 const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -255,11 +249,20 @@
             
             const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
             
-            const thisWeekStr = toStr(thisMon);
+            const thisWeekStart = toStr(thisMon);
             const thisWeekEnd = toStr(thisSun);
-            const lastWeekStr = toStr(lastMon);
+            const lastWeekStart = toStr(lastMon);
             const lastWeekEnd = toStr(lastSun);
             const monthStartStr = toStr(monthStart);
+
+            // Display Dates
+            const toShort = (dStr) => {
+                const parts = dStr.split('-');
+                return `${parseInt(parts[1])}/${parseInt(parts[2])}`;
+            };
+            document.getElementById('week-range').innerText = `${thisWeekStart} -> Now`;
+            document.getElementById('this-week-dates').innerText = `${toShort(thisWeekStart)} - ${toShort(thisWeekEnd)}`;
+            document.getElementById('last-week-dates').innerText = `${toShort(lastWeekStart)} - ${toShort(lastWeekEnd)}`;
 
             let stats = {
                 month: { b: 0, t: 0, rev: 0 },
@@ -276,17 +279,13 @@
                     dateStr = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
                 }
 
-                // MONTHLY: Strict Filter (Exclude Internal)
                 if (dateStr >= monthStartStr) {
                     const isInternal = e.p.match(/IWD|Runners|Dominate/i);
-                    
                     if (!isInternal) {
                         stats.month.t += e.h;
                         if (e.b) stats.month.b += e.h;
-                        
                         const rate = rates[e.pid] || rates[e.p] || globalRate;
                         stats.month.rev += e.h * rate;
-
                         if (e.b) {
                             if (!users[e.u]) users[e.u] = 0;
                             users[e.u] += e.h;
@@ -296,8 +295,7 @@
                     }
                 }
 
-                // WEEKLY: Loose Filter (Include Internal, Exclude Isah)
-                if (e.x) return; // SKIP ISAH from Weekly Denominators
+                if (e.x) return; 
 
                 if (dateStr >= thisWeekStart && dateStr <= thisWeekEnd) {
                     stats.thisWeek.t += e.h;
@@ -311,7 +309,6 @@
                 }
             });
 
-            document.getElementById('week-range').innerText = `${thisWeekStr} -> Now`;
             render(stats, users, projects);
         }
 
@@ -332,7 +329,6 @@
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
             document.getElementById('month-total-main').innerText = Math.round(stats.month.t) + 'h';
 
-            // Weekly
             document.getElementById('week-billable').innerText = Math.round(stats.thisWeek.b);
             const wPct = stats.thisWeek.t_adj > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t_adj) * 100) : 0;
             const wPctEl = document.getElementById('week-pct');
