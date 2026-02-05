@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse v71 (Fix)</title>
+    <title>Weekly Pulse v72</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -20,7 +20,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        
         *, ::before, ::after { animation: none !important; transition: none !important; }
         
         .stat-card { @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-between h-full relative overflow-hidden; }
@@ -28,7 +27,7 @@
         .dark .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.1) 100%); }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8">
+<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 dark">
 
     <!-- LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-gray-50 dark:bg-black flex flex-col items-center justify-center z-50">
@@ -39,6 +38,9 @@
         </button>
     </div>
 
+    <!-- ERROR CONSOLE -->
+    <div id="error-console" class="fixed bottom-0 left-0 right-0 bg-red-900 text-white p-4 font-mono text-xs z-50 hidden"></div>
+
     <!-- DASHBOARD -->
     <div id="dashboard" class="max-w-6xl mx-auto hidden">
         <!-- HEADER -->
@@ -46,7 +48,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v71</span></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v72</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase" id="live-indicator">Ready</span>
                 </div>
             </div>
@@ -79,11 +81,6 @@
                 <div class="text-xs text-gray-500 mt-1" id="month-total">-- Hrs Logged</div>
             </div>
         </div>
-        
-        <!-- MIDDLE: Placeholder -->
-        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 mb-8 p-8 text-center">
-            <h3 class="text-gray-400 text-sm">Weekly Breakdown Syncing...</h3>
-        </div>
 
         <!-- BOTTOM: LISTS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -97,9 +94,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- DEBUG -->
-    <div id="debug-box" class="fixed bottom-0 left-0 right-0 bg-red-900 text-white p-2 text-xs font-mono hidden"></div>
 
     <script>
         netlifyIdentity.on('init', user => {
@@ -115,82 +109,61 @@
 
         async function init() {
             try {
-                // Fetch Main Endpoint
-                const res = await fetch('/.netlify/functions/get-stats');
+                // BYPASS: Use the known-good Main API
+                const res = await fetch('/.netlify/functions/get-stats'); 
+                if(!res.ok) throw new Error("API Status: " + res.status);
                 const data = await res.json();
                 
-                // Show DEBUG info if empty
-                if (!data.users || data.users.length === 0) {
-                    document.getElementById('debug-box').classList.remove('hidden');
-                    document.getElementById('debug-box').innerText = "API returned 0 users. Raw: " + JSON.stringify(data);
-                }
-
                 render(data);
             } catch (e) {
                 console.error("Error", e);
-                document.getElementById('month-proj').innerText = "OFFLINE";
+                document.getElementById('month-proj').innerText = "ERROR";
+                document.getElementById('error-console').classList.remove('hidden');
+                document.getElementById('error-console').innerText = "CRITICAL ERROR: " + e.message;
             }
         }
 
         function render(data) {
-            console.log("Rendering Data:", data);
-            
-            // 1. SAFE EXTRACTION
-            const projects = Array.isArray(data.projects) ? data.projects : [];
-            const users = Array.isArray(data.users) ? data.users : [];
-            
-            // 2. CALC TOTALS
-            let totalHours = 0;
-            let rev = 0;
-            
-            projects.forEach(p => {
-                totalHours += (p.hours || 0);
-                rev += (p.hours || 0) * (p.rate || 155);
-            });
-            
-            // 3. UPDATE DOM (Monthly)
-            const daysPassed = Math.max(new Date().getDate() - 1, 1);
-            const projRev = (rev / daysPassed) * 20;
+            try {
+                // EXACT LOGIC CLONED FROM index.html (Main Dashboard)
+                const projects = data.projects || [];
+                const users = data.users || [];
+                
+                // Calculate Totals
+                const totalHours = projects.reduce((s,p) => s + p.hours, 0);
+                const rate = 155; 
+                // Use effective rate logic if possible, or fallback to base
+                const rev = projects.reduce((s,p) => s + (p.hours * (p.rate || 155)), 0);
+                
+                // Projections
+                const daysPassed = Math.max(new Date().getDate() - 1, 1); 
+                const projRev = (rev / daysPassed) * 20;
 
-            document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
-            document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
-            document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs';
-
-            // 4. LISTS (Simple Loop)
-            const userListEl = document.getElementById('top-users');
-            userListEl.innerHTML = '';
-            
-            const sortedUsers = [...users].sort((a,b) => (b.hours||0) - (a.hours||0)).slice(0,5);
-            if (sortedUsers.length === 0) {
-                userListEl.innerHTML = '<tr><td class="p-4 text-gray-500">No Users Found</td></tr>';
-            } else {
-                sortedUsers.forEach((u, i) => {
-                    userListEl.innerHTML += `
-                        <tr class="border-b border-gray-800">
-                            <td class="py-3 px-4 text-gray-400 font-mono">0${i+1}</td>
-                            <td class="py-3 px-4 text-white font-bold">${u.name}</td>
-                            <td class="py-3 px-4 text-right text-gray-300 font-mono">${Math.round(u.hours)}h</td>
-                        </tr>`;
-                });
-            }
-
-            const clientListEl = document.getElementById('top-clients');
-            clientListEl.innerHTML = '';
-            const sortedClients = [...projects].sort((a,b) => (b.hours||0) - (a.hours||0)).slice(0,5);
-            if (sortedClients.length === 0) {
-                 clientListEl.innerHTML = '<tr><td class="p-4 text-gray-500">No Clients Found</td></tr>';
-            } else {
-                sortedClients.forEach((p, i) => {
-                    clientListEl.innerHTML += `
-                        <tr class="border-b border-gray-800">
-                            <td class="py-3 px-4 text-gray-400 font-mono">0${i+1}</td>
-                            <td class="py-3 px-4 text-white font-bold">${p.name}</td>
-                            <td class="py-3 px-4 text-right text-gray-300 font-mono">${Math.round(p.hours)}h</td>
-                        </tr>`;
-                });
+                document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
+                document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
+                document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
+                
+                // Lists
+                const renderList = (id, list) => {
+                    const el = document.getElementById(id);
+                    el.innerHTML = '';
+                    list.sort((a,b)=>b.hours-a.hours).slice(0,5).forEach((item, i) => {
+                        el.innerHTML += `
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                <td class="px-6 py-3 w-10 text-xs font-mono text-gray-500">0${i+1}</td>
+                                <td class="px-6 py-3 font-medium text-gray-900 dark:text-white">${item.name}</td>
+                                <td class="px-6 py-3 text-right font-mono text-gray-700 dark:text-gray-300">${Math.round(item.hours)}h</td>
+                            </tr>`;
+                    });
+                };
+                renderList('top-users', users);
+                renderList('top-clients', projects);
+            } catch (renderError) {
+                document.getElementById('error-console').classList.remove('hidden');
+                document.getElementById('error-console').innerText = "RENDER ERROR: " + renderError.message;
             }
         }
-        
+
         function toggleTheme() { 
             document.documentElement.classList.toggle('dark'); 
             localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); 
