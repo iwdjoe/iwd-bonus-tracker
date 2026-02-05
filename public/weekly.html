@@ -94,11 +94,32 @@
     </div>
 
     <script>
-        // BYPASS AUTH GATE FOR DEBUGGING
-        // netlifyIdentity.on('init', user => { ... });
-        
-        // Auto-Init
-        setTimeout(init, 500);
+        // AUTH LOGIC (Restored V62)
+        function checkAuth() {
+            const user = netlifyIdentity.currentUser();
+            
+            if (user) {
+                // LOGGED IN
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard').classList.remove('hidden');
+                
+                // Force close the Netlify widget if open
+                netlifyIdentity.close();
+                
+                // Load Data if not already loaded
+                if(document.getElementById('month-proj').innerText === '--') init();
+            } else {
+                // LOGGED OUT
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('dashboard').classList.add('hidden');
+            }
+        }
+
+        // Initialize Identity
+        netlifyIdentity.on('init', checkAuth);
+        netlifyIdentity.on('login', checkAuth);
+        netlifyIdentity.on('logout', checkAuth);
+        netlifyIdentity.init();
 
         async function init() {
             try {
