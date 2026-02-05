@@ -154,53 +154,90 @@
         }
 
         function render(data) {
-            const projects = data.projects || [];
-            const users = data.users || [];
-            
-            // Re-Calculate "This Week" (Client Side) because V50 API doesn't send it yet
-            // Wait, Main API DOES send weekly object now in V51, let's try to use it if present
-            // Fallback to "Syncing..." if not present
+            // SAFE DATA EXTRACTION
             const w = data.weekly || { 
-                thisWeek: { billable: 0, total: 0 }, 
+                month: { billable: 0, total: 0, topUsers: [], topClients: [] },
+                thisWeek: { billable: 0, total: 0 },
                 lastWeek: { billable: 0, total: 0 },
                 ranges: { this: "Syncing...", last: "" }
             };
-
-            // Calculate Totals
-            const totalHours = projects.reduce((s,p) => s + p.hours, 0);
+            
+            // USE THE API DATA DIRECTLY (Do not recalculate from projects)
+            const monthBillable = w.month.billable;
+            const monthTotal = w.month.total || monthBillable; // Fallback if total missing
+            
+            // --- Monthly Projections ---
             const rate = 155; 
-            const rev = projects.reduce((s,p) => s + (p.hours * p.rate), 0);
+            const rev = monthBillable * rate;
             
-            // Projections (Same logic as main)
-            const daysPassed = Math.max(new Date().getDate() - 1, 1); 
-            const projRev = (rev / daysPassed) * 20;
+            const now = new Date();
+            // Calculate working days passed
+            let daysPassed = 0;
+            const start = new Date(now.getFullYear(), now.getMonth(), 1);
+            let cur = new Date(start);
+            while(cur <= now) {
+                if(cur.getDay()!==0 && cur.getDay()!==6) daysPassed++;
+                cur.setDate(cur.getDate()+1);
+            }
+            if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
+            
+            const projRev = (rev / daysPassed) * 20; // 20 day month approx
 
-            document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
+            // UPDATE DOM
+            document.getElementById('month-rev').innerText = 'Current: $' + Math.round(rev).toLocaleString();
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
-            document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
+            document.getElementById('month-total').innerText = Math.round(monthTotal) + ' Hrs Logged';
             
-            // WEEKLY (If data exists)
+            const efficiency = monthTotal > 0 ? Math.round((monthBillable / monthTotal) * 100) : 0;
+            document.getElementById('month-pct').innerText = efficiency + '%';
+            document.getElementById('eff-bar').style.width = efficiency + '%';
+
+            // Pool Logic
+            const getPool = (r) => {
+                if (r >= 160000) return 6000;
+                if (r >= 145000) return 5000;
+                if (r >= 130000) return 4000;
+                if (r >= 115000) return 3000;
+                if (r >= 100000) return 2000;
+                if (r >= 85000) return 1000;
+                return 0;
+            };
+            document.getElementById('month-pool').innerText = '$' + getPool(projRev).toLocaleString();
+
+            // --- Weekly ---
             document.getElementById('week-range').innerText = w.ranges.this;
             document.getElementById('week-billable').innerText = Math.round(w.thisWeek.billable);
-            document.getElementById('week-total').innerText = Math.round(w.thisWeek.total);
+            document.getElementById('week-total').innerText = Math.round(w.thisWeek.total || w.thisWeek.billable);
+            
             document.getElementById('last-billable').innerText = Math.round(w.lastWeek.billable);
-            document.getElementById('last-total').innerText = Math.round(w.lastWeek.total);
+            document.getElementById('last-total').innerText = Math.round(w.lastWeek.total || w.lastWeek.billable);
 
-            // Lists
+            // Goal Pace
+            const globalGoal = (data.meta && data.meta.globalGoal) ? data.meta.globalGoal : 200;
+            document.getElementById('goal-input').value = globalGoal;
+            renderPace(globalGoal, w.thisWeek.billable);
+
+            // --- Lists ---
             const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
-                list.sort((a,b)=>b.hours-a.hours).slice(0,5).forEach((item, i) => {
+                if (!list || list.length === 0) {
+                    el.innerHTML = '<tr><td class="p-4 text-gray-500">No data available</td></tr>';
+                    return;
+                }
+                list.forEach((item, i) => {
+                    const color = i === 0 ? 'text-blue-400' : 'text-gray-400';
                     el.innerHTML += `
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                            <td class="px-6 py-3 w-10 text-xs font-bold text-gray-400">${i+1}</td>
-                            <td class="px-6 py-3 font-medium text-gray-900 dark:text-white">${item.name}</td>
-                            <td class="px-6 py-3 text-right font-bold text-gray-700 dark:text-gray-300">${Math.round(item.hours)}h</td>
+                        <tr class="hover:bg-white/5">
+                            <td class="px-6 py-3 w-10 text-xs font-mono text-gray-500">0${i+1}</td>
+                            <td class="px-6 py-3 font-medium text-white">${item.name}</td>
+                            <td class="px-6 py-3 text-right font-mono text-gray-300">${Math.round(item.hours)}h</td>
                         </tr>`;
                 });
             };
-            renderList('top-users', users);
-            renderList('top-clients', projects);
+            
+            renderList('top-users', w.month.topUsers);
+            renderList('top-clients', w.month.topClients);
         }
 
         function toggleTheme() { 
