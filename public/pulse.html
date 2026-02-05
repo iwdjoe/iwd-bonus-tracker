@@ -47,7 +47,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v113</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v114</span></h1>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -153,8 +153,12 @@
                 body.className = "bg-black text-white min-h-screen p-4 md:p-8 transition-colors duration-200";
                 cards.forEach(c => c.className = c.className.replace('light-card', 'dark-card').replace('bg-white', '').replace('bg-gray-900', '') + ' dark-card');
                 
-                // Explicitly set Dark BG for This Week
-                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-800 transition-colors duration-200 bg-blue-900 bg-opacity-10";
+                // Explicitly set Dark BG + White Text for This Week
+                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-800 transition-colors duration-200 bg-blue-900 bg-opacity-10 text-white";
+                
+                // Force child text elements to inherit or be white
+                document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-white";
+                document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-900', 'text-gray-300');
                 
                 document.querySelectorAll('.divide-y').forEach(el => el.classList.add('divide-gray-800'));
                 document.querySelectorAll('.border-b').forEach(el => el.classList.add('border-gray-800'));
@@ -162,8 +166,12 @@
                 body.className = "bg-gray-50 text-gray-900 min-h-screen p-4 md:p-8 transition-colors duration-200";
                 cards.forEach(c => c.className = c.className.replace('dark-card', 'light-card').replace('bg-white', '').replace('bg-gray-900', '') + ' light-card');
                 
-                // Explicitly set Light BG for This Week
-                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 transition-colors duration-200 bg-blue-50";
+                // Explicitly set Light BG + Dark Text for This Week
+                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 transition-colors duration-200 bg-blue-50 text-gray-900";
+                
+                // Force child text elements to be dark
+                document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-gray-900";
+                document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-300', 'text-gray-900').replace('text-white', 'text-gray-900');
                 
                 document.querySelectorAll('.divide-y').forEach(el => el.classList.remove('divide-gray-800'));
                 document.querySelectorAll('.border-b').forEach(el => el.classList.remove('border-gray-800'));
