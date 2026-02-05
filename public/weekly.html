@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (Stable)</title>
+    <title>Weekly Pulse | IWD Agency</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -19,7 +19,7 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
         *, ::before, ::after { animation: none !important; transition: none !important; }
         
         .stat-card { @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-between h-full relative overflow-hidden; }
@@ -79,7 +79,43 @@
             </div>
         </div>
 
-        <!-- BOTTOM: LISTS (Weekly row removed for stability) -->
+        <!-- MIDDLE ROW (RESTORED WEEKLY) -->
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 mb-8 overflow-hidden">
+            <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 border-b border-gray-200 dark:border-gray-800 flex justify-between">
+                <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300">📅 Weekly Comparison</h3>
+                <span class="text-xs text-gray-500 font-mono" id="week-range"></span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-800">
+                <div class="p-8 text-center bg-blue-50/50 dark:bg-blue-900/10">
+                    <div class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full bg-white dark:bg-black border border-blue-100 dark:border-blue-900">This Week</div>
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-8 text-center">
+                    <div class="text-xs text-gray-400 font-bold uppercase mb-6 inline-block px-3 py-1">Last Week</div>
+                    <div class="grid grid-cols-2 gap-8 opacity-60">
+                        <div>
+                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM: LISTS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50"><h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">🏆 Top Contributors</h3></div>
@@ -121,6 +157,15 @@
             const projects = data.projects || [];
             const users = data.users || [];
             
+            // Re-Calculate "This Week" (Client Side) because V50 API doesn't send it yet
+            // Wait, Main API DOES send weekly object now in V51, let's try to use it if present
+            // Fallback to "Syncing..." if not present
+            const w = data.weekly || { 
+                thisWeek: { billable: 0, total: 0 }, 
+                lastWeek: { billable: 0, total: 0 },
+                ranges: { this: "Syncing...", last: "" }
+            };
+
             // Calculate Totals
             const totalHours = projects.reduce((s,p) => s + p.hours, 0);
             const rate = 155; 
@@ -134,6 +179,13 @@
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
             document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
             
+            // WEEKLY (If data exists)
+            document.getElementById('week-range').innerText = w.ranges.this;
+            document.getElementById('week-billable').innerText = Math.round(w.thisWeek.billable);
+            document.getElementById('week-total').innerText = Math.round(w.thisWeek.total);
+            document.getElementById('last-billable').innerText = Math.round(w.lastWeek.billable);
+            document.getElementById('last-total').innerText = Math.round(w.lastWeek.total);
+
             // Lists
             const renderList = (id, list) => {
                 const el = document.getElementById(id);
