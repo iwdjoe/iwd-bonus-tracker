@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse | IWD Agency</title>
+    <!-- Version in Title for easy verification -->
+    <title>Weekly Pulse v1.0 | IWD Agency</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -21,6 +22,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         
+        /* NO ANIMATIONS ALLOWED - STATIC ONLY */
         .stat-card { @apply bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-between h-full relative overflow-hidden; }
         .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(147,51,234,0.05) 100%); }
         .dark .funky-bg { background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.1) 100%); }
@@ -31,7 +33,7 @@
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 bg-gray-50 dark:bg-black flex flex-col items-center justify-center z-50">
         <img src="iwd-logo-new.png" class="w-24 h-auto mb-6">
-        <h1 class="text-2xl font-bold mb-2">IWD Weekly Pulse</h1>
+        <h1 class="text-2xl font-bold mb-2">IWD Weekly Pulse v1.0</h1>
         <button onclick="netlifyIdentity.open('login')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-md mt-4">
             <span>🔒</span> Login
         </button>
@@ -45,7 +47,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain" alt="IWD">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse</h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v1.0</span></h1>
                     <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300 uppercase" id="live-indicator">Ready</span>
                 </div>
                 <div class="flex items-center gap-2 mt-1 ml-1 text-xs text-gray-400">
@@ -184,7 +186,8 @@
 
         async function init() {
             try {
-                const res = await fetch('/.netlify/functions/get-stats');
+                // FORCE FRESH FETCH
+                const res = await fetch('/.netlify/functions/get-stats?t=' + Date.now());
                 if(!res.ok) throw new Error("API " + res.status);
                 const data = await res.json();
                 
@@ -194,13 +197,12 @@
                 document.getElementById('last-updated').innerText = t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
                 if (data.weekly) render(data);
-                else throw new Error("Missing Weekly Data");
+                else console.warn("No weekly data found");
 
             } catch (e) {
                 console.error("Error", e);
                 document.getElementById('last-updated').innerText = "ERROR";
                 document.getElementById('live-indicator').innerText = 'OFFLINE';
-                document.getElementById('live-indicator').className = "text-[10px] font-bold bg-red-100 text-red-800 px-2 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300 uppercase";
             }
         }
 
@@ -245,7 +247,6 @@
             document.getElementById('month-pct').innerText = efficiency + '%';
             document.getElementById('eff-bar').style.width = efficiency + '%';
 
-            // Pool Logic
             const getPool = (r) => {
                 if (r >= 160000) return 6000;
                 if (r >= 145000) return 5000;

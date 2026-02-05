@@ -73,15 +73,22 @@ exports.handler = async function(event, context) {
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
             const client = e['project-name'];
 
-            // 1. Main Dashboard Logic (Strictly This Month)
-            if (date >= startOfMonth) {
+            // RELAXED DATE MATCHING (UTC Safety)
+            // Convert everything to simple YYYY-MM-DD strings for comparison
+            const dateStr = e.date; // "2024-02-05"
+            const monthStr = startOfMonth.toISOString().split('T')[0];
+            const weekStr = startOfWeek.toISOString().split('T')[0];
+            const lastWeekStartStr = startLastWeek.toISOString().split('T')[0];
+            const lastWeekEndStr = endLastWeek.toISOString().split('T')[0];
+
+            // Month Bucket
+            if (dateStr >= monthStr) {
                 if (!users[user]) users[user] = 0;
-                users[user] += hours; // Logged (Total) hours usually shown in leaderboard
+                users[user] += hours; 
                 
                 if (!projects[client]) projects[client] = { hours: 0 };
                 if (isBillable) projects[client].hours += hours;
 
-                // Weekly Pulse Month Bucket
                 weekly.month.total += hours;
                 if (isBillable) {
                     weekly.month.billable += hours;
@@ -90,11 +97,11 @@ exports.handler = async function(event, context) {
                 }
             }
 
-            // 2. Weekly Buckets
-            if (date >= startOfWeek) {
+            // Week Buckets
+            if (dateStr >= weekStr) {
                 weekly.thisWeek.total += hours;
                 if (isBillable) weekly.thisWeek.billable += hours;
-            } else if (date >= startLastWeek && date <= endLastWeek) {
+            } else if (dateStr >= lastWeekStartStr && dateStr <= lastWeekEndStr) {
                 weekly.lastWeek.total += hours;
                 if (isBillable) weekly.lastWeek.billable += hours;
             }
