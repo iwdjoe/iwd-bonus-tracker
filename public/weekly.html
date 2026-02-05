@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Team Pulse</title>
+    <link rel="icon" type="image/png" href="iwd-logo-new.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: white; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Glassmorphism Cards */
+        .glass {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Neon Glows */
+        .glow-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        .grid-bg {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="min-h-screen grid-bg flex items-center justify-center p-4">
+
+    <!-- AUTH GATE -->
+    <div id="login-screen" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
+        <h1 class="text-3xl font-bold mb-4 tracking-widest">RESTRICTED ACCESS</h1>
+        <button onclick="netlifyIdentity.open()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded font-bold transition">AUTHENTICATE</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="w-full max-w-7xl hidden">
+        
+        <header class="flex justify-between items-center mb-12">
+            <div class="flex items-center gap-4">
+                <img src="iwd-logo-new.png" class="h-10 opacity-80">
+                <h1 class="text-3xl font-bold tracking-tight text-white/90">BILLABLE HOURS <span class="text-blue-500">PULSE</span></h1>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-blue-400 uppercase tracking-widest mb-1">Status</div>
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <span class="mono text-sm">LIVE FEED</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- LEFT: MONTH ACCUMULATED -->
+            <div class="lg:col-span-3 glass rounded-xl p-1">
+                <div class="bg-slate-900/50 rounded-t-lg p-4 border-b border-white/5">
+                    <h2 class="text-xs text-blue-300 font-bold uppercase tracking-widest text-center">Current Month</h2>
+                </div>
+                <div class="p-6 space-y-6">
+                    <div class="flex justify-between items-center border-b border-white/5 pb-4">
+                        <span class="text-sm text-gray-400 font-medium">Billable</span>
+                        <span class="text-3xl font-bold text-blue-400 mono glow-text" id="month-billable">--</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-white/5 pb-4">
+                        <span class="text-sm text-gray-400 font-medium">Total</span>
+                        <span class="text-xl font-bold text-white mono" id="month-total">--</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-white/5 pb-4">
+                        <span class="text-sm text-gray-400 font-medium">Non-Billable</span>
+                        <span class="text-xl font-bold text-gray-500 mono" id="month-non">--</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-sm text-gray-400 font-medium">% Billable</span>
+                        <span class="text-4xl font-black text-green-400 mono" id="month-pct">--%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CENTER: WEEKLY COMPARISON -->
+            <div class="lg:col-span-6 glass rounded-xl p-8 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+                
+                <h3 class="text-center text-gray-400 text-sm uppercase tracking-widest mb-8">Weekly Performance</h3>
+
+                <div class="grid grid-cols-2 gap-8 text-center">
+                    <!-- THIS WEEK -->
+                    <div class="relative">
+                        <div class="text-xs text-blue-400 font-bold uppercase mb-2">This Week*</div>
+                        <div class="text-[10px] text-gray-500 mb-6" id="range-this">--</div>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <div class="text-5xl font-bold text-white mono mb-1" id="week-billable">--</div>
+                                <div class="text-[10px] text-gray-500 uppercase">Billable Hours</div>
+                            </div>
+                            <div>
+                                <div class="text-xl font-medium text-gray-400 mono" id="week-total">--</div>
+                                <div class="text-[10px] text-gray-600 uppercase">Total Logged</div>
+                            </div>
+                            <div class="inline-block bg-blue-500/10 px-3 py-1 rounded text-blue-300 font-bold text-sm">
+                                <span id="week-pct">--%</span> Efficiency
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LAST WEEK -->
+                    <div class="relative border-l border-white/10">
+                        <div class="text-xs text-gray-400 font-bold uppercase mb-2">Last Week</div>
+                        <div class="text-[10px] text-gray-500 mb-6" id="range-last">--</div>
+                        
+                        <div class="space-y-6 opacity-60">
+                            <div>
+                                <div class="text-4xl font-bold text-white mono mb-1" id="last-billable">--</div>
+                                <div class="text-[10px] text-gray-500 uppercase">Billable Hours</div>
+                            </div>
+                            <div>
+                                <div class="text-xl font-medium text-gray-400 mono" id="last-total">--</div>
+                                <div class="text-[10px] text-gray-600 uppercase">Total Logged</div>
+                            </div>
+                            <div class="inline-block bg-gray-800 px-3 py-1 rounded text-gray-400 font-bold text-sm">
+                                <span id="last-pct">--%</span> Efficiency
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-8 text-[10px] text-gray-600 italic">*Current week in progress</div>
+            </div>
+
+            <!-- RIGHT: GOALS -->
+            <div class="lg:col-span-3 glass rounded-xl p-1">
+                <div class="bg-slate-900/50 rounded-t-lg p-4 border-b border-white/5">
+                    <h2 class="text-xs text-green-300 font-bold uppercase tracking-widest text-center">2026 Targets</h2>
+                </div>
+                <div class="p-6 space-y-8">
+                    
+                    <div class="text-center">
+                        <div class="text-xs text-gray-400 mb-2 uppercase">Weekly Goal</div>
+                        <div class="flex items-center justify-center gap-2">
+                            <span class="text-gray-500 text-lg">🎯</span>
+                            <input type="number" id="goal-input" value="200" class="bg-transparent border-b border-gray-600 text-center text-3xl font-bold text-white mono w-24 focus:outline-none focus:border-blue-500" onchange="saveGoal(this.value)">
+                        </div>
+                        <div class="text-[10px] text-gray-600 mt-1">Editable</div>
+                    </div>
+
+                    <div class="text-center border-t border-white/5 pt-8">
+                        <div class="text-xs text-gray-400 mb-2 uppercase">2026 Average</div>
+                        <div class="text-3xl font-bold text-purple-400 mono" id="year-avg">--</div>
+                        <div class="text-[10px] text-gray-600 mt-1">Billable Hrs / Week</div>
+                    </div>
+
+                    <div class="text-center bg-green-500/10 rounded p-3 border border-green-500/20">
+                        <div class="text-[10px] text-green-400 uppercase font-bold">Pace vs Goal</div>
+                        <div class="text-xl font-bold text-white mt-1 mono" id="pace-stat">--%</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // AUTH GATE
+        netlifyIdentity.on('init', user => {
+            if (!user) document.getElementById('login-screen').classList.remove('hidden');
+            else if (user.email.endsWith('@iwdagency.com')) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                init();
+            }
+        });
+        netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
+        netlifyIdentity.init();
+
+        // APP LOGIC
+        async function init() {
+            try {
+                const res = await fetch('/.netlify/functions/get-weekly-stats');
+                const data = await res.json();
+                render(data);
+            } catch (e) {
+                console.error("Fetch failed", e);
+            }
+        }
+
+        function render(data) {
+            // Helper: Safe Percent
+            const pct = (b, t) => t > 0 ? Math.round((b/t)*100) : 0;
+            const num = (n) => Math.round(n);
+
+            // Month
+            document.getElementById('month-billable').innerText = num(data.month.billable);
+            document.getElementById('month-total').innerText = num(data.month.total);
+            document.getElementById('month-non').innerText = num(data.month.nonBillable);
+            document.getElementById('month-pct').innerText = pct(data.month.billable, data.month.total) + '%';
+
+            // This Week
+            document.getElementById('range-this').innerText = data.meta.thisWeekRange;
+            document.getElementById('week-billable').innerText = num(data.thisWeek.billable);
+            document.getElementById('week-total').innerText = num(data.thisWeek.total);
+            document.getElementById('week-pct').innerText = pct(data.thisWeek.billable, data.thisWeek.total) + '%';
+
+            // Last Week
+            document.getElementById('range-last').innerText = data.meta.lastWeekRange;
+            document.getElementById('last-billable').innerText = num(data.lastWeek.billable);
+            document.getElementById('last-total').innerText = num(data.lastWeek.total);
+            document.getElementById('last-pct').innerText = pct(data.lastWeek.billable, data.lastWeek.total) + '%';
+
+            // Year / Goal
+            const savedGoal = localStorage.getItem('weekly_goal') || 200;
+            document.getElementById('goal-input').value = savedGoal;
+            document.getElementById('year-avg').innerText = Math.round(data.year.weeklyAvg);
+            
+            // Pace Calc
+            const pace = Math.round((data.thisWeek.billable / savedGoal) * 100);
+            document.getElementById('pace-stat').innerText = pace + '%';
+        }
+
+        function saveGoal(val) {
+            localStorage.setItem('weekly_goal', val);
+            // Re-render pace
+            const currentBillable = parseFloat(document.getElementById('week-billable').innerText);
+            const pace = Math.round((currentBillable / val) * 100);
+            document.getElementById('pace-stat').innerText = pace + '%';
+        }
+    </script>
+</body>
+</html>
