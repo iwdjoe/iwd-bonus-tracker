@@ -1,4 +1,4 @@
-// WEEKLY CACHE (Strictly This Month)
+// WEEKLY BACKEND V47 (Debug + Fix)
 let cache = { data: null, time: 0 };
 
 exports.handler = async function(event, context) {
@@ -8,17 +8,14 @@ exports.handler = async function(event, context) {
     const REPO = "iwdjoe/iwd-bonus-tracker";
     const GH_TOKEN = process.env.GITHUB_PAT;
 
-    if (cache.data && (Date.now() - cache.time < 60000)) {
-        return { statusCode: 200, body: JSON.stringify(cache.data) };
-    }
-
     try {
         const now = new Date();
-        // FETCH ONLY THIS MONTH (Safe, Fast)
         const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        
+        // Format YYYYMMDD for API
         const fmt = (d) => d.toISOString().split('T')[0].replace(/-/g, '');
         
-        // Parallel Fetch
+        // Fetch This Month
         const [twRes, ratesRes] = await Promise.all([
             fetch(`https://iwdagency.teamwork.com/time_entries.json?page=1&pageSize=1000&fromDate=${fmt(startMonth)}&toDate=${fmt(now)}`, { headers: { 'Authorization': AUTH } }),
             fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
@@ -28,44 +25,54 @@ exports.handler = async function(event, context) {
         const data = await twRes.json();
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
 
-        // Define Ranges
-        const startOfWeek = new Date(now);
-        const day = startOfWeek.getDay() || 7; 
-        if (day !== 1) startOfWeek.setHours(-24 * (day - 1)); else startOfWeek.setHours(0,0,0,0);
+        const entries = data['time-entries'] || [];
         
+        // DEBUG: Check first entry format
+        const firstDate = entries.length > 0 ? entries[0].date : "No Entries";
+
         // Stats Buckets
         const stats = {
             month: { billable: 0, total: 0, users: {}, clients: {} },
             thisWeek: { billable: 0, total: 0 },
-            lastWeek: { billable: 0, total: 0 } // Will be empty if last week was Jan
+            lastWeek: { billable: 0, total: 0 }
         };
 
-        const weekStr = startOfWeek.toISOString().split('T')[0];
+        // Date Helpers
+        const startOfWeek = new Date(now);
+        const day = startOfWeek.getDay() || 7; 
+        if (day !== 1) startOfWeek.setHours(-24 * (day - 1)); else startOfWeek.setHours(0,0,0,0);
+        
+        // Convert to YYYY-MM-DD Strings for robust comparison
+        const toStr = (d) => d.toISOString().split('T')[0];
+        const monthStr = toStr(startMonth);
+        const weekStr = toStr(startOfWeek);
 
-        (data['time-entries'] || []).forEach(e => {
+        entries.forEach(e => {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
             
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             const isBillable = e['isbillable'] === '1';
-            const dateStr = e.date;
+            
+            // Teamwork returns YYYY-MM-DD usually, let's normalize just in case
+            const dateStr = e.date; 
 
-            // Month Totals
-            stats.month.total += hours;
-            if (isBillable) {
-                stats.month.billable += hours;
-                const user = e['person-first-name'] + ' ' + e['person-last-name'];
-                stats.month.users[user] = (stats.month.users[user] || 0) + hours;
-                const client = e['project-name'];
-                stats.month.clients[client] = (stats.month.clients[client] || 0) + hours;
+            // Month
+            if (dateStr >= monthStr) {
+                stats.month.total += hours;
+                if (isBillable) {
+                    stats.month.billable += hours;
+                    const user = e['person-first-name'] + ' ' + e['person-last-name'];
+                    stats.month.users[user] = (stats.month.users[user] || 0) + hours;
+                    const client = e['project-name'];
+                    stats.month.clients[client] = (stats.month.clients[client] || 0) + hours;
+                }
             }
 
-            // Week Logic
+            // This Week
             if (dateStr >= weekStr) {
                 stats.thisWeek.total += hours;
                 if (isBillable) stats.thisWeek.billable += hours;
-            } 
-            // Note: Last Week logic removed because fetching January data crashes the API.
-            // We accept "0" for Last Week in exchange for a working dashboard.
+            }
         });
 
         const sortMap = (map) => Object.entries(map).sort(([,a], [,b]) => b - a).slice(0, 5).map(([n, h]) => ({ name, hours: h }));
@@ -73,16 +80,13 @@ exports.handler = async function(event, context) {
         const responseData = {
             month: { ...stats.month, topUsers: sortMap(stats.month.users), topClients: sortMap(stats.month.clients) },
             thisWeek: stats.thisWeek,
-            lastWeek: stats.lastWeek, // Will be 0
+            lastWeek: stats.lastWeek, // 0 for safety
             meta: {
                 thisWeekRange: `${startOfWeek.toLocaleDateString()} - Now`,
-                lastWeekRange: "Data Unavailable",
-                globalGoal: parseInt(savedRates['__WEEKLY_GOAL__'] || 200)
+                globalGoal: parseInt(savedRates['__WEEKLY_GOAL__'] || 200),
+                debug: { firstDate, monthStr, weekStr, count: entries.length }
             }
         };
-
-        cache.data = responseData;
-        cache.time = Date.now();
 
         return { statusCode: 200, body: JSON.stringify(responseData) };
 
