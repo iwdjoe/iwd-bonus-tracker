@@ -1,6 +1,6 @@
-// V121 SPLIT FETCH API
-// Accepts ?range=this_week OR ?range=last_week
-// Keeps payloads small to survive Netlify 10s Timeout
+// V123 OPTIMIZED SPLIT FETCH API
+// this_week = 1 Page (Fast)
+// last_week = 2 Pages (Deep)
 
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
@@ -19,6 +19,7 @@ exports.handler = async function(event, context) {
         const day = d.getDay(); 
         const diff = d.getDate() - day + (day == 0 ? -6 : 1); // Monday
         const thisMon = new Date(d.setDate(diff));
+        thisMon.setHours(0,0,0,0);
         
         if (range === 'last_week') {
             const lastMon = new Date(thisMon);
@@ -28,7 +29,6 @@ exports.handler = async function(event, context) {
             fetchStart = lastMon;
             fetchEnd = lastSun;
         } else {
-            // this_week (Monday to Tomorrow)
             fetchStart = thisMon;
             fetchEnd = new Date(now);
             fetchEnd.setDate(now.getDate() + 1);
@@ -44,26 +44,34 @@ exports.handler = async function(event, context) {
         const fetchStartStr = formatDate(fetchStart);
         const fetchEndStr = formatDate(fetchEnd);
 
-        // Fetch 2 Pages (1000 entries) - plenty for 1 week
-        const [p1, p2, ratesRes] = await Promise.all([
-            fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}`, { headers: { 'Authorization': AUTH } }),
-            fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}`, { headers: { 'Authorization': AUTH } }),
-            fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
-        ]);
+        // OPTIMIZATION:
+        // "This Week" only needs 1 page (500 entries covers 7 days easily).
+        // "Last Week" might need 2 pages if it's very dense or pagination is weird.
+        const pagesToFetch = (range === 'last_week') ? 2 : 1;
 
-        const d1 = p1.ok ? await p1.json() : {};
-        const d2 = p2.ok ? await p2.json() : {};
+        const promises = [];
+        for(let i=1; i<=pagesToFetch; i++) {
+            promises.push(fetch(`https://${DOMAIN}/time_entries.json?page=${i}&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }));
+        }
+        // Always fetch rates
+        promises.push(fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } }));
+
+        const responses = await Promise.all(promises);
+        
+        const ratesRes = responses.pop(); // Last one is rates
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
-        const entries = [
-            ...(d1['time-entries'] || []),
-            ...(d2['time-entries'] || [])
-        ];
+        const entries = [];
+        for(const res of responses) {
+            const data = res.ok ? await res.json() : {};
+            if(data['time-entries']) entries.push(...data['time-entries']);
+        }
         
         const cleanEntries = entries.map(e => {
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
             const isExcludedUser = user.match(/Isah/i) && user.match(/Ramos/i);
+            // INCLUDE INTERNAL for Denominator
             const isInternal = e['project-name'].match(/IWD|Runners|Dominate/i);
 
             return {
@@ -72,8 +80,8 @@ exports.handler = async function(event, context) {
                 pid: e['project-name'].replace(/[^a-z0-9]/gi, ''),
                 d: e.date,
                 h: parseFloat(e.hours) + (parseFloat(e.minutes) / 60),
-                b: e['isbillable'] === '1' && !isInternal, // Billable (Strict)
-                x: !!isExcludedUser // Isah flag
+                b: e['isbillable'] === '1' && !isInternal, // Strict Billable
+                x: !!isExcludedUser
             };
         }).filter(Boolean);
 
