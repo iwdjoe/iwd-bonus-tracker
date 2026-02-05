@@ -40,7 +40,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v82</span></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v83</span></h1>
                     <span id="mode-badge" class="hidden text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase">CACHED MODE</span>
                 </div>
             </div>
@@ -55,7 +55,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="stat-card funky-bg border-blue-500/20">
                 <h3 class="text-[10px] font-bold text-blue-600 dark:text-blue-500 uppercase tracking-wider mb-1">Monthly Projection</h3>
-                <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-proj">--</div>
+                <div class="text-3xl font-black text-blue-900 dark:text-white" id="month-proj">--</div>
                 <div class="text-xs text-gray-600 dark:text-gray-400 mt-1" id="month-rev">Current: --</div>
             </div>
             <div class="stat-card border-purple-500/20">
@@ -123,7 +123,7 @@
         // Force fresh API fetch
         const API_URL = '/.netlify/functions/get-stats?v=' + Date.now(); 
         const BACKUP_URL = 'backup-stats.json';
-        const TIMEOUT_MS = 8000; // Gave it 2 extra seconds 
+        const TIMEOUT_MS = 8000; 
 
         window.addEventListener('DOMContentLoaded', init);
 
@@ -196,10 +196,15 @@
             const projRev = (rev / daysPassed) * totalDays;
 
             document.getElementById('month-rev').innerText = '$' + Math.round(rev).toLocaleString();
-            document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
+            
+            const projEl = document.getElementById('month-proj');
+            projEl.innerText = '$' + Math.round(projRev).toLocaleString();
+            // FIX: Enforce contrast for Light Mode
+            projEl.className = "text-3xl font-black text-blue-900 dark:text-white";
+
             document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
 
-            // --- WEEKLY DATA FIX (V79) ---
+            // --- WEEKLY DATA FIX (V83) ---
             const w = (data.weekly && data.weekly.thisWeek) ? data.weekly.thisWeek : { billable: 0, total: 0 };
             const l = (data.weekly && data.weekly.lastWeek) ? data.weekly.lastWeek : { billable: 0, total: 0 };
             const ranges = (data.weekly && data.weekly.ranges) ? data.weekly.ranges : { this: "Syncing...", last: "" };
@@ -210,20 +215,18 @@
             document.getElementById('last-billable').innerText = Math.round(l.billable);
             document.getElementById('last-total').innerText = Math.round(l.total);
 
-            // PACE CALCULATION (V80)
+            // PACE CALCULATION
             const updatePace = () => {
                 const goal = parseFloat(document.getElementById('goal-input').value) || 200;
                 const billable = w.billable || 0;
                 const pace = Math.round((billable / goal) * 100);
                 const el = document.getElementById('week-pace');
                 el.innerText = `Pace: ${pace}%`;
-                // Color coding
                 if (pace >= 100) el.className = "text-xs font-bold text-green-600 dark:text-green-400 mt-2";
                 else if (pace >= 80) el.className = "text-xs font-bold text-yellow-600 dark:text-yellow-400 mt-2";
                 else el.className = "text-xs text-gray-600 dark:text-gray-400 mt-2";
             };
             
-            // Init and listener
             updatePace();
             document.getElementById('goal-input').addEventListener('input', updatePace);
 
