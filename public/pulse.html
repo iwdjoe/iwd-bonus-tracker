@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (V125)</title>
+    <title>Weekly Pulse (V126)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -34,7 +34,7 @@
 
     <!-- STATUS BAR -->
     <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Syncing V125...
+        Syncing V126...
     </div>
 
     <!-- DASHBOARD -->
@@ -45,7 +45,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v125</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v126</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE API</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
@@ -141,10 +141,14 @@
             </div>
         </div>
     </div>
+    
+    <!-- DEBUG FOOTER -->
+    <div id="debug-footer" class="fixed bottom-0 left-0 right-0 bg-black text-xs text-gray-500 p-2 font-mono text-center opacity-50 hover:opacity-100">
+        Initializing...
+    </div>
 
     <script>
-        // CLIENT SIDE LOGIC (V125 - Pro Tier Fetch)
-        const API_BASE = '/.netlify/functions/get-pulse'; 
+        const API_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
         
         netlifyIdentity.on('init', user => { if(user) document.getElementById('user-email').innerText = user.email; });
         netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
@@ -197,8 +201,7 @@
             const status = document.getElementById('status-bar');
             status.innerText = "Connecting...";
             try {
-                // SINGLE ROBUST FETCH (Possible due to Pro Tier 26s Timeout)
-                const res = await fetch(`${API_BASE}?v=${Date.now()}`);
+                const res = await fetch(API_URL);
                 if (!res.ok) throw new Error("API Timeout");
 
                 const data = await res.json();
@@ -210,6 +213,11 @@
                 const date = new Date();
                 document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 
+                // Debug Footer
+                if(data.meta && data.meta.debug) {
+                    document.getElementById('debug-footer').innerText = `Token: ${data.meta.debug.tokenPrefix}... | TW: ${data.meta.debug.twStatus} | Rates: ${data.meta.debug.ratesStatus} | Entries: ${data.meta.count}`;
+                }
+
                 processData(data);
             } catch (e) {
                 console.error(e);

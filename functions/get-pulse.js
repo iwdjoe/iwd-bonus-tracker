@@ -75,7 +75,14 @@ exports.handler = async function(event, context) {
                 entries: cleanEntries,
                 rates: savedRates,
                 globalRate: GLOBAL_RATE,
-                meta: { count: cleanEntries.length }
+                meta: { 
+                    count: cleanEntries.length,
+                    debug: {
+                        tokenPrefix: TOKEN ? TOKEN.substring(0,4) : 'NULL',
+                        twStatus: p1.status, // Check page 1 status
+                        ratesStatus: ratesRes.status
+                    }
+                }
             }) 
         };
 
