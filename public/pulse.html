@@ -40,7 +40,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v78</span></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse <span class="text-xs text-gray-500 font-normal">v79</span></h1>
                     <span id="mode-badge" class="hidden text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase">CACHED MODE</span>
                 </div>
             </div>
@@ -55,7 +55,8 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="stat-card funky-bg border-blue-500/20">
                 <h3 class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">Monthly Projection</h3>
-                <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-proj">--</div>
+                <!-- FIX: Explicit text color for contrast -->
+                <div class="text-3xl font-black text-blue-900 dark:text-blue-100" id="month-proj">--</div>
                 <div class="text-xs text-gray-500 mt-1" id="month-rev">Current: --</div>
             </div>
             <div class="stat-card border-purple-500/20">
@@ -67,6 +68,42 @@
                 <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Month Efficiency</h3>
                 <div class="text-3xl font-black text-gray-900 dark:text-white" id="month-pct">100%</div>
                 <div class="text-xs text-gray-500 mt-1" id="month-total">-- Hrs Logged</div>
+            </div>
+        </div>
+
+        <!-- MIDDLE ROW (WEEKLY) -->
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 mb-8 overflow-hidden">
+            <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 border-b border-gray-200 dark:border-gray-800 flex justify-between">
+                <h3 class="font-bold text-sm text-gray-700 dark:text-gray-300">📅 Weekly Comparison</h3>
+                <span class="text-xs text-gray-500 font-mono" id="week-range"></span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-800">
+                <div class="p-8 text-center bg-blue-50/50 dark:bg-blue-900/10">
+                    <div class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full bg-white dark:bg-black border border-blue-100 dark:border-blue-900">This Week</div>
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <div class="text-4xl font-black text-gray-900 dark:text-white mb-1" id="week-billable">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold text-gray-300 dark:text-gray-700 mb-1" id="week-total">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-8 text-center">
+                    <div class="text-xs text-gray-400 font-bold uppercase mb-6 inline-block px-3 py-1">Last Week</div>
+                    <div class="grid grid-cols-2 gap-8 opacity-60">
+                        <div>
+                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-1" id="last-billable">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Billable</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-gray-400 dark:text-gray-600 mb-1" id="last-total">--</div>
+                            <div class="text-[10px] text-gray-400 uppercase font-bold">Total</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -86,7 +123,7 @@
     <script>
         const API_URL = '/.netlify/functions/get-stats';
         const BACKUP_URL = 'backup-stats.json';
-        const TIMEOUT_MS = 6000; // 6 seconds max for live API
+        const TIMEOUT_MS = 6000; 
 
         window.addEventListener('DOMContentLoaded', init);
 
@@ -162,6 +199,18 @@
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
             document.getElementById('month-total').innerText = Math.round(totalHours) + ' Hrs Logged';
 
+            // --- WEEKLY DATA FIX (V79) ---
+            const w = (data.weekly && data.weekly.thisWeek) ? data.weekly.thisWeek : { billable: 0, total: 0 };
+            const l = (data.weekly && data.weekly.lastWeek) ? data.weekly.lastWeek : { billable: 0, total: 0 };
+            const ranges = (data.weekly && data.weekly.ranges) ? data.weekly.ranges : { this: "Syncing...", last: "" };
+
+            document.getElementById('week-range').innerText = ranges.this;
+            document.getElementById('week-billable').innerText = Math.round(w.billable);
+            document.getElementById('week-total').innerText = Math.round(w.total);
+            document.getElementById('last-billable').innerText = Math.round(l.billable);
+            document.getElementById('last-total').innerText = Math.round(l.total);
+
+            // Lists
             const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
@@ -169,8 +218,8 @@
                     el.innerHTML += `
                         <tr class="hover:bg-white/5">
                             <td class="px-6 py-3 w-10 text-xs font-mono text-gray-500">0${i+1}</td>
-                            <td class="px-6 py-3 font-medium text-white">${item.name}</td>
-                            <td class="px-6 py-3 text-right font-mono text-gray-300">${Math.round(item.hours)}h</td>
+                            <td class="px-6 py-3 font-medium text-gray-900 dark:text-white">${item.name}</td>
+                            <td class="px-6 py-3 text-right font-mono text-gray-700 dark:text-gray-300">${Math.round(item.hours)}h</td>
                         </tr>`;
                 });
             };
