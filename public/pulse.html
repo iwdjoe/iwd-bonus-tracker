@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (V104)</title>
+    <title>Weekly Pulse (V106)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -34,7 +34,7 @@
 
     <!-- STATUS BAR -->
     <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Syncing V104...
+        Syncing V106...
     </div>
 
     <!-- DASHBOARD -->
@@ -45,7 +45,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v105</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v106</span></h1>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -85,6 +85,7 @@
                 <span class="text-xs font-mono opacity-50" id="week-range"></span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
+                <!-- This Week (Fixed BG for Dark Mode) -->
                 <div class="p-8 text-center bg-blue-50 dark:bg-gray-800 flex flex-col justify-center items-center">
                     <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs">
@@ -98,6 +99,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- Last Week -->
                 <div class="p-8 text-center flex flex-col justify-center items-center">
                     <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 opacity-50">Last Week</div>
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs opacity-60">
@@ -125,16 +127,35 @@
                 <table class="w-full text-sm"><tbody class="divide-y" id="top-clients"></tbody></table>
             </div>
         </div>
+        
+        <!-- DEBUG CONSOLE -->
+        <div id="debug-console" class="fixed bottom-0 left-0 right-0 bg-gray-900 text-green-400 font-mono text-[10px] p-2 overflow-auto h-32 border-t border-gray-700 z-50 opacity-90">
+            Initializing Debugger...
+        </div>
     </div>
 
     <script>
         const API_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
+        
+        function log(msg) {
+            const el = document.getElementById('debug-console');
+            el.innerText += '\n' + msg;
+            el.scrollTop = el.scrollHeight;
+            console.log(msg);
+        }
 
         let isDark = true; 
-        function toggleTheme() { isDark = !isDark; applyTheme(); document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙'; }
+
+        function toggleTheme() {
+            isDark = !isDark;
+            applyTheme();
+            document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
+        }
+
         function applyTheme() {
             const body = document.getElementById('body');
             const cards = document.querySelectorAll('.card');
+            
             if (isDark) {
                 body.className = "bg-black text-white min-h-screen p-4 md:p-8 transition-colors duration-200";
                 cards.forEach(c => c.className = c.className.replace('light-card', 'dark-card').replace('bg-white', '').replace('bg-gray-900', '') + ' dark-card');
@@ -149,6 +170,7 @@
                 document.querySelectorAll('.border-r').forEach(el => el.classList.remove('border-gray-800'));
             }
         }
+
         setTimeout(() => { isDark = true; applyTheme(); document.getElementById('theme-icon').innerText = '☀️'; }, 100);
 
         window.addEventListener('DOMContentLoaded', init);
@@ -173,10 +195,19 @@
 
         function processData(data) {
             const entries = data.entries || [];
+            log(`Processing ${entries.length} entries...`);
+            
+            if(entries.length > 0) {
+                log(`Sample Entry Date Format: "${entries[0].d}"`);
+            }
+
             const rates = data.rates || {};
             const globalRate = data.globalRate || 155;
 
+            // 1. DATE BOUNDARIES
             const now = new Date();
+            
+            // Helper: YYYY-MM-DD
             const toStr = (d) => {
                 const y = d.getFullYear();
                 const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -185,21 +216,35 @@
             };
 
             const d = new Date(now);
-            const day = d.getDay();
-            const diff = d.getDate() - day + (day == 0 ? -6 : 1);
-            const thisMon = new Date(d.setDate(diff));
+            const day = d.getDay(); 
+            const diff = d.getDate() - day + (day == 0 ? -6 : 1); // Adjust to Monday
+            
+            // This Week: Monday to Sunday
+            const thisMon = new Date(d);
+            thisMon.setDate(diff);
+            const thisSun = new Date(thisMon);
+            thisSun.setDate(thisMon.getDate() + 6);
+            
+            // Last Week: Previous Monday to Previous Sunday
             const lastMon = new Date(thisMon);
-            lastMon.setDate(lastMon.getDate() - 7);
+            lastMon.setDate(thisMon.getDate() - 7);
+            const lastSun = new Date(lastMon);
+            lastSun.setDate(lastMon.getDate() + 6);
+            
             const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
             
-            const thisWeekStr = toStr(thisMon);
-            const lastWeekStr = toStr(lastMon);
+            const thisWeekStart = toStr(thisMon);
+            const thisWeekEnd = toStr(thisSun);
+            const lastWeekStart = toStr(lastMon);
+            const lastWeekEnd = toStr(lastSun);
             const monthStartStr = toStr(monthStart);
+
+            log(`Ranges: \nTW: ${thisWeekStart} -> ${thisWeekEnd} \nLW: ${lastWeekStart} -> ${lastWeekEnd}`);
 
             let stats = {
                 month: { b: 0, t: 0, rev: 0 },
-                thisWeek: { b: 0, t: 0, t_adj: 0 }, // t_adj = Total excluding Isah
-                lastWeek: { b: 0, t: 0, t_adj: 0 }
+                thisWeek: { b: 0, t: 0 },
+                lastWeek: { b: 0, t: 0 }
             };
             
             let users = {};
@@ -207,10 +252,21 @@
 
             entries.forEach(e => {
                 let dateStr = e.d;
+                if (!dateStr.includes('-') && dateStr.length === 8) {
+                    dateStr = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
+                }
+
+                // EXCLUDE ISAH FROM WEEKLY CALCS (Completely)
+                // "Percent billable hours (divided by total amount of hours - employee isah hours)"
+                // This means Isah contributes NOTHING to the Weekly numbers.
+                // We use e.x (excluded flag) to skip him.
                 
+                // MONTHLY (Standard Logic - Isah is included in total revenue/hours usually, unless you want him out there too?)
+                // Assuming standard logic for Monthly to match Bonus Report
                 if (dateStr >= monthStartStr) {
                     stats.month.t += e.h;
                     if (e.b) stats.month.b += e.h;
+                    
                     const rate = rates[e.pid] || rates[e.p] || globalRate;
                     stats.month.rev += e.h * rate;
 
@@ -222,19 +278,25 @@
                     projects[e.p].hours += e.h;
                 }
 
-                // WEEKLY (With Isah Exclusion for Denominator)
-                if (dateStr >= thisWeekStr) {
+                // WEEKLY (Strict Date Range + Isah Exclusion)
+                if (e.x) return; // SKIP ISAH
+
+                // This Week
+                if (dateStr >= thisWeekStart && dateStr <= thisWeekEnd) {
                     stats.thisWeek.t += e.h;
-                    if (!e.x) stats.thisWeek.t_adj += e.h; // Exclude Isah from total
                     if (e.b) stats.thisWeek.b += e.h;
-                } else if (dateStr >= lastWeekStr && dateStr < thisWeekStr) {
+                } 
+                // Last Week
+                else if (dateStr >= lastWeekStart && dateStr <= lastWeekEnd) {
                     stats.lastWeek.t += e.h;
-                    if (!e.x) stats.lastWeek.t_adj += e.h;
                     if (e.b) stats.lastWeek.b += e.h;
                 }
             });
+            
+            log(`This Week Total: ${stats.thisWeek.t.toFixed(1)}h`);
+            log(`Last Week Total: ${stats.lastWeek.t.toFixed(1)}h`);
 
-            document.getElementById('week-range').innerText = `${thisWeekStr} -> Now`;
+            document.getElementById('week-range').innerText = `${thisWeekStart} -> Now`;
             render(stats, users, projects);
         }
 
@@ -255,13 +317,13 @@
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
             document.getElementById('month-total-main').innerText = Math.round(stats.month.t) + 'h';
 
-            // Weekly - Use Adjusted Total (No Isah) for Denominator
+            // Weekly
             document.getElementById('week-billable').innerText = Math.round(stats.thisWeek.b);
-            const wPct = stats.thisWeek.t_adj > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t_adj) * 100) : 0;
+            const wPct = stats.thisWeek.t > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t) * 100) : 0;
             document.getElementById('week-pct').innerText = wPct + '%';
 
             document.getElementById('last-billable').innerText = Math.round(stats.lastWeek.b);
-            const lPct = stats.lastWeek.t_adj > 0 ? Math.round((stats.lastWeek.b / stats.lastWeek.t_adj) * 100) : 0;
+            const lPct = stats.lastWeek.t > 0 ? Math.round((stats.lastWeek.b / stats.lastWeek.t) * 100) : 0;
             document.getElementById('last-pct').innerText = lPct + '%';
 
             const updatePace = () => {
