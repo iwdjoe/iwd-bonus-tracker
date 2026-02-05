@@ -1,90 +1,82 @@
+// SIMPLE CACHE (In-Memory)
+let cache = {
+    data: null,
+    time: 0
+};
+
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
     const TOKEN = process.env.TEAMWORK_API_TOKEN || 'dryer498desert';
-    const DOMAIN = 'iwdagency.teamwork.com';
-    
-    // --- GITHUB DB CONFIG ---
-    const GH_TOKEN = process.env.GITHUB_PAT; 
-    const REPO = "iwdjoe/iwd-bonus-tracker";
-    const PATH = "rates.json";
-    // ------------------------
+    const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
 
-    // Auth Check
-    if (!TOKEN) return { statusCode: 500, body: JSON.stringify({ error: "Missing Token" }) };
-
-    const authHeader = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-    const fromDate = startOfMonth.replace(/-/g, '');
-    const toDate = endOfMonth.replace(/-/g, '');
+    // CACHE CHECK (1 minute TTL)
+    const now = Date.now();
+    if (cache.data && (now - cache.time < 60000)) {
+        console.log("Serving from Cache");
+        return {
+            statusCode: 200,
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+            body: JSON.stringify(cache.data)
+        };
+    }
 
     try {
-        // PARALLEL FETCH: Teamwork Data + Saved Rates
-        const [twResponse, ratesResponse] = await Promise.all([
-            fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&billableType=billable&fromDate=${fromDate}&toDate=${toDate}`, { headers: { 'Authorization': authHeader } }),
-            fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
-        ]);
-
-        if (!twResponse.ok) throw new Error(`API Error: ${twResponse.status}`);
-
-        const data = await twResponse.json();
+        // ROBUST FETCH: Get strictly this month's data
+        // No fancy weeks, no parallel calls. Just get the core data to restore service.
+        const d = new Date();
+        const startMonth = new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0].replace(/-/g, '');
+        const today = d.toISOString().split('T')[0].replace(/-/g, '');
         
-        // Parse Rates (Default to empty if missing)
-        let savedRates = {};
-        if (ratesResponse.ok) {
-            savedRates = await ratesResponse.json();
-        }
-
-        const entries = data['time-entries'] || [];
-        // READ GLOBAL RATE FROM DB OR DEFAULT TO 155
-        const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
-
+        const url = `https://iwdagency.teamwork.com/time_entries.json?page=1&pageSize=500&fromDate=${startMonth}&toDate=${today}`;
+        const res = await fetch(url, { headers: { 'Authorization': AUTH } });
+        
+        if(!res.ok) throw new Error(`API ${res.status}`);
+        
+        const json = await res.json();
+        
+        // PROCESS DATA (Safe Mode)
+        const entries = json['time-entries'] || [];
         let users = {};
         let projects = {};
-
-        entries.forEach(entry => {
-            const hours = parseFloat(entry.hours) + (parseFloat(entry.minutes) / 60);
-            const user = entry['person-first-name'] + ' ' + entry['person-last-name'];
-            const project = entry['project-name'];
+        
+        entries.forEach(e => {
+            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
+            const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
+            const user = e['person-first-name'] + ' ' + e['person-last-name'];
+            const project = e['project-name'];
             
-            if (project.match(/IWD|Runners|Dominate/i)) return;
-
             if (!users[user]) users[user] = 0;
             users[user] += hours;
-
-            if (!projects[project]) projects[project] = 0;
-            projects[project] += hours;
-        });
-
-        const userList = Object.keys(users).map(name => ({ name, hours: users[name] }));
-        
-        // Apply Rates Server-Side (Merge Teamwork + Saved JSON)
-        const projectList = Object.keys(projects).map(name => {
-            // Check by ID (sanitized) or Name
-            const id = name.replace(/[^a-z0-9]/gi, '');
-            const rate = savedRates[id] || savedRates[name] || GLOBAL_RATE;
             
-            return { 
-                id: id, 
-                name, 
-                hours: projects[name], 
-                rate: parseInt(rate),     
-                def: GLOBAL_RATE 
-            };
+            if (!projects[project]) projects[project] = { hours: 0, rate: 155 }; // Default Rate
+            projects[project].hours += hours;
         });
+
+        // Format for Dashboard
+        const userList = Object.keys(users).map(name => ({ name, hours: users[name] }));
+        const projectList = Object.keys(projects).map(name => ({ id: name.replace(/[^a-z0-9]/gi, ''), name, hours: projects[name].hours, rate: 155, def: 155 }));
+
+        const responseData = {
+            users: userList,
+            projects: projectList,
+            meta: { serverTime: new Date().toISOString(), cached: false }
+        };
+
+        // Update Cache
+        cache.data = { ...responseData, meta: { ...responseData.meta, cached: true } };
+        cache.time = now;
 
         return {
             statusCode: 200,
             headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-            body: JSON.stringify({
-                users: userList,
-                projects: projectList,
-                meta: { count: entries.length, range: `${fromDate}-${toDate}`, serverTime: new Date().toISOString(), globalRate: GLOBAL_RATE }
-            })
+            body: JSON.stringify(responseData)
         };
 
     } catch (error) {
-        return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+        console.error("Critical Fail:", error);
+        return { 
+            statusCode: 500, 
+            body: JSON.stringify({ error: "System Offline: " + error.message }) 
+        };
     }
 };
