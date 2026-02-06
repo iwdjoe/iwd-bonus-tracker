@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (Final)</title>
+    <title>Weekly Pulse (V139 Bulletproof)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -27,14 +27,51 @@
         .light-bg { background: #f9fafb; }
         .dark-bg { background: #000000; }
         
-        .flex-center-col { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #error-box {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #dc2626;
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            z-index: 9999;
+            max-width: 90%;
+            width: 500px;
+            border: 3px solid #fca5a5;
+        }
+        #error-box.visible { display: block; }
+        #error-box pre {
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 11px;
+            margin-top: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body class="light-bg min-h-screen p-4 md:p-8 transition-colors duration-200" id="body">
 
+    <!-- GLOBAL ERROR BOX -->
+    <div id="error-box">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <h2 style="font-weight: bold; font-size: 18px;">🚨 ERROR DETECTED</h2>
+            <button onclick="document.getElementById('error-box').classList.remove('visible')" style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 6px; font-weight: bold;">CLOSE</button>
+        </div>
+        <p id="error-message" style="margin-bottom: 8px; font-size: 14px;"></p>
+        <pre id="error-details" style="font-family: monospace; white-space: pre-wrap; word-break: break-all;"></pre>
+        <p style="margin-top: 12px; font-size: 12px; opacity: 0.8;">📸 Screenshot this and send to dev team</p>
+    </div>
+
     <!-- STATUS BAR -->
     <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Syncing...
+        Initializing...
     </div>
 
     <!-- DASHBOARD -->
@@ -45,12 +82,12 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">Final</span></h1>
-                    <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">STABLE</span>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">V139</span></h1>
+                    <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">BULLETPROOF</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
-                    <span>Last Updated: <span id="time-updated">Just now</span></span>
-                    <span id="user-email" class="hidden md:inline">joe@iwdagency.com</span>
+                    <span>Last Updated: <span id="time-updated">--</span></span>
+                    <span id="user-email" class="hidden md:inline">--</span>
                 </div>
             </div>
             
@@ -91,7 +128,7 @@
         <div class="card rounded-lg shadow-sm mb-8 overflow-hidden">
             <div class="px-6 py-3 border-b flex justify-between items-center bg-green-600 bg-opacity-10">
                 <h3 class="font-bold text-sm text-green-600 dark:text-green-400">📅 Weekly Comparison</h3>
-                <span class="text-xs font-mono opacity-50" id="week-range"></span>
+                <span class="text-xs font-mono opacity-50" id="week-range">--</span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
                 
@@ -143,245 +180,478 @@
     </div>
 
     <script>
-        // CLIENT SIDE LOGIC - V130 FINAL (Restored to V108 Logic + V122 UI)
+        // ============================================
+        // BULLETPROOF V139 - DEFENSIVE CODING EDITION
+        // ============================================
+        
         const API_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
         
-        netlifyIdentity.on('init', user => { if(user) document.getElementById('user-email').innerText = user.email; });
-        netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
-        netlifyIdentity.on('logout', () => { location.reload(); });
-        netlifyIdentity.init();
+        // GLOBAL ERROR HANDLER
+        window.onerror = function(message, source, lineno, colno, error) {
+            showError('JavaScript Error', `${message}\n\nFile: ${source}\nLine: ${lineno}:${colno}\n\n${error ? error.stack : 'No stack trace'}`);
+            return true; // Prevent default browser error handling
+        };
 
-        function log(msg) { console.log(msg); } 
+        window.addEventListener('unhandledrejection', function(event) {
+            showError('Unhandled Promise Rejection', event.reason ? (event.reason.stack || event.reason.toString()) : 'Unknown error');
+        });
 
-        let isDark = true; 
-
-        function toggleTheme() {
-            isDark = !isDark;
-            applyTheme();
-            document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
-        }
-
-        function applyTheme() {
-            const body = document.getElementById('body');
-            const cards = document.querySelectorAll('.card');
-            const thisWeekBox = document.getElementById('this-week-box');
+        function showError(title, details) {
+            console.error('[ERROR]', title, details);
+            const box = document.getElementById('error-box');
+            const msg = document.getElementById('error-message');
+            const det = document.getElementById('error-details');
             
-            if (isDark) {
-                body.className = "bg-black text-white min-h-screen p-4 md:p-8 transition-colors duration-200";
-                cards.forEach(c => c.className = c.className.replace('light-card', 'dark-card').replace('bg-white', '').replace('bg-gray-900', '') + ' dark-card');
-                
-                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-800 transition-colors duration-200 bg-blue-900 bg-opacity-10 text-white";
-                document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-white";
-                document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-900', 'text-gray-300');
-                
-                document.querySelectorAll('.divide-y').forEach(el => el.classList.add('divide-gray-800'));
-                document.querySelectorAll('.border-b').forEach(el => el.classList.add('border-gray-800'));
-            } else {
-                body.className = "bg-gray-50 text-gray-900 min-h-screen p-4 md:p-8 transition-colors duration-200";
-                cards.forEach(c => c.className = c.className.replace('dark-card', 'light-card').replace('bg-white', '').replace('bg-gray-900', '') + ' light-card');
-                
-                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 transition-colors duration-200 bg-blue-50 text-gray-900";
-                document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-gray-900";
-                document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-300', 'text-gray-900').replace('text-white', 'text-gray-900');
-                
-                document.querySelectorAll('.divide-y').forEach(el => el.classList.remove('divide-gray-800'));
-                document.querySelectorAll('.border-b').forEach(el => el.classList.remove('border-gray-800'));
+            if (box && msg && det) {
+                msg.textContent = title;
+                det.textContent = details;
+                box.classList.add('visible');
             }
-        }
-
-        setTimeout(() => { isDark = true; applyTheme(); document.getElementById('theme-icon').innerText = '☀️'; }, 100);
-
-        window.addEventListener('DOMContentLoaded', init);
-
-        async function init() {
+            
+            // Also update status bar
             const status = document.getElementById('status-bar');
-            status.innerText = "Connecting...";
-            try {
-                const res = await fetch(API_URL);
-                if (!res.ok) throw new Error("API Error " + res.status);
-                const data = await res.json();
-                
-                status.innerText = "Loaded (" + (data.meta ? data.meta.count : 0) + " entries)";
-                status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
-                setTimeout(() => status.classList.add('hidden'), 3000);
-                
-                const date = new Date();
-                document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                
-                processData(data);
-            } catch (e) {
-                console.error(e);
-                status.innerText = "Error: " + e.message;
+            if (status) {
+                status.innerText = "❌ ERROR: " + title;
                 status.className = "fixed top-0 left-0 right-0 bg-red-600 text-white text-xs font-bold text-center py-1 z-50";
             }
         }
 
-        function processData(data) {
-            const entries = data.entries || [];
-            const rates = data.rates || {};
-            const globalRate = data.globalRate || 155;
-
-            const now = new Date();
-            const toStr = (d) => {
-                const y = d.getFullYear();
-                const m = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                return `${y}-${m}-${day}`;
-            };
-
-            // ====== WEEK RANGES (Fixed) ======
-            const d = new Date(now);
-            const day = d.getDay(); 
-            const diff = d.getDate() - day + (day == 0 ? -6 : 1); 
-            
-            const thisMon = new Date(d.setDate(diff));
-            const thisSun = new Date(thisMon);
-            thisSun.setDate(thisMon.getDate() + 6);
-            
-            const lastMon = new Date(thisMon);
-            lastMon.setDate(lastMon.getDate() - 7);
-            const lastSun = new Date(lastMon);
-            lastSun.setDate(lastMon.getDate() + 6);
-            
-            const thisWeekStart = toStr(thisMon);
-            const thisWeekEnd = toStr(thisSun);
-            const lastWeekStart = toStr(lastMon);
-            const lastWeekEnd = toStr(lastSun);
-            
-            // ====== MONTH START ======
-            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-            const monthStartStr = toStr(monthStart);
-
-            document.getElementById('week-range').innerText = `${thisWeekStart} → ${thisWeekEnd}`; 
-
-            let stats = {
-                month: { b: 0, t: 0, rev: 0 },
-                thisWeek: { b: 0, t: 0, t_adj: 0 }, 
-                lastWeek: { b: 0, t: 0, t_adj: 0 }
-            };
-            
-            let users = {};
-            let projects = {};
-
-            entries.forEach(e => {
-                // Normalize date format
-                let dateStr = e.d;
-                if (!dateStr.includes('-') && dateStr.length === 8) {
-                    dateStr = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
+        function safeGetElement(id, defaultValue = '--') {
+            try {
+                const el = document.getElementById(id);
+                if (!el) {
+                    console.warn(`Element not found: ${id}`);
+                    return null;
                 }
+                return el;
+            } catch (e) {
+                console.error(`Error getting element ${id}:`, e);
+                return null;
+            }
+        }
 
-                // ====== MONTHLY STATS (Internal Projects EXCLUDED for Revenue) ======
-                if (dateStr >= monthStartStr) {
-                    // Internal Projects: EXCLUDED from Monthly Revenue
-                    if (!e.i) {
-                        stats.month.t += e.h;
-                        if (e.b) stats.month.b += e.h;
-                        const rate = rates[e.pid] || rates[e.p] || globalRate;
-                        stats.month.rev += e.h * rate;
-                        
-                        // Top Contributors (Billable only, no internal)
-                        if (e.b && !e.x) {
-                            if (!users[e.u]) users[e.u] = 0;
-                            users[e.u] += e.h;
-                        }
-                    }
-                    
-                    // Top Clients (All non-internal projects)
-                    if (!e.i) {
-                        if (!projects[e.p]) projects[e.p] = { hours: 0 };
-                        projects[e.p].hours += e.h;
-                    }
-                }
+        function safeSetText(id, value) {
+            const el = safeGetElement(id);
+            if (el) el.innerText = value || '--';
+        }
 
-                // ====== WEEKLY STATS (Internal Projects INCLUDED, Isah EXCLUDED from Denominator) ======
-                if (dateStr >= thisWeekStart && dateStr <= thisWeekEnd) {
-                    // Internal Projects: INCLUDED in weekly totals
-                    stats.thisWeek.t += e.h;
-                    
-                    // Isah Ramos: EXCLUDED from denominator (t_adj)
-                    if (!e.x) {
-                        stats.thisWeek.t_adj += e.h;
-                    }
-                    
-                    // Billable hours (all users)
-                    if (e.b) {
-                        stats.thisWeek.b += e.h;
-                    }
-                } 
-                else if (dateStr >= lastWeekStart && dateStr <= lastWeekEnd) {
-                    stats.lastWeek.t += e.h;
-                    
-                    // Isah Ramos: EXCLUDED from denominator
-                    if (!e.x) {
-                        stats.lastWeek.t_adj += e.h;
-                    }
-                    
-                    if (e.b) {
-                        stats.lastWeek.b += e.h;
-                    }
+        function safeSetHTML(id, value) {
+            const el = safeGetElement(id);
+            if (el) el.innerHTML = value || '';
+        }
+
+        // NETLIFY IDENTITY
+        try {
+            netlifyIdentity.on('init', user => { 
+                if (user && user.email) {
+                    safeSetText('user-email', user.email);
                 }
             });
+            netlifyIdentity.on('login', () => { 
+                netlifyIdentity.close(); 
+                location.reload(); 
+            });
+            netlifyIdentity.on('logout', () => { 
+                location.reload(); 
+            });
+            netlifyIdentity.init();
+        } catch (e) {
+            console.error('Netlify Identity error:', e);
+            showError('Auth System Error', e.toString());
+        }
 
-            render(stats, users, projects);
+        let isDark = true; 
+
+        function toggleTheme() {
+            try {
+                isDark = !isDark;
+                applyTheme();
+                safeSetText('theme-icon', isDark ? '☀️' : '🌙');
+            } catch (e) {
+                showError('Theme Toggle Error', e.toString());
+            }
+        }
+
+        function applyTheme() {
+            try {
+                const body = safeGetElement('body');
+                const cards = document.querySelectorAll('.card');
+                const thisWeekBox = safeGetElement('this-week-box');
+                
+                if (!body) return;
+                
+                if (isDark) {
+                    body.className = "bg-black text-white min-h-screen p-4 md:p-8 transition-colors duration-200";
+                    cards.forEach(c => {
+                        if (c) c.className = c.className.replace('light-card', 'dark-card').replace('bg-white', '').replace('bg-gray-900', '') + ' dark-card';
+                    });
+                    
+                    if (thisWeekBox) thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-800 transition-colors duration-200 bg-blue-900 bg-opacity-10 text-white";
+                    
+                    const weekBillable = safeGetElement('week-billable');
+                    if (weekBillable) weekBillable.className = "text-4xl font-black mb-1 text-white";
+                    
+                    document.querySelectorAll('.divide-y').forEach(el => el.classList.add('divide-gray-800'));
+                    document.querySelectorAll('.border-b').forEach(el => el.classList.add('border-gray-800'));
+                } else {
+                    body.className = "bg-gray-50 text-gray-900 min-h-screen p-4 md:p-8 transition-colors duration-200";
+                    cards.forEach(c => {
+                        if (c) c.className = c.className.replace('dark-card', 'light-card').replace('bg-white', '').replace('bg-gray-900', '') + ' light-card';
+                    });
+                    
+                    if (thisWeekBox) thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 transition-colors duration-200 bg-blue-50 text-gray-900";
+                    
+                    const weekBillable = safeGetElement('week-billable');
+                    if (weekBillable) weekBillable.className = "text-4xl font-black mb-1 text-gray-900";
+                    
+                    document.querySelectorAll('.divide-y').forEach(el => el.classList.remove('divide-gray-800'));
+                    document.querySelectorAll('.border-b').forEach(el => el.classList.remove('border-gray-800'));
+                }
+            } catch (e) {
+                showError('Theme Application Error', e.toString());
+            }
+        }
+
+        setTimeout(() => { 
+            try {
+                isDark = true; 
+                applyTheme(); 
+                safeSetText('theme-icon', '☀️');
+            } catch (e) {
+                showError('Initial Theme Error', e.toString());
+            }
+        }, 100);
+
+        window.addEventListener('DOMContentLoaded', init);
+
+        async function init() {
+            console.log('[INIT] Starting application...');
+            const status = safeGetElement('status-bar');
+            if (status) status.innerText = "Connecting to API...";
+            
+            try {
+                console.log('[INIT] Fetching from:', API_URL);
+                const res = await fetch(API_URL);
+                
+                console.log('[INIT] Response status:', res.status, res.statusText);
+                
+                if (!res.ok) {
+                    throw new Error(`API returned ${res.status}: ${res.statusText}`);
+                }
+                
+                const rawText = await res.text();
+                console.log('[INIT] Raw response (first 500 chars):', rawText.substring(0, 500));
+                
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (parseError) {
+                    throw new Error(`JSON Parse Error: ${parseError.message}\n\nResponse: ${rawText.substring(0, 200)}`);
+                }
+                
+                console.log('[INIT] Parsed data:', {
+                    hasEntries: !!data.entries,
+                    entriesCount: data.entries ? data.entries.length : 0,
+                    hasRates: !!data.rates,
+                    hasMeta: !!data.meta
+                });
+                
+                if (!data) {
+                    throw new Error('API returned null/undefined data');
+                }
+                
+                if (!data.entries) {
+                    throw new Error('API response missing "entries" field');
+                }
+                
+                if (!Array.isArray(data.entries)) {
+                    throw new Error(`"entries" is not an array, got: ${typeof data.entries}`);
+                }
+                
+                const count = data.entries.length;
+                console.log('[INIT] Data loaded successfully. Entry count:', count);
+                
+                if (status) {
+                    status.innerText = `✅ Loaded (${count} entries)`;
+                    status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
+                    setTimeout(() => status.classList.add('hidden'), 3000);
+                }
+                
+                const date = new Date();
+                safeSetText('time-updated', date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
+                
+                processData(data);
+                
+            } catch (e) {
+                console.error('[INIT] Fatal error:', e);
+                showError('Failed to Load Data', `${e.message}\n\n${e.stack || 'No stack trace'}`);
+                
+                if (status) {
+                    status.innerText = "❌ Failed to load";
+                    status.className = "fixed top-0 left-0 right-0 bg-red-600 text-white text-xs font-bold text-center py-1 z-50";
+                }
+            }
+        }
+
+        function processData(data) {
+            try {
+                console.log('[PROCESS] Starting data processing...');
+                
+                const entries = data.entries || [];
+                const rates = data.rates || {};
+                const globalRate = data.globalRate || 155;
+
+                console.log('[PROCESS] Using global rate:', globalRate);
+                console.log('[PROCESS] Custom rates count:', Object.keys(rates).length);
+
+                const now = new Date();
+                
+                // SAFE DATE FORMATTER
+                const toStr = (d) => {
+                    try {
+                        if (!d || !(d instanceof Date) || isNaN(d.getTime())) {
+                            console.error('[DATE] Invalid date:', d);
+                            return '1970-01-01';
+                        }
+                        const y = d.getFullYear();
+                        const m = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        return `${y}-${m}-${day}`;
+                    } catch (e) {
+                        console.error('[DATE] Format error:', e);
+                        return '1970-01-01';
+                    }
+                };
+
+                // WEEK RANGES
+                const d = new Date(now);
+                const day = d.getDay(); 
+                const diff = d.getDate() - day + (day == 0 ? -6 : 1); 
+                
+                const thisMon = new Date(d.setDate(diff));
+                const thisSun = new Date(thisMon);
+                thisSun.setDate(thisMon.getDate() + 6);
+                
+                const lastMon = new Date(thisMon);
+                lastMon.setDate(lastMon.getDate() - 7);
+                const lastSun = new Date(lastMon);
+                lastSun.setDate(lastMon.getDate() + 6);
+                
+                const thisWeekStart = toStr(thisMon);
+                const thisWeekEnd = toStr(thisSun);
+                const lastWeekStart = toStr(lastMon);
+                const lastWeekEnd = toStr(lastSun);
+                
+                console.log('[PROCESS] Week ranges:', {
+                    thisWeek: `${thisWeekStart} → ${thisWeekEnd}`,
+                    lastWeek: `${lastWeekStart} → ${lastWeekEnd}`
+                });
+                
+                // MONTH START
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const monthStartStr = toStr(monthStart);
+
+                safeSetText('week-range', `${thisWeekStart} → ${thisWeekEnd}`);
+
+                let stats = {
+                    month: { b: 0, t: 0, rev: 0 },
+                    thisWeek: { b: 0, t: 0, t_adj: 0 }, 
+                    lastWeek: { b: 0, t: 0, t_adj: 0 }
+                };
+                
+                let users = {};
+                let projects = {};
+
+                console.log('[PROCESS] Processing entries...');
+                let processedCount = 0;
+                let skippedCount = 0;
+
+                entries.forEach((e, idx) => {
+                    try {
+                        if (!e || typeof e !== 'object') {
+                            console.warn(`[PROCESS] Entry ${idx} is not an object:`, e);
+                            skippedCount++;
+                            return;
+                        }
+                        
+                        // DEFENSIVE DATE NORMALIZATION
+                        let dateStr = e.d || e.date || '';
+                        if (!dateStr) {
+                            console.warn(`[PROCESS] Entry ${idx} has no date:`, e);
+                            skippedCount++;
+                            return;
+                        }
+                        
+                        // Convert YYYYMMDD to YYYY-MM-DD
+                        if (!dateStr.includes('-') && dateStr.length === 8) {
+                            dateStr = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
+                        }
+                        
+                        // Validate date format
+                        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                            console.warn(`[PROCESS] Entry ${idx} has invalid date format: "${dateStr}"`);
+                            skippedCount++;
+                            return;
+                        }
+
+                        // MONTHLY STATS
+                        if (dateStr >= monthStartStr) {
+                            if (!e.i) {
+                                stats.month.t += (e.h || 0);
+                                if (e.b) stats.month.b += (e.h || 0);
+                                const rate = rates[e.pid] || rates[e.p] || globalRate;
+                                stats.month.rev += (e.h || 0) * rate;
+                                
+                                if (e.b && !e.x) {
+                                    if (!users[e.u]) users[e.u] = 0;
+                                    users[e.u] += (e.h || 0);
+                                }
+                            }
+                            
+                            if (!e.i) {
+                                if (!projects[e.p]) projects[e.p] = { hours: 0 };
+                                projects[e.p].hours += (e.h || 0);
+                            }
+                        }
+
+                        // WEEKLY STATS
+                        if (dateStr >= thisWeekStart && dateStr <= thisWeekEnd) {
+                            stats.thisWeek.t += (e.h || 0);
+                            if (!e.x) stats.thisWeek.t_adj += (e.h || 0);
+                            if (e.b) stats.thisWeek.b += (e.h || 0);
+                        } 
+                        else if (dateStr >= lastWeekStart && dateStr <= lastWeekEnd) {
+                            stats.lastWeek.t += (e.h || 0);
+                            if (!e.x) stats.lastWeek.t_adj += (e.h || 0);
+                            if (e.b) stats.lastWeek.b += (e.h || 0);
+                        }
+                        
+                        processedCount++;
+                    } catch (entryError) {
+                        console.error(`[PROCESS] Error processing entry ${idx}:`, entryError, e);
+                        skippedCount++;
+                    }
+                });
+
+                console.log(`[PROCESS] Complete. Processed: ${processedCount}, Skipped: ${skippedCount}`);
+                console.log('[PROCESS] Final stats:', stats);
+
+                render(stats, users, projects);
+                
+            } catch (e) {
+                console.error('[PROCESS] Fatal error:', e);
+                showError('Data Processing Error', `${e.message}\n\n${e.stack || 'No stack trace'}`);
+            }
         }
 
         function render(stats, users, projects) {
-            const now = new Date();
-            const start = new Date(now.getFullYear(), now.getMonth(), 1);
-            let daysPassed = 0;
-            let cur = new Date(start);
-            while(cur <= now) {
-                if(cur.getDay()!==0 && cur.getDay()!==6) daysPassed++;
-                cur.setDate(cur.getDate()+1);
+            try {
+                console.log('[RENDER] Starting render...');
+                
+                const now = new Date();
+                const start = new Date(now.getFullYear(), now.getMonth(), 1);
+                let daysPassed = 0;
+                let cur = new Date(start);
+                
+                while(cur <= now) {
+                    if(cur.getDay()!==0 && cur.getDay()!==6) daysPassed++;
+                    cur.setDate(cur.getDate()+1);
+                }
+                
+                if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
+                const totalDays = 20; 
+                const projRev = (stats.month.rev / daysPassed) * totalDays;
+
+                console.log('[RENDER] Projection calc:', { daysPassed, totalDays, monthRev: stats.month.rev, projRev });
+
+                safeSetText('month-rev', '$' + Math.round(stats.month.rev || 0).toLocaleString());
+                safeSetText('month-proj', '$' + Math.round(projRev || 0).toLocaleString());
+                safeSetText('month-total-main', Math.round(stats.month.t || 0) + 'h');
+
+                safeSetText('week-billable', Math.round(stats.thisWeek.b || 0));
+                
+                const wPct = stats.thisWeek.t_adj > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t_adj) * 100) : 0;
+                const wPctEl = safeGetElement('week-pct');
+                if (wPctEl) {
+                    wPctEl.innerText = wPct + '%';
+                    wPctEl.className = `text-4xl font-bold mb-1 opacity-60 ${wPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
+                }
+
+                safeSetText('last-billable', Math.round(stats.lastWeek.b || 0));
+                
+                const lPct = stats.lastWeek.t_adj > 0 ? Math.round((stats.lastWeek.b / stats.lastWeek.t_adj) * 100) : 0;
+                const lPctEl = safeGetElement('last-pct');
+                if (lPctEl) {
+                    lPctEl.innerText = lPct + '%';
+                    lPctEl.className = `text-3xl font-bold mb-1 opacity-60 ${lPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
+                }
+
+                const updatePace = () => {
+                    try {
+                        const goalInput = safeGetElement('goal-input');
+                        const goal = goalInput ? (parseFloat(goalInput.value) || 200) : 200;
+                        const billable = stats.thisWeek.b || 0;
+                        const pace = Math.round((billable / goal) * 100);
+                        const el = safeGetElement('week-pace');
+                        if (el) {
+                            el.innerText = `Pace: ${pace}%`;
+                            if (pace >= 100) el.style.color = "#10b981"; 
+                            else if (pace >= 80) el.style.color = "#d97706"; 
+                            else el.style.color = "inherit";
+                        }
+                    } catch (e) {
+                        console.error('[RENDER] Pace update error:', e);
+                    }
+                };
+                
+                updatePace();
+                
+                const goalInput = safeGetElement('goal-input');
+                if (goalInput) {
+                    goalInput.addEventListener('input', updatePace);
+                }
+
+                const renderList = (id, listObj) => {
+                    try {
+                        const el = safeGetElement(id);
+                        if (!el) return;
+                        
+                        el.innerHTML = '';
+                        
+                        if (!listObj || typeof listObj !== 'object') {
+                            console.warn(`[RENDER] Invalid list object for ${id}`);
+                            return;
+                        }
+                        
+                        const sorted = Object.keys(listObj).map(k => ({ 
+                            name: k, 
+                            hours: listObj[k].hours || listObj[k] || 0
+                        }));
+                        
+                        sorted.sort((a,b) => (b.hours || 0) - (a.hours || 0))
+                               .slice(0,5)
+                               .forEach((item, i) => {
+                            el.innerHTML += `
+                                <tr class="hover:bg-white hover:bg-opacity-10 dark:border-gray-800">
+                                    <td class="px-6 py-3 w-10 text-xs font-mono opacity-50">0${i+1}</td>
+                                    <td class="px-6 py-3 font-medium">${item.name || 'Unknown'}</td>
+                                    <td class="px-6 py-3 text-right font-mono opacity-80">${Math.round(item.hours || 0)}h</td>
+                                </tr>`;
+                        });
+                    } catch (e) {
+                        console.error(`[RENDER] List render error for ${id}:`, e);
+                    }
+                };
+                
+                renderList('top-users', users);
+                renderList('top-clients', projects);
+                
+                console.log('[RENDER] Complete');
+                
+            } catch (e) {
+                console.error('[RENDER] Fatal error:', e);
+                showError('Rendering Error', `${e.message}\n\n${e.stack || 'No stack trace'}`);
             }
-            if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
-            const totalDays = 20; 
-            const projRev = (stats.month.rev / daysPassed) * totalDays;
-
-            document.getElementById('month-rev').innerText = '$' + Math.round(stats.month.rev).toLocaleString();
-            document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
-            document.getElementById('month-total-main').innerText = Math.round(stats.month.t) + 'h';
-
-            document.getElementById('week-billable').innerText = Math.round(stats.thisWeek.b);
-            const wPct = stats.thisWeek.t_adj > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t_adj) * 100) : 0;
-            const wPctEl = document.getElementById('week-pct');
-            wPctEl.innerText = wPct + '%';
-            wPctEl.className = `text-4xl font-bold mb-1 opacity-60 ${wPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
-
-            document.getElementById('last-billable').innerText = Math.round(stats.lastWeek.b);
-            const lPct = stats.lastWeek.t_adj > 0 ? Math.round((stats.lastWeek.b / stats.lastWeek.t_adj) * 100) : 0;
-            const lPctEl = document.getElementById('last-pct');
-            lPctEl.innerText = lPct + '%';
-            lPctEl.className = `text-3xl font-bold mb-1 opacity-60 ${lPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
-
-            const updatePace = () => {
-                const goal = parseFloat(document.getElementById('goal-input').value) || 200;
-                const billable = stats.thisWeek.b || 0;
-                const pace = Math.round((billable / goal) * 100);
-                const el = document.getElementById('week-pace');
-                el.innerText = `Pace: ${pace}%`;
-                if (pace >= 100) el.style.color = "#10b981"; 
-                else if (pace >= 80) el.style.color = "#d97706"; 
-                else el.style.color = "inherit";
-            };
-            updatePace();
-            document.getElementById('goal-input').addEventListener('input', updatePace);
-
-            const renderList = (id, listObj) => {
-                const el = document.getElementById(id);
-                el.innerHTML = '';
-                const sorted = Object.keys(listObj).map(k => ({ name: k, hours: listObj[k].hours || listObj[k] }));
-                sorted.sort((a,b) => b.hours - a.hours).slice(0,5).forEach((item, i) => {
-                    el.innerHTML += `
-                        <tr class="hover:bg-white hover:bg-opacity-10 dark:border-gray-800">
-                            <td class="px-6 py-3 w-10 text-xs font-mono opacity-50">0${i+1}</td>
-                            <td class="px-6 py-3 font-medium">${item.name}</td>
-                            <td class="px-6 py-3 text-right font-mono opacity-80">${Math.round(item.hours)}h</td>
-                        </tr>`;
-                });
-            };
-            renderList('top-users', users);
-            renderList('top-clients', projects);
         }
     </script>
 </body>
