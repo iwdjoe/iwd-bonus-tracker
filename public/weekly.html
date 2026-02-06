@@ -56,7 +56,7 @@
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
                     <span>Last Updated: <span id="time-updated">Just now</span></span>
-                    <span id="user-email" class="hidden md:inline">joe@iwdagency.com</span>
+                    <span id="user-email" class="hidden md:inline"></span>
                 </div>
             </div>
             
@@ -64,7 +64,14 @@
                 <button onclick="toggleTheme()" class="text-xl p-2 rounded hover:opacity-80 transition-opacity" title="Toggle Theme">
                     <span id="theme-icon">☀️</span>
                 </button>
-                <button onclick="netlifyIdentity.logout()" class="text-xl p-2 rounded hover:opacity-80 transition-opacity text-gray-500 hover:text-red-500" title="Logout">
+                
+                <!-- Login Button -->
+                <button id="btn-login" onclick="netlifyIdentity.open()" class="text-xs font-bold bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors uppercase tracking-wider">
+                    Login
+                </button>
+
+                <!-- Logout Button (Hidden by default) -->
+                <button id="btn-logout" onclick="netlifyIdentity.logout()" class="hidden text-xl p-2 rounded hover:opacity-80 transition-opacity text-gray-500 hover:text-red-500" title="Logout">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 </button>
             </div>
@@ -154,12 +161,25 @@
     </div>
 
     <script>
-        // Using Sequential Fetch (V163 Logic) as it is proven stable
         const API_URL = '/.netlify/functions/get-pulse-seq?v=' + Date.now(); 
         
-        netlifyIdentity.on('init', user => { if(user) document.getElementById('user-email').innerText = user.email; });
-        netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
-        netlifyIdentity.on('logout', () => { location.reload(); });
+        const updateAuthUI = (user) => {
+            const btnLogin = document.getElementById('btn-login');
+            const btnLogout = document.getElementById('btn-logout');
+            if (user) {
+                if(btnLogin) btnLogin.classList.add('hidden');
+                if(btnLogout) btnLogout.classList.remove('hidden');
+                document.getElementById('user-email').innerText = user.email;
+            } else {
+                if(btnLogin) btnLogin.classList.remove('hidden');
+                if(btnLogout) btnLogout.classList.add('hidden');
+                document.getElementById('user-email').innerText = '';
+            }
+        };
+
+        netlifyIdentity.on('init', user => updateAuthUI(user));
+        netlifyIdentity.on('login', user => { updateAuthUI(user); netlifyIdentity.close(); location.reload(); });
+        netlifyIdentity.on('logout', () => { updateAuthUI(null); location.reload(); });
         netlifyIdentity.init();
 
         let isDark = true; 
