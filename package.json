@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "fetch-data": "node scripts/fetch-pulse.js",
+    "update": "npm run fetch-data"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,6 @@
   },
   "homepage": "https://github.com/iwdjoe/iwd-bonus-tracker#readme",
   "dependencies": {
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.7.0"
   }
 }

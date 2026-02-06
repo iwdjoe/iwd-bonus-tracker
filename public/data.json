@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "updated": "2026-02-06T09:46:00.000Z",
+    "source": "Manual Snapshot"
+  },
+  "entries": [
+    {"d":"2026-02-05","h":5.5,"b":true,"u":"Oleg Sergiyenko","p":"SchoolFix","pid":"SF"},
+    {"d":"2026-02-04","h":6.0,"b":true,"u":"Irina Lukyanchuk","p":"Inyo Pools","pid":"IP"},
+    {"d":"2026-02-03","h":8.0,"b":true,"u":"Marcos Araujo","p":"Pryor","pid":"PR"},
+    {"d":"2026-01-29","h":7.5,"b":true,"u":"Pradeep Mudaliar","p":"IWD","pid":"IWD"},
+    {"d":"2026-01-28","h":8.0,"b":true,"u":"Bohdan Bohaichuk","p":"Runners","pid":"RA"}
+  ],
+  "pulse": {
+     "thisWeek": { "b": 93, "t": 247, "t_adj": 247 },
+     "lastWeek": { "b": 154, "t": 380, "t_adj": 380 },
+     "month": { "b": 93, "t": 106, "rev": 84434 }
+  },
+  "rates": {},
+  "globalRate": 155
+}

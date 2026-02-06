@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Pulse (Static)</title>
+    <link rel="icon" type="image/png" href="iwd-logo-new.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { astro: { 900: '#0b0f19', 800: '#111827' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        *, ::before, ::after { animation: none !important; transition: none !important; }
+        .light-bg { background: #f9fafb; }
+        .dark-bg { background: #000000; }
+    </style>
+</head>
+<body class="light-bg min-h-screen p-4 md:p-8 transition-colors duration-200" id="body">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl font-bold">Weekly Pulse <span class="text-xs font-normal opacity-50">v148 (Static)</span></h1>
+            <div class="text-xs opacity-50">Last Updated: <span id="time-updated">--</span></div>
+        </div>
+        <div>
+            <button onclick="toggleTheme()" class="text-2xl">☀️</button>
+        </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="grid grid-cols-3 gap-6 mb-8">
+        <div class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow border-l-4 border-green-500">
+            <h3 class="text-xs font-bold text-green-600 mb-1">Monthly Projection</h3>
+            <div class="text-3xl font-black text-green-600" id="month-proj">--</div>
+        </div>
+        <div class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow">
+            <h3 class="text-xs font-bold text-purple-600 mb-1">Weekly Goal</h3>
+            <div class="text-3xl font-black">200</div>
+        </div>
+        <div class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow">
+            <h3 class="text-xs font-bold opacity-50 mb-1">Month Total</h3>
+            <div class="text-3xl font-black" id="month-total">--</div>
+        </div>
+    </div>
+
+    <!-- WEEKLY GRID -->
+    <div class="grid grid-cols-2 gap-0 bg-white dark:bg-gray-900 rounded-xl shadow overflow-hidden mb-8">
+        <div class="p-8 text-center border-r border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
+            <div class="text-xs font-bold uppercase mb-4 text-blue-600">This Week</div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <div class="text-4xl font-black" id="tw-b">--</div>
+                    <div class="text-xs opacity-50">Billable</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-black opacity-50" id="tw-p">--%</div>
+                    <div class="text-xs opacity-50">% Billable</div>
+                </div>
+            </div>
+        </div>
+        <div class="p-8 text-center">
+            <div class="text-xs font-bold uppercase mb-4 opacity-50">Last Week</div>
+            <div class="grid grid-cols-2 gap-4 opacity-60">
+                <div>
+                    <div class="text-3xl font-black" id="lw-b">--</div>
+                    <div class="text-xs opacity-50">Billable</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-black opacity-50" id="lw-p">--%</div>
+                    <div class="text-xs opacity-50">% Billable</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // STATIC READ
+        fetch('data.json?v=' + Date.now())
+            .then(r => r.json())
+            .then(data => {
+                const p = data.pulse;
+                
+                // Monthly
+                const now = new Date();
+                const daysPassed = Math.max(now.getDate() - 1, 1);
+                const proj = (p.month.rev / daysPassed) * 20;
+                
+                document.getElementById('month-proj').innerText = '$' + Math.round(proj).toLocaleString();
+                document.getElementById('month-total').innerText = Math.round(p.month.t) + 'h';
+                
+                // Weekly
+                document.getElementById('tw-b').innerText = Math.round(p.thisWeek.b);
+                document.getElementById('tw-p').innerText = Math.round((p.thisWeek.b / p.thisWeek.t_adj) * 100) + '%';
+                
+                document.getElementById('lw-b').innerText = Math.round(p.lastWeek.b);
+                document.getElementById('lw-p').innerText = Math.round((p.lastWeek.b / p.lastWeek.t_adj) * 100) + '%';
+
+                document.getElementById('time-updated').innerText = new Date(data.meta.updated).toLocaleString();
+            });
+
+        // Theme Logic
+        let isDark = true;
+        function toggleTheme() {
+            isDark = !isDark;
+            document.body.className = isDark ? "bg-black text-white p-8" : "bg-gray-50 text-gray-900 p-8";
+            // Simple toggle for now, can refine later
+        }
+        toggleTheme(); // Init
+    </script>
+</body>
+</html>

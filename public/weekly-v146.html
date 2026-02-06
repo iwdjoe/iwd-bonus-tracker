@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (Static)</title>
+    <title>Weekly Pulse (V146 Static)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -33,8 +33,8 @@
 <body class="light-bg min-h-screen p-4 md:p-8 transition-colors duration-200" id="body">
 
     <!-- STATUS BAR -->
-    <div id="status-bar" class="fixed top-0 left-0 right-0 bg-gray-600 text-white text-xs font-bold text-center py-1 z-50 hidden">
-        Ready
+    <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
+        Loading...
     </div>
 
     <!-- DASHBOARD -->
@@ -45,17 +45,15 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v150</span></h1>
-                    <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full uppercase">STATIC</span>
-                    <span id="last-updated" class="text-[10px] font-mono opacity-50"></span>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v146</span></h1>
+                    <span class="text-[10px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full uppercase">STATIC</span>
                 </div>
             </div>
             
             <div class="flex items-center gap-3">
-                <button onclick="triggerUpdate()" id="update-btn" class="flex items-center gap-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors" title="Trigger Background Update">
-                    <span>↻ UPDATE DATA</span>
+                <button id="update-btn" onclick="triggerUpdate()" class="text-xs font-bold bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors">
+                    🔄 Update Data
                 </button>
-
                 <button onclick="toggleTheme()" class="text-xl p-2 rounded hover:opacity-80 transition-opacity" title="Toggle Theme">
                     <span id="theme-icon">☀️</span>
                 </button>
@@ -144,8 +142,10 @@
     </div>
 
     <script>
-        // Use static JSON file instead of live API
-        const DATA_URL = 'data.json?v=' + Date.now(); 
+        // V146 - STATIC DATA MODEL
+        // Read from pre-generated data.json instead of live API calls
+        const DATA_URL = '/data.json?v=' + Date.now(); 
+        const UPDATE_URL = '/.netlify/functions/update-pulse-bg';
         
         netlifyIdentity.on('init', user => {});
         netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
@@ -158,46 +158,6 @@
             isDark = !isDark;
             applyTheme();
             document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
-        }
-
-        async function triggerUpdate() {
-            const btn = document.getElementById('update-btn');
-            const status = document.getElementById('status-bar');
-            
-            if (btn.disabled) return;
-            
-            btn.disabled = true;
-            btn.innerText = "SYNCING...";
-            btn.className = "text-xs font-bold bg-gray-400 text-white px-3 py-2 rounded cursor-not-allowed";
-            
-            status.innerText = "Starting Background Sync...";
-            status.className = "fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50";
-            status.classList.remove('hidden');
-
-            try {
-                // Fire and forget - background function
-                const res = await fetch('/.netlify/functions/get-pulse-background', { method: 'POST' });
-                
-                if (res.status === 202 || res.ok) {
-                    status.innerText = "Sync Started! Check back in ~1 minute.";
-                    status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
-                    setTimeout(() => status.classList.add('hidden'), 5000);
-                    setTimeout(() => {
-                        btn.disabled = false;
-                        btn.innerText = "SYNC DATA";
-                        btn.className = "text-xs font-bold bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors";
-                    }, 60000); // Re-enable after 1 min
-                } else {
-                    throw new Error("Status " + res.status);
-                }
-            } catch (e) {
-                console.error(e);
-                status.innerText = "Sync Failed: " + e.message;
-                status.className = "fixed top-0 left-0 right-0 bg-red-600 text-white text-xs font-bold text-center py-1 z-50";
-                btn.disabled = false;
-                btn.innerText = "SYNC DATA";
-                btn.className = "text-xs font-bold bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors";
-            }
         }
 
         function applyTheme() {
@@ -234,59 +194,50 @@
 
         async function init() {
             const status = document.getElementById('status-bar');
-            status.innerText = "Loading local data...";
-            status.classList.remove('hidden');
-            
+            status.innerText = "Loading V146 (Static)...";
             try {
                 const res = await fetch(DATA_URL);
-                if (!res.ok) throw new Error("Local Data Missing or Error");
+                if (!res.ok) throw new Error("Data file not found - click Update Data button");
                 const data = await res.json();
                 
-                status.innerText = "Loaded (" + (data.meta ? data.meta.count : 0) + " entries)";
+                const fetchedDate = data.meta && data.meta.fetched ? new Date(data.meta.fetched).toLocaleString() : 'Unknown';
+                status.innerText = `✅ Loaded ${data.meta ? data.meta.count : 0} entries (Updated: ${fetchedDate})`;
                 status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
-                setTimeout(() => status.classList.add('hidden'), 2000);
-
-                if (data.meta && data.meta.generated) {
-                    const date = new Date(data.meta.generated);
-                    document.getElementById('last-updated').innerText = "Updated: " + date.toLocaleTimeString() + " " + date.toLocaleDateString();
-                }
+                setTimeout(() => status.classList.add('hidden'), 5000);
                 
                 processData(data);
             } catch (e) {
                 console.error(e);
-                status.innerText = "Failed to load data. Click 'Update Data' to generate.";
-                status.className = "fixed top-0 left-0 right-0 bg-red-600 text-white text-xs font-bold text-center py-1 z-50";
+                status.innerText = "❌ " + e.message;
+                status.className = "fixed top-0 left-0 right-0 bg-red-500 text-white text-xs font-bold text-center py-1 z-50";
             }
         }
-
+        
         async function triggerUpdate() {
-            const btn = document.getElementById('update-btn');
             const status = document.getElementById('status-bar');
+            const btn = document.getElementById('update-btn');
             
             btn.disabled = true;
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-            btn.innerHTML = "⏳ Updating...";
-            
-            status.innerText = "Triggering Background Update... (This takes ~45s)";
+            btn.innerText = "🔄 Updating...";
+            status.innerText = "⏳ Update started (this may take 30-60s)...";
             status.className = "fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50";
             status.classList.remove('hidden');
             
             try {
-                const res = await fetch('/.netlify/functions/generate-pulse-background');
-                // Background functions might return 202 Accepted immediately
-                if (res.ok || res.status === 202) {
-                    status.innerText = "Update started in background! Check back in 1 minute.";
-                    status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
-                    setTimeout(() => status.classList.add('hidden'), 5000);
-                } else {
-                    throw new Error("Function returned " + res.status);
-                }
+                const res = await fetch(UPDATE_URL);
+                if (!res.ok) throw new Error("Update trigger failed");
+                
+                status.innerText = "✅ Update triggered! Refresh in 60s to see new data.";
+                status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
+                
+                // Auto-refresh after 60 seconds
+                setTimeout(() => location.reload(), 60000);
             } catch (e) {
-                status.innerText = "Error triggering update: " + e.message;
-                status.className = "fixed top-0 left-0 right-0 bg-red-600 text-white text-xs font-bold text-center py-1 z-50";
+                console.error(e);
+                status.innerText = "❌ Update failed: " + e.message;
+                status.className = "fixed top-0 left-0 right-0 bg-red-500 text-white text-xs font-bold text-center py-1 z-50";
                 btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                btn.innerHTML = "↻ UPDATE DATA";
+                btn.innerText = "🔄 Update Data";
             }
         }
 
@@ -303,7 +254,6 @@
                 return `${y}-${m}-${day}`;
             };
 
-            // Logic to determine "Current Week" and "Last Week"
             const d = new Date(now);
             const day = d.getDay(); 
             const diff = d.getDate() - day + (day == 0 ? -6 : 1); 
@@ -320,7 +270,7 @@
             const lastWeekStart = toStr(lastMon);
             const lastWeekEnd = toStr(lastSun);
 
-            document.getElementById('week-range').innerText = `${thisWeekStart} vs ${lastWeekStart}`; 
+            document.getElementById('week-range').innerText = ""; 
 
             let stats = {
                 month: { b: 0, t: 0, rev: 0 },
@@ -379,7 +329,7 @@
             }
             if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
             const totalDays = 20; 
-            const projRev = daysPassed > 0 ? (stats.month.rev / daysPassed) * totalDays : 0;
+            const projRev = (stats.month.rev / daysPassed) * totalDays;
 
             document.getElementById('month-rev').innerText = '$' + Math.round(stats.month.rev).toLocaleString();
             document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
