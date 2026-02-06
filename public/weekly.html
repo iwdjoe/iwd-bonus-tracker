@@ -38,13 +38,19 @@
 </head>
 <body class="light-bg min-h-screen p-4 md:p-8 transition-colors duration-200" id="body">
 
-    <!-- STATUS BAR -->
-    <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Syncing...
+    <!-- LOGIN SCREEN (GATED) -->
+    <div id="login-screen" class="fixed inset-0 bg-gray-50 dark:bg-black flex flex-col items-center justify-center z-50 transition-opacity duration-500">
+        <img src="iwd-logo-new.png" class="w-24 h-auto mb-6" alt="IWD Agency">
+        <h1 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Weekly Pulse</h1>
+        <p class="text-gray-500 mb-8 text-sm">Internal Access Only</p>
+        <button onclick="netlifyIdentity.open('login')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition shadow-md flex items-center gap-2 transform hover:scale-105">
+            <span>🔒</span> Login with Google
+        </button>
+        <p id="auth-error" class="text-red-500 mt-4 text-xs font-bold hidden">Access Denied: Please use your @iwdagency.com email.</p>
     </div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboard" class="max-w-6xl mx-auto pt-6">
+    <!-- DASHBOARD CONTENT (HIDDEN BY DEFAULT) -->
+    <div id="dashboard-content" class="max-w-6xl mx-auto pt-6 hidden">
         
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -65,16 +71,17 @@
                     <span id="theme-icon">☀️</span>
                 </button>
                 
-                <!-- Login Button -->
-                <button id="btn-login" onclick="netlifyIdentity.open()" class="text-xs font-bold bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors uppercase tracking-wider">
-                    Login
-                </button>
-
-                <!-- Logout Button (Hidden by default) -->
-                <button id="btn-logout" onclick="handleLogout()" class="hidden text-xs font-bold bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-red-100 hover:text-red-600 transition-colors uppercase tracking-wider" title="Logout">
-                    Logout
+                <button onclick="netlifyIdentity.logout()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-red-500 transition" title="Logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
                 </button>
             </div>
+        </div>
+
+        <!-- STATUS BAR (Inside Content) -->
+        <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-40 hidden">
+            Syncing...
         </div>
 
         <!-- TOP ROW -->
@@ -161,33 +168,42 @@
     </div>
 
     <script>
-        // API 1: Weekly Data (Safe 14-day Window)
         const API_PULSE = '/.netlify/functions/get-pulse-seq?v=' + Date.now(); 
-        // API 2: Monthly Data (Main Dashboard Source - Guaranteed Match)
         const API_STATS = '/.netlify/functions/get-stats?v=' + Date.now();
         
-        const updateAuthUI = (user) => {
-            const btnLogin = document.getElementById('btn-login');
-            const btnLogout = document.getElementById('btn-logout');
-            if (user) {
-                if(btnLogin) btnLogin.classList.add('hidden');
-                if(btnLogout) btnLogout.classList.remove('hidden');
-                document.getElementById('user-email').innerText = user.email;
-            } else {
-                if(btnLogin) btnLogin.classList.remove('hidden');
-                if(btnLogout) btnLogout.classList.add('hidden');
-                document.getElementById('user-email').innerText = '';
-            }
-        };
+        // AUTH GATING LOGIC
+        function checkAuth() {
+            const user = netlifyIdentity.currentUser();
+            const screen = document.getElementById('login-screen');
+            const dashboard = document.getElementById('dashboard-content');
+            const error = document.getElementById('auth-error');
 
-        function handleLogout() {
-            netlifyIdentity.logout();
-            location.reload();
+            if (!user) {
+                screen.classList.remove('hidden');
+                dashboard.classList.add('hidden');
+                error.classList.add('hidden');
+            } else {
+                if (user.email.endsWith('@iwdagency.com')) {
+                    screen.classList.add('hidden');
+                    dashboard.classList.remove('hidden');
+                    document.getElementById('user-email').innerText = user.email;
+                    
+                    // Kill alert if present
+                    const popup = document.querySelector('.netlify-identity-alert');
+                    if (popup) popup.remove();
+                    
+                    init(); 
+                } else {
+                    error.classList.remove('hidden');
+                    // Force logout if invalid domain to prevent loop
+                    setTimeout(() => netlifyIdentity.logout(), 3000);
+                }
+            }
         }
 
-        netlifyIdentity.on('init', user => updateAuthUI(user));
-        netlifyIdentity.on('login', user => { updateAuthUI(user); netlifyIdentity.close(); location.reload(); });
-        netlifyIdentity.on('logout', () => { updateAuthUI(null); location.reload(); });
+        netlifyIdentity.on('init', checkAuth);
+        netlifyIdentity.on('login', () => { netlifyIdentity.close(); checkAuth(); });
+        netlifyIdentity.on('logout', () => { location.reload(); });
         netlifyIdentity.init();
 
         let isDark = true; 
@@ -220,15 +236,10 @@
         }
         setTimeout(() => { isDark = true; applyTheme(); document.getElementById('theme-icon').innerText = '☀️'; }, 100);
 
-        window.addEventListener('DOMContentLoaded', init);
-
         async function init() {
             const status = document.getElementById('status-bar');
-            status.innerText = "Syncing...";
+            status.classList.remove('hidden');
             try {
-                // HYBRID FETCH: 
-                // 1. Get Weekly Data (Pulse Seq)
-                // 2. Get Monthly Data (Main Stats) - In Parallel
                 const [resPulse, resStats] = await Promise.all([
                     fetch(API_PULSE),
                     fetch(API_STATS)
@@ -237,12 +248,15 @@
                 if (!resPulse.ok) throw new Error("Pulse API Error");
                 
                 const dataPulse = await resPulse.json();
-                const dataStats = resStats.ok ? await resStats.json() : null; // Fail gracefully if Stats fails
+                const dataStats = resStats.ok ? await resStats.json() : null; 
                 
                 status.innerText = "Loaded";
                 status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
                 setTimeout(() => status.classList.add('hidden'), 3000);
                 
+                const date = new Date();
+                document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
                 processData(dataPulse, dataStats);
             } catch (e) {
                 console.error(e);
@@ -283,11 +297,9 @@
             const lastWeekStart = toStr(lastMon);
             const lastWeekEnd = toStr(lastSun);
 
-            // Populate Date Labels
             document.getElementById('this-week-dates').innerText = `${toShort(thisWeekStart)} - ${toShort(thisWeekEnd)}`;
             document.getElementById('last-week-dates').innerText = `${toShort(lastWeekStart)} - ${toShort(lastWeekEnd)}`;
 
-            // Buckets
             let stats = {
                 thisWeek: { b: 0, t: 0, t_adj: 0 }, 
                 lastWeek: { b: 0, t: 0, t_adj: 0 }
@@ -296,7 +308,6 @@
             let users = {};
             let projects = {};
 
-            // 1. PROCESS WEEKLY DATA (From Pulse API)
             entries.forEach(e => {
                 let dateStr = e.d;
                 if (!dateStr.includes('-') && dateStr.length === 8) {
@@ -314,31 +325,22 @@
                     if (e.b && !e.i) stats.lastWeek.b += e.h;
                 }
                 
-                // Populate Lists
                 if (e.b && !e.i) {
                     if(!users[e.u]) users[e.u]=0; users[e.u] += e.h;
                     if(!projects[e.p]) projects[e.p]={hours:0}; projects[e.p].hours += e.h;
                 }
             });
 
-            // 2. PROCESS MONTHLY DATA (From Main Stats API - EXACT MATCH)
             if (statsData && statsData.projects) {
-                // Recalculate Totals from Stats Data
                 let mRev = 0;
                 let mHours = 0;
-                
-                // We need to sum up what get-stats calculated
-                // Actually, get-stats returns aggregated lists (users/projects). 
-                // We can sum the projects list to get total revenue/hours.
                 statsData.projects.forEach(p => {
                     const h = parseFloat(p.hours);
                     const r = parseInt(p.rate);
-                    // Stats API already excludes internal projects for the list!
                     mHours += h;
                     mRev += h * r;
                 });
 
-                // PROJECTION LOGIC (Same as Main Dashboard)
                 const start = new Date(now.getFullYear(), now.getMonth(), 1);
                 let daysPassed = 0;
                 let cur = new Date(start);
@@ -354,11 +356,9 @@
                 document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
                 document.getElementById('month-total-main').innerText = Math.round(mHours) + 'h';
             } else {
-                // Fallback if Stats API fails
                 document.getElementById('month-rev').innerText = 'Err';
             }
 
-            // RENDER WEEKLY
             document.getElementById('week-billable').innerText = Math.round(stats.thisWeek.b);
             const wPct = stats.thisWeek.t_adj > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t_adj) * 100) : 0;
             const wPctEl = document.getElementById('week-pct');
