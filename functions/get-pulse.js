@@ -1,6 +1,5 @@
-// V133 SURGICAL LIVE FETCH (Restoring V93 Logic)
-// Fetches specific range (Last Week Start -> Tomorrow)
-// 2 Pages (1000 entries) is plenty for 14 days.
+// V134 - RESTORING V108 ARCHITECTURE (FAST FETCH)
+// Fetch 14 Days. 2 Pages. Live.
 
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
@@ -13,18 +12,12 @@ exports.handler = async function(event, context) {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
         const now = new Date();
         
-        // DATE LOGIC: Find Last Monday
-        const d = new Date(now);
-        const day = d.getDay(); 
-        const diff = d.getDate() - day + (day == 0 ? -6 : 1); 
-        const thisMon = new Date(d.setDate(diff));
+        // 1. SURGICAL RANGE: 14 DAYS (Matches V108)
+        const fetchStart = new Date(now);
+        fetchStart.setDate(now.getDate() - 14);
+        const fetchEnd = new Date(now);
+        fetchEnd.setDate(now.getDate() + 1);
         
-        const lastMon = new Date(thisMon);
-        lastMon.setDate(thisMon.getDate() - 7); // Start of data needed
-        
-        const tomorrow = new Date(now);
-        tomorrow.setDate(now.getDate() + 1); // End of data needed
-
         const formatDate = (date) => {
             const y = date.getFullYear();
             const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -32,10 +25,10 @@ exports.handler = async function(event, context) {
             return `${y}${m}${day}`;
         };
 
-        const fetchStartStr = formatDate(lastMon);
-        const fetchEndStr = formatDate(tomorrow);
+        const fetchStartStr = formatDate(fetchStart);
+        const fetchEndStr = formatDate(fetchEnd);
 
-        // Fetch 2 Pages (Safe & Fast for ~14 days)
+        // 2. FETCH 2 PAGES (1000 Entries) - Parallel for speed
         const [p1, p2, ratesRes] = await Promise.all([
             fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
             fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
@@ -52,10 +45,13 @@ exports.handler = async function(event, context) {
             ...(d2['time-entries'] || [])
         ];
         
-        // CLEAN & FILTER
+        // 3. CLEAN & FLAG
         const cleanEntries = entries.map(e => {
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
-            const isExcludedUser = user.match(/Isah/i) && user.match(/Ramos/i);
+            const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
+            
+            // Flags
+            const isIsah = user.match(/Isah/i) && user.match(/Ramos/i);
             const isInternal = e['project-name'].match(/IWD|Runners|Dominate/i);
 
             return {
@@ -63,10 +59,10 @@ exports.handler = async function(event, context) {
                 p: e['project-name'],
                 pid: e['project-name'].replace(/[^a-z0-9]/gi, ''),
                 d: e.date,
-                h: parseFloat(e.hours) + (parseFloat(e.minutes) / 60),
+                h: hours,
                 b: e['isbillable'] === '1',
-                i: !!isInternal,
-                x: !!isExcludedUser
+                i: !!isInternal, // Flag Internal
+                x: !!isIsah      // Flag Isah
             };
         }).filter(Boolean);
 
