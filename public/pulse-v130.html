@@ -136,6 +136,7 @@
                 <div id="this-week-box" class="p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 dark:border-gray-800 transition-colors duration-200">
                     <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
                     
+                    <div class="text-[10px] opacity-50 mb-6 font-mono" id="this-week-dates">--</div>
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs">
                         <div class="text-center">
                             <div class="text-4xl font-black mb-1 text-gray-900 dark:text-white" id="week-billable">--</div>
@@ -150,7 +151,8 @@
                 
                 <!-- Last Week -->
                 <div class="p-8 text-center flex flex-col justify-center items-center">
-                    <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 opacity-50">Last Week</div>
+                    <div class="text-xs font-bold uppercase mb-2 inline-block px-3 py-1 opacity-50">Last Week</div>
+                    <div class="text-[10px] opacity-50 mb-6 font-mono" id="last-week-dates">--</div>
                     
                     <div class="grid grid-cols-2 gap-8 w-full max-w-xs opacity-60">
                         <div class="text-center">
