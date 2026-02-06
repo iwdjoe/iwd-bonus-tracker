@@ -101,9 +101,9 @@
             </div>
             
             <div class="card p-6 rounded-xl shadow-sm flex flex-col justify-between h-full">
-                <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 opacity-60">Month Total</h3>
+                <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 opacity-60">Month Billable</h3>
                 <div class="text-3xl font-black" id="month-total-main">--</div>
-                <div class="text-xs mt-1 opacity-60" id="month-pct">100% Billable</div>
+                <div class="text-xs mt-1 opacity-60" id="month-pct">--% Utilization</div>
             </div>
         </div>
 
@@ -157,11 +157,11 @@
         <!-- LISTS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="card rounded-lg shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">🏆 Top Contributors (Billable Only • This Month)</h3></div>
+                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">🏆 Top Contributors (Billable Only)</h3></div>
                 <table class="w-full text-sm"><tbody class="divide-y" id="top-users"></tbody></table>
             </div>
             <div class="card rounded-lg shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">💼 Top Clients (Billable Only • This Month)</h3></div>
+                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">💼 Top Clients (Billable Only)</h3></div>
                 <table class="w-full text-sm"><tbody class="divide-y" id="top-clients"></tbody></table>
             </div>
         </div>
@@ -268,6 +268,7 @@
             const rates = pulseData.rates || {};
             const globalRate = pulseData.globalRate || 155;
 
+            // Date Ranges
             const now = new Date();
             const toStr = (d) => {
                 const y = d.getFullYear();
@@ -308,6 +309,7 @@
             let users = {};
             let projects = {};
 
+            // 1. Process Raw Entries (Weekly + Lists)
             entries.forEach(e => {
                 let dateStr = e.d;
                 if (!dateStr.includes('-') && dateStr.length === 8) {
@@ -326,8 +328,7 @@
                     if (e.b && !e.i) stats.lastWeek.b += e.h;
                 }
                 
-                // LIST POPULATION (Strict Filter: This Month + Billable + No Internal)
-                // Filter: Date >= Feb 1st
+                // LISTS (Month to Date)
                 if (dateStr >= monthStartStr) {
                     if (e.b && !e.i) { // Billable AND Not Internal
                         if(!users[e.u]) users[e.u]=0; users[e.u] += e.h;
@@ -336,14 +337,20 @@
                 }
             });
 
-            // MONTHLY TOTALS (From Stats API)
+            // 2. Process Monthly Aggregates (From Stats API)
             if (statsData && statsData.projects) {
                 let mRev = 0;
-                let mHours = 0;
+                let mBillable = 0; // Total Billable Hours (for Display)
+                
+                // statsData.projects only contains BILLABLE projects (filtered in backend? no, backend sends all projects but lists user hours. Wait.)
+                // V38 Logic: "if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;"
+                // So Stats API ALREADY excludes Internal projects.
+                // So summing hours here = Total Billable Hours (Client Work).
+                
                 statsData.projects.forEach(p => {
                     const h = parseFloat(p.hours);
                     const r = parseInt(p.rate);
-                    mHours += h; // Total Billable Hours
+                    mBillable += h;
                     mRev += h * r;
                 });
 
@@ -360,7 +367,11 @@
 
                 document.getElementById('month-rev').innerText = '$' + Math.round(mRev).toLocaleString();
                 document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
-                document.getElementById('month-total-main').innerText = Math.round(mHours) + 'h';
+                
+                // FIXED: Showing Billable Hours now (matching Teamwork's ~100h)
+                document.getElementById('month-total-main').innerText = Math.round(mBillable) + 'h';
+                document.getElementById('month-pct').innerText = 'Billable Total'; // Renamed label
+                
             } else {
                 document.getElementById('month-rev').innerText = 'Err';
             }
