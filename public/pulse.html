@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (V128)</title>
+    <title>Weekly Pulse (V129)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -45,7 +45,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v128</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v129</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">CACHED</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
@@ -148,7 +148,7 @@
     </div>
 
     <script>
-        // CACHE ARCHITECTURE (V128)
+        // CACHE ARCHITECTURE (V129)
         const READ_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
         const UPDATE_URL = '/.netlify/functions/update-pulse';
         
@@ -218,14 +218,17 @@
                 // Parse Updated Time
                 if (data.meta && data.meta.updated) {
                     const date = new Date(data.meta.updated);
-                    document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    document.getElementById('time-updated').innerText = date.toLocaleString();
                 }
 
                 renderCached(data);
 
             } catch (e) {
                 console.error(e);
-                document.getElementById('time-updated').innerText = "Error Loading";
+                // Don't show "Error Loading" if it's just first run, let them click Sync
+                if(document.getElementById('time-updated').innerText === "--") {
+                    document.getElementById('time-updated').innerText = "Click Sync →";
+                }
             }
         }
 
@@ -300,19 +303,7 @@
             lPctEl.innerText = lPct + '%';
             lPctEl.className = `text-3xl font-bold mb-1 opacity-60 ${lPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
 
-            const updatePace = () => {
-                const goal = parseFloat(document.getElementById('goal-input').value) || 200;
-                const billable = stats.thisWeek.b || 0;
-                const pace = Math.round((billable / goal) * 100);
-                const el = document.getElementById('week-pace');
-                el.innerText = `Pace: ${pace}%`;
-                if (pace >= 100) el.style.color = "#10b981"; 
-                else if (pace >= 80) el.style.color = "#d97706"; 
-                else el.style.color = "inherit";
-            };
-            updatePace();
-            document.getElementById('goal-input').addEventListener('input', updatePace);
-
+            // Lists
             const renderList = (id, list) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
@@ -327,5 +318,19 @@
             };
             renderList('top-users', users);
             renderList('top-clients', projects);
+            
+            // Pace
+            const updatePace = () => {
+                const goal = parseFloat(document.getElementById('goal-input').value) || 200;
+                const billable = stats.thisWeek.b || 0;
+                const pace = Math.round((billable / goal) * 100);
+                const el = document.getElementById('week-pace');
+                el.innerText = `Pace: ${pace}%`;
+                if (pace >= 100) el.style.color = "#10b981"; 
+                else if (pace >= 80) el.style.color = "#d97706"; 
+                else el.style.color = "inherit";
+            };
+            updatePace();
+            document.getElementById('goal-input').addEventListener('input', updatePace);
         }
     </script>

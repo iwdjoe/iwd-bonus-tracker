@@ -8,12 +8,15 @@ exports.handler = async function(event, context) {
     const REPO = "iwdjoe/iwd-bonus-tracker";
 
     try {
-        // Read Raw from GitHub (add timestamp to bust CDN cache)
-        const res = await fetch(`https://raw.githubusercontent.com/${REPO}/main/pulse-cache.json?v=${Date.now()}`, {
-            headers: { "Authorization": `token ${GH_TOKEN}` }
+        // USE GITHUB API (Reliable for Private Repos)
+        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/pulse-cache.json`, {
+            headers: { 
+                "Authorization": `token ${GH_TOKEN}`,
+                "Accept": "application/vnd.github.v3.raw" // Returns raw file content
+            }
         });
         
-        if (!res.ok) throw new Error("Cache Read Failed");
+        if (!res.ok) throw new Error(`GitHub API Error: ${res.status}`);
         const data = await res.json();
 
         return { 
