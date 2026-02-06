@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Pulse (V130)</title>
+    <link rel="icon" type="image/png" href="iwd-logo-new.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { astro: { 900: '#0b0f19', 800: '#111827' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        *, ::before, ::after { animation: none !important; transition: none !important; }
+        
+        .light-card { background: white; border: 1px solid #e5e7eb; color: #111827; }
+        .dark-card { background: #111827; border: 1px solid #1f2937; color: white; }
+        .light-bg { background: #f9fafb; }
+        .dark-bg { background: #000000; }
+        
+        .flex-center-col { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    </style>
+</head>
+<body class="light-bg min-h-screen p-4 md:p-8 transition-colors duration-200" id="body">
+
+    <!-- STATUS BAR -->
+    <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50 hidden">
+        Syncing...
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="max-w-6xl mx-auto pt-6">
+        
+        <!-- HEADER -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <div class="flex items-center gap-3">
+                    <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v130 (Fresh URL)</span></h1>
+                    <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">CACHED</span>
+                </div>
+                <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
+                    <span>Last Synced: <span id="time-updated">--</span></span>
+                    <span id="user-email" class="hidden md:inline">joe@iwdagency.com</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <!-- REFRESH DATA BUTTON -->
+                <button onclick="refreshData()" id="refresh-btn" class="text-sm font-bold px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-2">
+                    <span>↻ Sync Now</span>
+                </button>
+
+                <button onclick="toggleTheme()" class="text-xl p-2 rounded hover:opacity-80 transition-opacity" title="Toggle Theme">
+                    <span id="theme-icon">☀️</span>
+                </button>
+                <button onclick="netlifyIdentity.logout()" class="text-xl p-2 rounded hover:opacity-80 transition-opacity text-gray-500 hover:text-red-500" title="Logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- TOP ROW -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card p-6 rounded-xl shadow-sm flex flex-col justify-between h-full border-l-4 border-green-500">
+                <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 text-green-600">Monthly Projection</h3>
+                <div class="text-3xl font-black text-green-600 dark:text-green-400" id="month-proj">--</div>
+                <div class="text-xs mt-1 opacity-60" id="month-rev">Current: --</div>
+            </div>
+            
+            <div class="card p-6 rounded-xl shadow-sm flex flex-col justify-between h-full">
+                <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 text-purple-600">Weekly Goal</h3>
+                <div class="flex items-baseline gap-2">
+                    <input type="number" id="goal-input" value="200" class="bg-transparent text-4xl font-black w-24 border-b border-gray-300 dark:border-gray-700 focus:outline-none">
+                </div>
+                <div class="text-xs mt-2 font-bold" id="week-pace">Pace: --%</div>
+            </div>
+            
+            <div class="card p-6 rounded-xl shadow-sm flex flex-col justify-between h-full">
+                <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 opacity-60">Month Total</h3>
+                <div class="text-3xl font-black" id="month-total-main">--</div>
+                <div class="text-xs mt-1 opacity-60" id="month-pct">100% Billable</div>
+            </div>
+        </div>
+
+        <!-- WEEKLY ROW -->
+        <div class="card rounded-lg shadow-sm mb-8 overflow-hidden">
+            <div class="px-6 py-3 border-b flex justify-between items-center bg-opacity-50">
+                <h3 class="font-bold text-sm">📅 Weekly Comparison</h3>
+                <span class="text-xs font-mono opacity-50" id="week-range"></span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
+                <!-- This Week -->
+                <div id="this-week-box" class="p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 dark:border-gray-800 transition-colors duration-200">
+                    <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400">This Week</div>
+                    
+                    <div class="grid grid-cols-2 gap-8 w-full max-w-xs">
+                        <div class="text-center">
+                            <div class="text-4xl font-black mb-1 text-gray-900 dark:text-white" id="week-billable">--</div>
+                            <div class="text-[10px] uppercase font-bold opacity-50 text-gray-600 dark:text-gray-400">Billable</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold mb-1 opacity-60 text-gray-900 dark:text-gray-300" id="week-pct">--%</div>
+                            <div class="text-[10px] uppercase font-bold opacity-50 text-gray-600 dark:text-gray-400">% Billable</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Last Week -->
+                <div class="p-8 text-center flex flex-col justify-center items-center">
+                    <div class="text-xs font-bold uppercase mb-6 inline-block px-3 py-1 opacity-50">Last Week</div>
+                    
+                    <div class="grid grid-cols-2 gap-8 w-full max-w-xs opacity-60">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold mb-1" id="last-billable">--</div>
+                            <div class="text-[10px] uppercase font-bold opacity-50">Billable</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold mb-1 opacity-60" id="last-pct">--%</div>
+                            <div class="text-[10px] uppercase font-bold opacity-50">% Billable</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LISTS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="card rounded-lg shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">🏆 Top Contributors (Billable)</h3></div>
+                <table class="w-full text-sm"><tbody class="divide-y" id="top-users"></tbody></table>
+            </div>
+            <div class="card rounded-lg shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">💼 Top Clients (Total)</h3></div>
+                <table class="w-full text-sm"><tbody class="divide-y" id="top-clients"></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CACHE ARCHITECTURE (V130)
+        const READ_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
+        const UPDATE_URL = '/.netlify/functions/update-pulse';
+        
+        netlifyIdentity.on('init', user => { if(user) document.getElementById('user-email').innerText = user.email; });
+        netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
+        netlifyIdentity.on('logout', () => { location.reload(); });
+        netlifyIdentity.init();
+
+        function log(msg) { console.log(msg); } 
+
+        let isDark = true; 
+
+        function toggleTheme() {
+            isDark = !isDark;
+            applyTheme();
+            document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
+        }
+
+        function applyTheme() {
+            const body = document.getElementById('body');
+            const cards = document.querySelectorAll('.card');
+            const thisWeekBox = document.getElementById('this-week-box');
+            
+            if (isDark) {
+                body.className = "bg-black text-white min-h-screen p-4 md:p-8 transition-colors duration-200";
+                cards.forEach(c => c.className = c.className.replace('light-card', 'dark-card').replace('bg-white', '').replace('bg-gray-900', '') + ' dark-card');
+                
+                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-800 transition-colors duration-200 bg-blue-900 bg-opacity-10 text-white";
+                document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-white";
+                document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-900', 'text-gray-300');
+                
+                document.querySelectorAll('.divide-y').forEach(el => el.classList.add('divide-gray-800'));
+                document.querySelectorAll('.border-b').forEach(el => el.classList.add('border-gray-800'));
+            } else {
+                body.className = "bg-gray-50 text-gray-900 min-h-screen p-4 md:p-8 transition-colors duration-200";
+                cards.forEach(c => c.className = c.className.replace('dark-card', 'light-card').replace('bg-white', '').replace('bg-gray-900', '') + ' light-card');
+                
+                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 transition-colors duration-200 bg-blue-50 text-gray-900";
+                document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-gray-900";
+                document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-300', 'text-gray-900').replace('text-white', 'text-gray-900');
+                
+                document.querySelectorAll('.divide-y').forEach(el => el.classList.remove('divide-gray-800'));
+                document.querySelectorAll('.border-b').forEach(el => el.classList.remove('border-gray-800'));
+            }
+        }
+
+        setTimeout(() => { isDark = true; applyTheme(); document.getElementById('theme-icon').innerText = '☀️'; }, 100);
+
+        window.addEventListener('DOMContentLoaded', init);
+
+        async function init() {
+            loadCache();
+        }
+
+        async function loadCache() {
+            try {
+                const res = await fetch(READ_URL);
+                if (!res.ok) throw new Error("Cache Empty");
+                const data = await res.json();
+                
+                // Check if data is valid
+                if (!data.users || data.users.length === 0) {
+                    document.getElementById('time-updated').innerText = "Empty Cache";
+                    return;
+                }
+
+                // Parse Updated Time
+                if (data.meta && data.meta.updated) {
+                    const date = new Date(data.meta.updated);
+                    document.getElementById('time-updated').innerText = date.toLocaleString();
+                }
+
+                renderCached(data);
+
+            } catch (e) {
+                console.error(e);
+                // Don't show error if simple first load
+            }
+        }
+
+        async function refreshData() {
+            const btn = document.getElementById('refresh-btn');
+            const originalText = btn.innerHTML;
+            
+            try {
+                btn.innerHTML = `<span>⏳ Syncing...</span>`;
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                const res = await fetch(UPDATE_URL);
+                const data = await res.json();
+                
+                if (!res.ok || !data.success) throw new Error("Sync Failed");
+                
+                await loadCache();
+                
+                btn.innerHTML = `<span>✓ Done</span>`;
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }, 2000);
+
+            } catch (e) {
+                console.error(e);
+                btn.innerHTML = `<span>❌ Failed</span>`;
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }, 2000);
+            }
+        }
+
+        function renderCached(data) {
+            const stats = data.pulse;
+            const users = data.users || [];
+            const projects = data.projects || [];
+
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth(), 1);
+            let daysPassed = 0;
+            let cur = new Date(start);
+            while(cur <= now) {
+                if(cur.getDay()!==0 && cur.getDay()!==6) daysPassed++;
+                cur.setDate(cur.getDate()+1);
+            }
+            if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
+            const totalDays = 20; 
+            const projRev = (stats.month.rev / daysPassed) * totalDays;
+
+            document.getElementById('month-rev').innerText = '$' + Math.round(stats.month.rev).toLocaleString();
+            document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
+            document.getElementById('month-total-main').innerText = Math.round(stats.month.t) + 'h';
+
+            document.getElementById('week-billable').innerText = Math.round(stats.thisWeek.b);
+            const wPct = stats.thisWeek.t_adj > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t_adj) * 100) : 0;
+            const wPctEl = document.getElementById('week-pct');
+            wPctEl.innerText = wPct + '%';
+            wPctEl.className = `text-4xl font-bold mb-1 opacity-60 ${wPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
+
+            document.getElementById('last-billable').innerText = Math.round(stats.lastWeek.b);
+            const lPct = stats.lastWeek.t_adj > 0 ? Math.round((stats.lastWeek.b / stats.lastWeek.t_adj) * 100) : 0;
+            const lPctEl = document.getElementById('last-pct');
+            lPctEl.innerText = lPct + '%';
+            lPctEl.className = `text-3xl font-bold mb-1 opacity-60 ${lPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
+
+            // Save/Load Goal
+            const goalInput = document.getElementById('goal-input');
+            const savedGoal = localStorage.getItem('pulse_goal');
+            if (savedGoal) goalInput.value = savedGoal;
+
+            const updatePace = () => {
+                const goal = parseFloat(goalInput.value) || 200;
+                localStorage.setItem('pulse_goal', goal);
+                const billable = stats.thisWeek.b || 0;
+                const pace = Math.round((billable / goal) * 100);
+                const el = document.getElementById('week-pace');
+                el.innerText = `Pace: ${pace}%`;
+                if (pace >= 100) el.style.color = "#10b981"; 
+                else if (pace >= 80) el.style.color = "#d97706"; 
+                else el.style.color = "inherit";
+            };
+            updatePace();
+            goalInput.addEventListener('input', updatePace);
+
+            const renderList = (id, list) => {
+                const el = document.getElementById(id);
+                el.innerHTML = '';
+                list.forEach((item, i) => {
+                    el.innerHTML += `
+                        <tr class="hover:bg-white hover:bg-opacity-10 dark:border-gray-800">
+                            <td class="px-6 py-3 w-10 text-xs font-mono opacity-50">0${i+1}</td>
+                            <td class="px-6 py-3 font-medium">${item.name}</td>
+                            <td class="px-6 py-3 text-right font-mono opacity-80">${Math.round(item.hours)}h</td>
+                        </tr>`;
+                });
+            };
+            renderList('top-users', users);
+            renderList('top-clients', projects);
+        }
+    </script>
+</body>
+</html>
