@@ -45,7 +45,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v152 (Reborn)</span></h1>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v153 (Renamed API)</span></h1>
                     <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE API</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
@@ -143,8 +143,8 @@
     </div>
 
     <script>
-        // CLIENT SIDE LOGIC (V152 - SPLIT FETCH RESTORED)
-        const API_BASE = '/.netlify/functions/get-pulse'; 
+        // CLIENT SIDE LOGIC (V153 - RENAMED API)
+        const API_BASE = '/.netlify/functions/get-weekly-pulse'; 
         
         netlifyIdentity.on('init', user => { if(user) document.getElementById('user-email').innerText = user.email; });
         netlifyIdentity.on('login', () => { netlifyIdentity.close(); location.reload(); });
