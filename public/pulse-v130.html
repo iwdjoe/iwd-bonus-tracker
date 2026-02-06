@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (V133)</title>
+    <title>Weekly Pulse (Final)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -34,7 +34,7 @@
 
     <!-- STATUS BAR -->
     <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-50">
-        Syncing V133...
+        Syncing...
     </div>
 
     <!-- DASHBOARD -->
@@ -45,8 +45,8 @@
             <div>
                 <div class="flex items-center gap-3">
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">v137 (Golden)</span></h1>
-                    <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE API</span>
+                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse <span class="text-xs font-normal opacity-50 ml-1">Final</span></h1>
+                    <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">STABLE</span>
                 </div>
                 <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
                     <span>Last Updated: <span id="time-updated">Just now</span></span>
@@ -89,8 +89,8 @@
 
         <!-- WEEKLY ROW -->
         <div class="card rounded-lg shadow-sm mb-8 overflow-hidden">
-            <div class="px-6 py-3 border-b flex justify-between items-center bg-opacity-50">
-                <h3 class="font-bold text-sm">📅 Weekly Comparison</h3>
+            <div class="px-6 py-3 border-b flex justify-between items-center bg-green-600 bg-opacity-10">
+                <h3 class="font-bold text-sm text-green-600 dark:text-green-400">📅 Weekly Comparison</h3>
                 <span class="text-xs font-mono opacity-50" id="week-range"></span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
@@ -132,18 +132,18 @@
         <!-- LISTS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="card rounded-lg shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">🏆 Top Contributors (Billable)</h3></div>
+                <div class="px-6 py-4 border-b bg-green-600 bg-opacity-10"><h3 class="text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-400">🏆 Top Contributors (Billable)</h3></div>
                 <table class="w-full text-sm"><tbody class="divide-y" id="top-users"></tbody></table>
             </div>
             <div class="card rounded-lg shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">💼 Top Clients (Total)</h3></div>
+                <div class="px-6 py-4 border-b bg-green-600 bg-opacity-10"><h3 class="text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-400">💼 Top Clients (Total)</h3></div>
                 <table class="w-full text-sm"><tbody class="divide-y" id="top-clients"></tbody></table>
             </div>
         </div>
     </div>
 
     <script>
-        // CLIENT SIDE LOGIC (V133 - Restored Live Fetch)
+        // CLIENT SIDE LOGIC - V130 FINAL (Restored to V108 Logic + V122 UI)
         const API_URL = '/.netlify/functions/get-pulse?v=' + Date.now(); 
         
         netlifyIdentity.on('init', user => { if(user) document.getElementById('user-email').innerText = user.email; });
@@ -229,6 +229,7 @@
                 return `${y}-${m}-${day}`;
             };
 
+            // ====== WEEK RANGES (Fixed) ======
             const d = new Date(now);
             const day = d.getDay(); 
             const diff = d.getDate() - day + (day == 0 ? -6 : 1); 
@@ -242,10 +243,16 @@
             const lastSun = new Date(lastMon);
             lastSun.setDate(lastMon.getDate() + 6);
             
+            const thisWeekStart = toStr(thisMon);
+            const thisWeekEnd = toStr(thisSun);
+            const lastWeekStart = toStr(lastMon);
+            const lastWeekEnd = toStr(lastSun);
+            
+            // ====== MONTH START ======
             const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
             const monthStartStr = toStr(monthStart);
 
-            document.getElementById('week-range').innerText = ""; 
+            document.getElementById('week-range').innerText = `${thisWeekStart} → ${thisWeekEnd}`; 
 
             let stats = {
                 month: { b: 0, t: 0, rev: 0 },
@@ -257,38 +264,61 @@
             let projects = {};
 
             entries.forEach(e => {
+                // Normalize date format
                 let dateStr = e.d;
                 if (!dateStr.includes('-') && dateStr.length === 8) {
                     dateStr = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
                 }
 
+                // ====== MONTHLY STATS (Internal Projects EXCLUDED for Revenue) ======
                 if (dateStr >= monthStartStr) {
-                    const isInternal = e.p.match(/IWD|Runners|Dominate/i);
-                    if (!isInternal) {
+                    // Internal Projects: EXCLUDED from Monthly Revenue
+                    if (!e.i) {
                         stats.month.t += e.h;
                         if (e.b) stats.month.b += e.h;
                         const rate = rates[e.pid] || rates[e.p] || globalRate;
                         stats.month.rev += e.h * rate;
-                        if (e.b) {
+                        
+                        // Top Contributors (Billable only, no internal)
+                        if (e.b && !e.x) {
                             if (!users[e.u]) users[e.u] = 0;
                             users[e.u] += e.h;
                         }
+                    }
+                    
+                    // Top Clients (All non-internal projects)
+                    if (!e.i) {
                         if (!projects[e.p]) projects[e.p] = { hours: 0 };
                         projects[e.p].hours += e.h;
                     }
                 }
 
-                if (e.x) return; 
-
+                // ====== WEEKLY STATS (Internal Projects INCLUDED, Isah EXCLUDED from Denominator) ======
                 if (dateStr >= thisWeekStart && dateStr <= thisWeekEnd) {
+                    // Internal Projects: INCLUDED in weekly totals
                     stats.thisWeek.t += e.h;
-                    if (!e.x) stats.thisWeek.t_adj += e.h; 
-                    if (e.b) stats.thisWeek.b += e.h;
+                    
+                    // Isah Ramos: EXCLUDED from denominator (t_adj)
+                    if (!e.x) {
+                        stats.thisWeek.t_adj += e.h;
+                    }
+                    
+                    // Billable hours (all users)
+                    if (e.b) {
+                        stats.thisWeek.b += e.h;
+                    }
                 } 
                 else if (dateStr >= lastWeekStart && dateStr <= lastWeekEnd) {
                     stats.lastWeek.t += e.h;
-                    if (!e.x) stats.lastWeek.t_adj += e.h;
-                    if (e.b) stats.lastWeek.b += e.h;
+                    
+                    // Isah Ramos: EXCLUDED from denominator
+                    if (!e.x) {
+                        stats.lastWeek.t_adj += e.h;
+                    }
+                    
+                    if (e.b) {
+                        stats.lastWeek.b += e.h;
+                    }
                 }
             });
 
@@ -354,3 +384,5 @@
             renderList('top-clients', projects);
         }
     </script>
+</body>
+</html>

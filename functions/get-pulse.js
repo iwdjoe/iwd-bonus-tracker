@@ -1,6 +1,3 @@
-// V137 - RESTORING V108 BACKEND (The one that worked)
-// Fetch 14 Days. 2 Pages. Live.
-
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
     const TOKEN = process.env.TEAMWORK_API_TOKEN || 'dryer498desert';
@@ -12,9 +9,10 @@ exports.handler = async function(event, context) {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
         const now = new Date();
         
-        // 1. SURGICAL RANGE: 14 DAYS
+        // 1. SAFE RANGE: 25 DAYS (To cover month boundaries safely)
+        // Restoring V108 Logic: Simple date range, no "this_week" split fetching.
         const fetchStart = new Date(now);
-        fetchStart.setDate(now.getDate() - 14);
+        fetchStart.setDate(now.getDate() - 25);
         const fetchEnd = new Date(now);
         fetchEnd.setDate(now.getDate() + 1);
         
@@ -28,8 +26,8 @@ exports.handler = async function(event, context) {
         const fetchStartStr = formatDate(fetchStart);
         const fetchEndStr = formatDate(fetchEnd);
 
-        // 2. FETCH 2 PAGES (1000 Entries)
-        // If this times out, NOTHING will work except the Database approach.
+        // 2. FETCH 2 PAGES (1000 Entries) - Simple, Direct
+        // No Caching. No DB. Just API.
         const [p1, p2, ratesRes] = await Promise.all([
             fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
             fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
@@ -46,14 +44,19 @@ exports.handler = async function(event, context) {
             ...(d2['time-entries'] || [])
         ];
         
-        // 3. CLEAN & FLAG (V108 Logic)
+        // 3. CLEAN & FLAG
+        // logic: Internal = IWD|Runners|Dominate. Isah = Isah Ramos.
         const cleanEntries = entries.map(e => {
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             
             // Flags
-            const isIsah = user.match(/Isah/i) && user.match(/Ramos/i);
-            const isInternal = e['project-name'].match(/IWD|Runners|Dominate/i);
+            // Isah Filter: Exclude from Weekly Denominator
+            const isIsah = !!(user.match(/Isah/i) && user.match(/Ramos/i));
+            
+            // Internal Filter: Exclude from Monthly Revenue, Include in Weekly Denominator
+            // (Project names like "IWD - Internal", "Runners", "Dominate")
+            const isInternal = !!(e['project-name'].match(/IWD|Runners|Dominate/i));
 
             return {
                 u: user,
@@ -62,8 +65,8 @@ exports.handler = async function(event, context) {
                 d: e.date,
                 h: hours,
                 b: e['isbillable'] === '1',
-                i: !!isInternal, // Flag Internal
-                x: !!isIsah      // Flag Isah
+                i: isInternal, // Internal Flag
+                x: isIsah      // Isah Flag
             };
         }).filter(Boolean);
 
@@ -73,7 +76,10 @@ exports.handler = async function(event, context) {
                 entries: cleanEntries,
                 rates: savedRates,
                 globalRate: GLOBAL_RATE,
-                meta: { count: cleanEntries.length }
+                meta: { 
+                    count: cleanEntries.length,
+                    version: "V108-Restored"
+                }
             }) 
         };
 
