@@ -6,3 +6,11 @@
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
+
+# FORCE NO-CACHE FOR HTML
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
