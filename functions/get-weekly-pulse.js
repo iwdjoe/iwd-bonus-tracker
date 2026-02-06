@@ -1,6 +1,6 @@
-// V153 - MICRO FETCH (1 PAGE MAX)
-// Renamed function to bypass any weird caching on 'get-pulse'
-// Fetches only 500 entries per request. Super fast.
+// V160 FINAL BACKEND
+// Split Fetch Architecture (Fast & Reliable)
+// Endpoint: get-weekly-pulse (to avoid cache)
 
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
@@ -48,23 +48,28 @@ exports.handler = async function(event, context) {
         const fetchStartStr = formatDate(fetchStart);
         const fetchEndStr = formatDate(fetchEnd);
 
-        // FETCH 1 PAGE ONLY (500 entries)
-        // This is the fastest possible request.
-        const [p1, ratesRes] = await Promise.all([
+        // Fetch 2 Pages (Safe limit for ~1 week of data)
+        const [p1, p2, ratesRes] = await Promise.all([
             fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
+            fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
             fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
         ]);
 
         const d1 = p1.ok ? await p1.json() : {};
+        const d2 = p2.ok ? await p2.json() : {};
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
-        const entries = d1['time-entries'] || [];
+        const entries = [
+            ...(d1['time-entries'] || []),
+            ...(d2['time-entries'] || [])
+        ];
         
         const cleanEntries = entries.map(e => {
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             
+            // Flags for Frontend Filtering
             const isIsah = user.match(/Isah/i) && user.match(/Ramos/i);
             const isInternal = e['project-name'].match(/IWD|Runners|Dominate/i);
 
@@ -85,8 +90,7 @@ exports.handler = async function(event, context) {
             body: JSON.stringify({ 
                 entries: cleanEntries,
                 rates: savedRates,
-                globalRate: GLOBAL_RATE,
-                meta: { count: cleanEntries.length, range: range, debug: "V153" }
+                globalRate: GLOBAL_RATE
             }) 
         };
 
