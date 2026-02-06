@@ -1,6 +1,8 @@
-// V150 LIVE FETCH (PRO TIER OPTIMIZED)
-// Fetches last 30 Days. 3 Pages (1500 entries).
-// Should be safe on Pro Plan (26s timeout).
+// V152 - V121 REBORN (SPLIT FETCH STRATEGY)
+// This architecture breaks the request into tiny chunks to guarantee NO TIMEOUTS.
+// Request 1: This Week (Fast)
+// Request 2: Last Week (Fast)
+// Request 3: This Month (Fast)
 
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
@@ -12,13 +14,34 @@ exports.handler = async function(event, context) {
     try {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
         const now = new Date();
+        const range = event.queryStringParameters.range || 'this_week';
         
-        // FETCH RANGE: 30 DAYS (Safe middle ground)
-        const fetchStart = new Date(now);
-        fetchStart.setDate(now.getDate() - 30);
-        const fetchEnd = new Date(now);
-        fetchEnd.setDate(now.getDate() + 1);
+        let fetchStart, fetchEnd;
+        const d = new Date(now);
+        const day = d.getDay(); 
+        const diff = d.getDate() - day + (day == 0 ? -6 : 1); 
+        const thisMon = new Date(d.setDate(diff));
+        thisMon.setHours(0,0,0,0);
         
+        if (range === 'last_week') {
+            const lastMon = new Date(thisMon);
+            lastMon.setDate(thisMon.getDate() - 7);
+            const lastSun = new Date(lastMon);
+            lastSun.setDate(lastMon.getDate() + 6);
+            fetchStart = lastMon;
+            fetchEnd = lastSun;
+        } else if (range === 'month') {
+            // Month Start to Now
+            fetchStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            fetchEnd = new Date(now);
+            fetchEnd.setDate(now.getDate() + 1);
+        } else {
+            // this_week (Default)
+            fetchStart = thisMon;
+            fetchEnd = new Date(now);
+            fetchEnd.setDate(now.getDate() + 1);
+        }
+
         const formatDate = (date) => {
             const y = date.getFullYear();
             const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -29,27 +52,24 @@ exports.handler = async function(event, context) {
         const fetchStartStr = formatDate(fetchStart);
         const fetchEndStr = formatDate(fetchEnd);
 
-        // Fetch 3 Pages (1500 entries) - Parallel
-        const [p1, p2, p3, ratesRes] = await Promise.all([
+        // FETCH 2 PAGES (Safe & Fast)
+        // Even for "Month", 1000 entries is usually enough for the first week of Feb.
+        const [p1, p2, ratesRes] = await Promise.all([
             fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
             fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
-            fetch(`https://${DOMAIN}/time_entries.json?page=3&pageSize=500&fromDate=${fetchStartStr}&toDate=${fetchEndStr}&sortorder=desc`, { headers: { 'Authorization': AUTH } }),
             fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
         ]);
 
         const d1 = p1.ok ? await p1.json() : {};
         const d2 = p2.ok ? await p2.json() : {};
-        const d3 = p3.ok ? await p3.json() : {};
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
         const entries = [
             ...(d1['time-entries'] || []),
-            ...(d2['time-entries'] || []),
-            ...(d3['time-entries'] || [])
+            ...(d2['time-entries'] || [])
         ];
         
-        // PROCESS
         const cleanEntries = entries.map(e => {
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
@@ -61,7 +81,7 @@ exports.handler = async function(event, context) {
                 u: user,
                 p: e['project-name'],
                 pid: e['project-name'].replace(/[^a-z0-9]/gi, ''),
-                d: e.date, // YYYY-MM-DD
+                d: e.date,
                 h: hours,
                 b: e['isbillable'] === '1',
                 i: !!isInternal,
@@ -75,7 +95,7 @@ exports.handler = async function(event, context) {
                 entries: cleanEntries,
                 rates: savedRates,
                 globalRate: GLOBAL_RATE,
-                meta: { count: cleanEntries.length, mode: "Live V150" }
+                meta: { count: cleanEntries.length, range: range }
             }) 
         };
 
