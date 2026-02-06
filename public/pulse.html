@@ -157,11 +157,11 @@
         <!-- LISTS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="card rounded-lg shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">🏆 Top Contributors (Billable)</h3></div>
+                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">🏆 Top Contributors (Billable Only • This Month)</h3></div>
                 <table class="w-full text-sm"><tbody class="divide-y" id="top-users"></tbody></table>
             </div>
             <div class="card rounded-lg shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">💼 Top Clients (Billable)</h3></div>
+                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">💼 Top Clients (Billable Only • This Month)</h3></div>
                 <table class="w-full text-sm"><tbody class="divide-y" id="top-clients"></tbody></table>
             </div>
         </div>
@@ -188,14 +188,12 @@
                     dashboard.classList.remove('hidden');
                     document.getElementById('user-email').innerText = user.email;
                     
-                    // Kill alert if present
                     const popup = document.querySelector('.netlify-identity-alert');
                     if (popup) popup.remove();
                     
                     init(); 
                 } else {
                     error.classList.remove('hidden');
-                    // Force logout if invalid domain to prevent loop
                     setTimeout(() => netlifyIdentity.logout(), 3000);
                 }
             }
@@ -270,7 +268,6 @@
             const rates = pulseData.rates || {};
             const globalRate = pulseData.globalRate || 155;
 
-            // Date Ranges
             const now = new Date();
             const toStr = (d) => {
                 const y = d.getFullYear();
@@ -292,6 +289,9 @@
             const lastMon = new Date(thisMon); lastMon.setDate(thisMon.getDate() - 7);
             const lastSun = new Date(lastMon); lastSun.setDate(lastMon.getDate() + 6);
             
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const monthStartStr = toStr(monthStart);
+
             const thisWeekStart = toStr(thisMon);
             const thisWeekEnd = toStr(thisSun);
             const lastWeekStart = toStr(lastMon);
@@ -314,6 +314,7 @@
                     dateStr = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
                 }
 
+                // WEEKLY STATS
                 if (dateStr >= thisWeekStart && dateStr <= thisWeekEnd) {
                     stats.thisWeek.t += e.h;
                     if (!e.x) stats.thisWeek.t_adj += e.h; 
@@ -325,19 +326,24 @@
                     if (e.b && !e.i) stats.lastWeek.b += e.h;
                 }
                 
-                if (e.b && !e.i) {
-                    if(!users[e.u]) users[e.u]=0; users[e.u] += e.h;
-                    if(!projects[e.p]) projects[e.p]={hours:0}; projects[e.p].hours += e.h;
+                // LIST POPULATION (Strict Filter: This Month + Billable + No Internal)
+                // Filter: Date >= Feb 1st
+                if (dateStr >= monthStartStr) {
+                    if (e.b && !e.i) { // Billable AND Not Internal
+                        if(!users[e.u]) users[e.u]=0; users[e.u] += e.h;
+                        if(!projects[e.p]) projects[e.p]={hours:0}; projects[e.p].hours += e.h;
+                    }
                 }
             });
 
+            // MONTHLY TOTALS (From Stats API)
             if (statsData && statsData.projects) {
                 let mRev = 0;
                 let mHours = 0;
                 statsData.projects.forEach(p => {
                     const h = parseFloat(p.hours);
                     const r = parseInt(p.rate);
-                    mHours += h;
+                    mHours += h; // Total Billable Hours
                     mRev += h * r;
                 });
 
