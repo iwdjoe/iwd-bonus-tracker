@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Pulse (Static)</title>
+    <title>Weekly Pulse (V149)</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -27,21 +27,24 @@
 <body class="light-bg min-h-screen p-4 md:p-8 transition-colors duration-200" id="body">
 
     <!-- HEADER -->
-    <div class="flex justify-between items-center mb-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h1 class="text-2xl font-bold">Weekly Pulse <span class="text-xs font-normal opacity-50">v148 (Static)</span></h1>
+            <h1 class="text-2xl font-bold">Weekly Pulse <span class="text-xs font-normal opacity-50">v149</span></h1>
             <div class="text-xs opacity-50">Last Updated: <span id="time-updated">--</span></div>
         </div>
-        <div>
-            <button onclick="toggleTheme()" class="text-2xl">☀️</button>
+        <div class="flex items-center gap-3">
+            <button onclick="triggerUpdate()" id="update-btn" class="text-sm font-bold bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                ↻ Update Data
+            </button>
+            <button onclick="toggleTheme()" class="text-2xl p-2">☀️</button>
         </div>
     </div>
 
-    <!-- MAIN GRID -->
-    <div class="grid grid-cols-3 gap-6 mb-8">
+    <!-- MAIN GRID (Stacked on mobile, 3-col on desktop) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow border-l-4 border-green-500">
             <h3 class="text-xs font-bold text-green-600 mb-1">Monthly Projection</h3>
-            <div class="text-3xl font-black text-green-600" id="month-proj">--</div>
+            <div class="text-3xl font-black text-green-600 break-words" id="month-proj">--</div>
         </div>
         <div class="p-6 bg-white dark:bg-gray-900 rounded-xl shadow">
             <h3 class="text-xs font-bold text-purple-600 mb-1">Weekly Goal</h3>
@@ -53,9 +56,9 @@
         </div>
     </div>
 
-    <!-- WEEKLY GRID -->
-    <div class="grid grid-cols-2 gap-0 bg-white dark:bg-gray-900 rounded-xl shadow overflow-hidden mb-8">
-        <div class="p-8 text-center border-r border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
+    <!-- WEEKLY GRID (Stacked on mobile) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-0 bg-white dark:bg-gray-900 rounded-xl shadow overflow-hidden mb-8">
+        <div class="p-8 text-center border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
             <div class="text-xs font-bold uppercase mb-4 text-blue-600">This Week</div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
@@ -85,37 +88,69 @@
 
     <script>
         // STATIC READ
-        fetch('data.json?v=' + Date.now())
-            .then(r => r.json())
-            .then(data => {
-                const p = data.pulse;
-                
-                // Monthly
-                const now = new Date();
-                const daysPassed = Math.max(now.getDate() - 1, 1);
-                const proj = (p.month.rev / daysPassed) * 20;
-                
-                document.getElementById('month-proj').innerText = '$' + Math.round(proj).toLocaleString();
-                document.getElementById('month-total').innerText = Math.round(p.month.t) + 'h';
-                
-                // Weekly
-                document.getElementById('tw-b').innerText = Math.round(p.thisWeek.b);
-                document.getElementById('tw-p').innerText = Math.round((p.thisWeek.b / p.thisWeek.t_adj) * 100) + '%';
-                
-                document.getElementById('lw-b').innerText = Math.round(p.lastWeek.b);
-                document.getElementById('lw-p').innerText = Math.round((p.lastWeek.b / p.lastWeek.t_adj) * 100) + '%';
+        const loadData = () => {
+            fetch('data.json?v=' + Date.now())
+                .then(r => r.json())
+                .then(data => {
+                    const p = data.pulse;
+                    
+                    // Monthly
+                    const now = new Date();
+                    const daysPassed = Math.max(now.getDate() - 1, 1);
+                    const proj = (p.month.rev / daysPassed) * 20;
+                    
+                    document.getElementById('month-proj').innerText = '$' + Math.round(proj).toLocaleString();
+                    document.getElementById('month-total').innerText = Math.round(p.month.t) + 'h';
+                    
+                    // Weekly
+                    document.getElementById('tw-b').innerText = Math.round(p.thisWeek.b);
+                    document.getElementById('tw-p').innerText = Math.round((p.thisWeek.b / p.thisWeek.t_adj) * 100) + '%';
+                    
+                    document.getElementById('lw-b').innerText = Math.round(p.lastWeek.b);
+                    document.getElementById('lw-p').innerText = Math.round((p.lastWeek.b / p.lastWeek.t_adj) * 100) + '%';
 
-                document.getElementById('time-updated').innerText = new Date(data.meta.updated).toLocaleString();
-            });
+                    document.getElementById('time-updated').innerText = new Date(data.meta.updated).toLocaleString();
+                });
+        };
+        
+        loadData();
+
+        // UPDATE TRIGGER
+        function triggerUpdate() {
+            const btn = document.getElementById('update-btn');
+            btn.innerText = "⏳ Requesting...";
+            btn.disabled = true;
+            
+            fetch('/.netlify/functions/update-pulse')
+                .then(r => r.json())
+                .then(d => {
+                    if(d.success) {
+                        btn.innerText = "✓ Queued (Wait 60s)";
+                        // Poll for new data in 60s? Or let user refresh.
+                        // Since it's background, we can't know exactly when it finishes without complex polling.
+                        setTimeout(() => btn.innerText = "↻ Update Data", 60000);
+                    } else {
+                        btn.innerText = "❌ Error";
+                        alert("Update failed: " + (d.error || "Unknown"));
+                    }
+                })
+                .catch(e => {
+                    btn.innerText = "❌ Error";
+                    alert("Network Error");
+                });
+        }
 
         // Theme Logic
         let isDark = true;
         function toggleTheme() {
             isDark = !isDark;
-            document.body.className = isDark ? "bg-black text-white p-8" : "bg-gray-50 text-gray-900 p-8";
-            // Simple toggle for now, can refine later
+            document.body.className = isDark ? "bg-black text-white p-4 md:p-8" : "bg-gray-50 text-gray-900 p-4 md:p-8";
+            // Also need to toggle card backgrounds properly if using tailwind classes on body isn't enough for child elements
+            // But the hardcoded classes in HTML handles it via dark: prefix if parent has 'dark' class.
+            // Wait, I need to add 'dark' class to HTML tag for Tailwind
+            document.documentElement.classList.toggle('dark', isDark);
         }
-        toggleTheme(); // Init
+        document.documentElement.classList.add('dark'); // Init
     </script>
 </body>
 </html>
