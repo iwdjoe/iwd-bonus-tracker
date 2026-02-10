@@ -1,7 +1,7 @@
 // WEEKLY DASHBOARD BACKEND (Dedicated File)
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
-    const TOKEN = process.env.TEAMWORK_API_TOKEN || 'dryer498desert';
+    const TOKEN = process.env.TEAMWORK_API_TOKEN;
     const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
 
     const now = new Date();

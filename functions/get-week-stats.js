@@ -3,7 +3,7 @@ let cache = { data: null, time: 0 };
 
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
-    const TOKEN = process.env.TEAMWORK_API_TOKEN || 'dryer498desert';
+    const TOKEN = process.env.TEAMWORK_API_TOKEN;
     const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
     const REPO = "iwdjoe/iwd-bonus-tracker";
     const GH_TOKEN = process.env.GITHUB_PAT;
@@ -83,7 +83,7 @@ exports.handler = async function(event, context) {
             }
         });
 
-        const sortMap = (map) => Object.entries(map).sort(([,a], [,b]) => b - a).slice(0, 5).map(([n, h]) => ({ name, hours: h }));
+        const sortMap = (map) => Object.entries(map).sort(([,a], [,b]) => b - a).slice(0, 5).map(([n, h]) => ({ name: n, hours: h }));
         
         const responseData = {
             month: { ...stats.month, topUsers: sortMap(stats.month.users), topClients: sortMap(stats.month.clients) },

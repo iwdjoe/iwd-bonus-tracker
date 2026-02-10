@@ -6,7 +6,7 @@ exports.handler = async function(event, context) {
     // if (cache.data && (Date.now() - cache.time < 60000)) ...
 
     const fetch = require('node-fetch');
-    const TOKEN = process.env.TEAMWORK_API_TOKEN || 'dryer498desert';
+    const TOKEN = process.env.TEAMWORK_API_TOKEN;
     const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
 
     try {
@@ -39,7 +39,7 @@ exports.handler = async function(event, context) {
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             const isBillable = e['isbillable'] === '1';
 
-            timeline.push({ date, hours, billable: isBill ? hours : 0 });
+            timeline.push({ date, hours, billable: isBillable ? hours : 0 });
 
             if (isBillable) {
                 const u = e['person-first-name'] + ' ' + e['person-last-name'];

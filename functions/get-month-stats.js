@@ -13,7 +13,7 @@ exports.handler = async function(event, context) {
     }
 
     try {
-        const TOKEN = process.env.TEAMWORK_API_TOKEN || 'dryer498desert';
+        const TOKEN = process.env.TEAMWORK_API_TOKEN;
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
         const REPO = "iwdjoe/iwd-bonus-tracker";
         const GH_TOKEN = process.env.GITHUB_PAT;

@@ -6,7 +6,7 @@
 
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
-    const TOKEN = process.env.TEAMWORK_API_TOKEN || 'dryer498desert';
+    const TOKEN = process.env.TEAMWORK_API_TOKEN;
     const DOMAIN = 'iwdagency.teamwork.com';
     const GH_TOKEN = process.env.GITHUB_PAT; 
     const REPO = "iwdjoe/iwd-bonus-tracker";

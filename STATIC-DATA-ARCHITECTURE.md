@@ -51,7 +51,7 @@ npm run fetch-data
 
 **Environment Variables Needed:**
 ```bash
-export TEAMWORK_API_TOKEN="dryer498desert"  # Or set in .env
+export TEAMWORK_API_TOKEN="<your-teamwork-api-token>"  # Or set in .env
 export GITHUB_PAT="your-github-personal-access-token"
 ```
 
@@ -102,7 +102,7 @@ https://yourdomain.netlify.app/weekly-v146.html
 cd bonus-site
 
 # Make sure you have the API token
-export TEAMWORK_API_TOKEN="dryer498desert"
+export TEAMWORK_API_TOKEN="<your-teamwork-api-token>"
 export GITHUB_PAT="your_github_pat"
 
 # Fetch data
