@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    
+
     <title>Weekly Pulse</title>
     <link rel="icon" type="image/png" href="iwd-logo-new.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,22 +23,19 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        
-        .light-bg { background: #f9fafb; }
-        .dark-bg { background: #000000; }
-        
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
+
         /* Hide number input arrows */
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
     </style>
 </head>
-<body class="light-bg min-h-screen p-4 md:p-8 transition-colors duration-200" id="body">
+<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 transition-colors duration-300">
 
-    <!-- LOGIN SCREEN (GATED) -->
+    <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 bg-gray-50 dark:bg-black flex flex-col items-center justify-center z-50 transition-opacity duration-500">
         <img src="iwd-logo-new.png" class="w-24 h-auto mb-6" alt="IWD Agency">
         <h1 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Weekly Pulse</h1>
@@ -49,105 +46,100 @@
         <p id="auth-error" class="text-red-500 mt-4 text-xs font-bold hidden">Access Denied: Please use your @iwdagency.com email.</p>
     </div>
 
-    <!-- DASHBOARD CONTENT (HIDDEN BY DEFAULT) -->
-    <div id="dashboard-content" class="max-w-6xl mx-auto pt-6 hidden">
-        
+    <!-- DASHBOARD CONTENT -->
+    <div id="dashboard-content" class="max-w-5xl mx-auto hidden">
+
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
                 <div class="flex items-center gap-3">
-                    <img src="iwd-logo-new.png" class="w-8 h-8 object-contain">
-                    <h1 class="text-2xl font-bold tracking-tight">Weekly Pulse</h1>
-                    <span class="text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase">LIVE</span>
+                    <img src="iwd-logo-new.png" class="w-8 h-8 object-contain" alt="IWD">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Weekly Pulse</h1>
+                    <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300 uppercase" id="live-indicator">Loading...</span>
+
+                    <button onclick="toggleTheme()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition ml-2" title="Toggle Theme">
+                        <span class="dark:hidden">🌙</span><span class="hidden dark:inline">☀️</span>
+                    </button>
+
+                    <button onclick="netlifyIdentity.logout()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-red-500 transition" title="Logout">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
                 </div>
-                <div class="text-xs opacity-50 mt-1 ml-11 flex gap-4">
-                    <span>Last Updated: <span id="time-updated">Just now</span></span>
-                    <span id="user-email" class="hidden md:inline"></span>
+                <div class="flex items-center gap-2 mt-1 ml-1 text-xs text-gray-400">
+                    <span id="time-updated">Waiting for data...</span>
+                    <span id="user-email" class="ml-4 text-gray-300 dark:text-gray-600 font-mono hidden md:inline"></span>
                 </div>
             </div>
-            
-            <div class="flex items-center gap-3">
-                <button onclick="toggleTheme()" class="text-xl p-2 rounded hover:opacity-80 transition-opacity" title="Toggle Theme">
-                    <span id="theme-icon">☀️</span>
-                </button>
-                
-                <button onclick="netlifyIdentity.logout()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-red-500 transition" title="Logout">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                </button>
+
+            <div class="flex items-center gap-6 text-sm bg-white dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-gray-400">WEEKLY GOAL:</label>
+                    <input type="number" id="goal-input" value="200" class="w-16 pr-1 py-0.5 border rounded text-right font-bold bg-transparent text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:outline-none focus:border-blue-500">
+                </div>
             </div>
         </div>
 
-        <!-- STATUS BAR (Inside Content) -->
-        <div id="status-bar" class="fixed top-0 left-0 right-0 bg-blue-600 text-white text-xs font-bold text-center py-1 z-40 hidden">
-            Syncing...
-        </div>
-
-        <!-- TOP ROW -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="card p-6 rounded-xl shadow-sm flex flex-col justify-between h-full border-l-4 border-green-500">
-                <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 text-green-600">Monthly Projection</h3>
-                <div class="text-3xl font-black text-green-600 dark:text-green-400" id="month-proj">--</div>
-                <div class="text-xs mt-1 opacity-60" id="month-rev">Current: --</div>
+        <!-- KPI GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 relative overflow-hidden">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Monthly Projection</h3>
+                <div class="text-4xl font-black text-green-600 dark:text-green-400" id="month-proj">--</div>
+                <div class="text-xs text-gray-400 mt-1" id="month-rev">Current: --</div>
             </div>
-            
-            <div class="card p-6 rounded-xl shadow-sm flex flex-col justify-between h-full">
-                <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 text-purple-600">Weekly Goal</h3>
-                <div class="flex items-baseline gap-2">
-                    <input type="number" id="goal-input" value="200" class="bg-transparent text-4xl font-black w-32 border-b border-gray-300 dark:border-gray-700 focus:outline-none placeholder-gray-500">
-                </div>
-                <div class="text-xs mt-2 font-bold" id="week-pace">Pace: --%</div>
+            <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800">
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Month Billable</h3>
+                <div class="text-3xl font-bold text-gray-900 dark:text-white" id="month-total-main">--</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="month-pct">--</div>
             </div>
-            
-            <div class="card p-6 rounded-xl shadow-sm flex flex-col justify-between h-full">
-                <h3 class="text-[10px] font-bold uppercase tracking-wider mb-1 opacity-60">Month Total</h3>
-                <div class="text-3xl font-black" id="month-total-main">--</div>
-                <div class="text-xs mt-1 opacity-60" id="month-pct">100% Billable</div>
+            <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800">
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Weekly Pace</h3>
+                <div class="text-3xl font-bold text-gray-900 dark:text-white" id="week-pace-value">--%</div>
+                <div class="text-xs mt-1 font-semibold" id="week-pace-label">vs Goal</div>
             </div>
         </div>
 
-        <!-- WEEKLY ROW -->
-        <div class="card rounded-lg shadow-sm mb-8 overflow-hidden">
-            <div class="px-6 py-3 border-b flex justify-between items-center bg-opacity-50">
-                <h3 class="font-bold text-sm">📅 Weekly Comparison</h3>
+        <!-- WEEKLY COMPARISON -->
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 mb-8 overflow-hidden">
+            <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+                <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300">Weekly Comparison</h3>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x">
-                
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-800">
+
                 <!-- This Week -->
-                <div id="this-week-box" class="p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 dark:border-gray-800 transition-colors duration-200">
+                <div class="p-8 text-center bg-blue-50 dark:bg-blue-900/10">
                     <div class="flex flex-col items-center mb-6">
-                        <div class="text-xs font-bold uppercase inline-block px-3 py-1 rounded-full border text-blue-600 border-blue-200 bg-white dark:bg-black dark:border-blue-900 dark:text-blue-400 mb-1">This Week</div>
-                        <div class="text-[10px] font-mono opacity-50" id="this-week-dates">--</div>
+                        <div class="text-xs font-bold uppercase px-3 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 mb-1">This Week</div>
+                        <div class="text-[10px] font-mono text-gray-400" id="this-week-dates">--</div>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-8 w-full max-w-xs">
+                    <div class="grid grid-cols-2 gap-8 w-full max-w-xs mx-auto">
                         <div class="text-center">
                             <div class="text-4xl font-black mb-1 text-gray-900 dark:text-white" id="week-billable">--</div>
-                            <div class="text-[10px] uppercase font-bold opacity-50 text-gray-600 dark:text-gray-400">Billable</div>
+                            <div class="text-[10px] uppercase font-bold text-gray-400">Billable</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-4xl font-bold mb-1 opacity-60 text-gray-900 dark:text-gray-300" id="week-pct">--%</div>
-                            <div class="text-[10px] uppercase font-bold opacity-50 text-gray-600 dark:text-gray-400">% Billable</div>
+                            <div class="text-4xl font-bold mb-1" id="week-pct">--%</div>
+                            <div class="text-[10px] uppercase font-bold text-gray-400">% Billable</div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Last Week -->
-                <div class="p-8 text-center flex flex-col justify-center items-center">
+                <div class="p-8 text-center">
                     <div class="flex flex-col items-center mb-6">
-                        <div class="text-xs font-bold uppercase inline-block px-3 py-1 opacity-50 mb-1">Last Week</div>
-                        <div class="text-[10px] font-mono opacity-50" id="last-week-dates">--</div>
+                        <div class="text-xs font-bold uppercase px-3 py-1 text-gray-400 mb-1">Last Week</div>
+                        <div class="text-[10px] font-mono text-gray-400" id="last-week-dates">--</div>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-8 w-full max-w-xs opacity-60">
+                    <div class="grid grid-cols-2 gap-8 w-full max-w-xs mx-auto opacity-60">
                         <div class="text-center">
-                            <div class="text-3xl font-bold mb-1" id="last-billable">--</div>
-                            <div class="text-[10px] uppercase font-bold opacity-50">Billable</div>
+                            <div class="text-3xl font-bold mb-1 text-gray-900 dark:text-white" id="last-billable">--</div>
+                            <div class="text-[10px] uppercase font-bold text-gray-400">Billable</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-3xl font-bold mb-1 opacity-60" id="last-pct">--%</div>
-                            <div class="text-[10px] uppercase font-bold opacity-50">% Billable</div>
+                            <div class="text-3xl font-bold mb-1" id="last-pct">--%</div>
+                            <div class="text-[10px] uppercase font-bold text-gray-400">% Billable</div>
                         </div>
                     </div>
                 </div>
@@ -155,88 +147,82 @@
         </div>
 
         <!-- LISTS -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="card rounded-lg shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">🏆 Top Contributors (Billable Only • This Month)</h3></div>
-                <table class="w-full text-sm"><tbody class="divide-y" id="top-users"></tbody></table>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
+            <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+                <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300">Top Contributors (Billable)</h3>
+                </div>
+                <table class="min-w-full">
+                    <thead class="bg-white dark:bg-black text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                        <tr>
+                            <th class="px-5 py-3 text-left w-10">#</th>
+                            <th class="px-5 py-3 text-left">Member</th>
+                            <th class="px-5 py-3 text-right">Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800 text-sm" id="top-users"></tbody>
+                </table>
             </div>
-            <div class="card rounded-lg shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b bg-opacity-50"><h3 class="text-xs font-bold uppercase tracking-wider opacity-60">💼 Top Clients (Billable Only • This Month)</h3></div>
-                <table class="w-full text-sm"><tbody class="divide-y" id="top-clients"></tbody></table>
+            <div class="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+                <div class="px-5 py-3 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300">Top Clients (Billable)</h3>
+                </div>
+                <table class="min-w-full">
+                    <thead class="bg-white dark:bg-black text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                        <tr>
+                            <th class="px-5 py-3 text-left w-10">#</th>
+                            <th class="px-5 py-3 text-left">Client</th>
+                            <th class="px-5 py-3 text-right">Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800 text-sm" id="top-clients"></tbody>
+                </table>
             </div>
         </div>
     </div>
 
     <script>
-        const API_PULSE = '/.netlify/functions/get-pulse-seq?v=' + Date.now(); 
+        const API_PULSE = '/.netlify/functions/get-pulse-seq?v=' + Date.now();
         const API_STATS = '/.netlify/functions/get-stats?v=' + Date.now();
-        
-        // AUTH GATING LOGIC
+
+        // AUTH LOGIC
         function checkAuth() {
             const user = netlifyIdentity.currentUser();
-            const screen = document.getElementById('login-screen');
-            const dashboard = document.getElementById('dashboard-content');
-            const error = document.getElementById('auth-error');
-
             if (!user) {
-                screen.classList.remove('hidden');
-                dashboard.classList.add('hidden');
-                error.classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('dashboard-content').classList.add('hidden');
             } else {
                 if (user.email.endsWith('@iwdagency.com')) {
-                    screen.classList.add('hidden');
-                    dashboard.classList.remove('hidden');
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('dashboard-content').classList.remove('hidden');
                     document.getElementById('user-email').innerText = user.email;
-                    
                     const popup = document.querySelector('.netlify-identity-alert');
                     if (popup) popup.remove();
-                    
-                    init(); 
+                    init();
                 } else {
-                    error.classList.remove('hidden');
-                    setTimeout(() => netlifyIdentity.logout(), 3000);
+                    document.getElementById('auth-error').classList.remove('hidden');
                 }
             }
         }
 
         netlifyIdentity.on('init', checkAuth);
         netlifyIdentity.on('login', () => { netlifyIdentity.close(); checkAuth(); });
-        netlifyIdentity.on('logout', () => { location.reload(); });
-        netlifyIdentity.init();
+        netlifyIdentity.on('logout', checkAuth);
 
-        let isDark = true; 
+        // THEME (matches bonus tracker)
         function toggleTheme() {
-            isDark = !isDark;
-            applyTheme();
-            document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
         }
-        function applyTheme() {
-            const body = document.getElementById('body');
-            const cards = document.querySelectorAll('.card');
-            const thisWeekBox = document.getElementById('this-week-box');
-            if (isDark) {
-                body.className = "bg-black text-white min-h-screen p-4 md:p-8 transition-colors duration-200";
-                cards.forEach(c => c.className = c.className.replace('light-card', 'dark-card').replace('bg-white', '').replace('bg-gray-900', '') + ' dark-card');
-                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-800 transition-colors duration-200 bg-blue-900 bg-opacity-10 text-white";
-                document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-white";
-                document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-900', 'text-gray-300');
-                document.querySelectorAll('.divide-y').forEach(el => el.classList.add('divide-gray-800'));
-                document.querySelectorAll('.border-b').forEach(el => el.classList.add('border-gray-800'));
-            } else {
-                body.className = "bg-gray-50 text-gray-900 min-h-screen p-4 md:p-8 transition-colors duration-200";
-                cards.forEach(c => c.className = c.className.replace('dark-card', 'light-card').replace('bg-white', '').replace('bg-gray-900', '') + ' light-card');
-                thisWeekBox.className = "p-8 text-center flex flex-col justify-center items-center border-r border-gray-200 transition-colors duration-200 bg-blue-50 text-gray-900";
-                document.getElementById('week-billable').className = "text-4xl font-black mb-1 text-gray-900";
-                document.getElementById('week-pct').className = document.getElementById('week-pct').className.replace('text-gray-300', 'text-gray-900').replace('text-white', 'text-gray-900');
-                document.querySelectorAll('.divide-y').forEach(el => el.classList.remove('divide-gray-800'));
-                document.querySelectorAll('.border-b').forEach(el => el.classList.remove('border-gray-800'));
-            }
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
         }
-        setTimeout(() => { isDark = true; applyTheme(); document.getElementById('theme-icon').innerText = '☀️'; }, 100);
 
         async function init() {
-            const status = document.getElementById('status-bar');
-            status.classList.remove('hidden');
+            const indicator = document.getElementById('live-indicator');
+            indicator.innerText = 'CONNECTING...';
+            indicator.className = "text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase";
+
             try {
                 const [resPulse, resStats] = await Promise.all([
                     fetch(API_PULSE),
@@ -244,22 +230,21 @@
                 ]);
 
                 if (!resPulse.ok) throw new Error("Pulse API Error");
-                
+
                 const dataPulse = await resPulse.json();
-                const dataStats = resStats.ok ? await resStats.json() : null; 
-                
-                status.innerText = "Loaded";
-                status.className = "fixed top-0 left-0 right-0 bg-green-600 text-white text-xs font-bold text-center py-1 z-50";
-                setTimeout(() => status.classList.add('hidden'), 3000);
-                
+                const dataStats = resStats.ok ? await resStats.json() : null;
+
+                indicator.innerText = 'LIVE API';
+                indicator.className = "text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase";
+
                 const date = new Date();
-                document.getElementById('time-updated').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                document.getElementById('time-updated').innerText = "Last Updated: " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
                 processData(dataPulse, dataStats);
             } catch (e) {
                 console.error(e);
-                status.innerText = "Error: " + e.message;
-                status.className = "fixed top-0 left-0 right-0 bg-red-600 text-white text-xs font-bold text-center py-1 z-50";
+                indicator.innerText = 'ERROR';
+                indicator.className = "text-[10px] font-bold bg-red-100 text-red-800 px-2 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300 uppercase";
             }
         }
 
@@ -268,7 +253,6 @@
             const rates = pulseData.rates || {};
             const globalRate = pulseData.globalRate || 155;
 
-            // Date Ranges
             const now = new Date();
             const toStr = (d) => {
                 const y = d.getFullYear();
@@ -282,14 +266,14 @@
             };
 
             const d = new Date(now);
-            const day = d.getDay(); 
-            const diff = d.getDate() - day + (day == 0 ? -6 : 1); 
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day == 0 ? -6 : 1);
             const thisMon = new Date(d.setDate(diff));
             const thisSun = new Date(thisMon); thisSun.setDate(thisMon.getDate() + 6);
-            
+
             const lastMon = new Date(thisMon); lastMon.setDate(thisMon.getDate() - 7);
             const lastSun = new Date(lastMon); lastSun.setDate(lastMon.getDate() + 6);
-            
+
             const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
             const monthStartStr = toStr(monthStart);
 
@@ -302,10 +286,10 @@
             document.getElementById('last-week-dates').innerText = `${toShort(lastWeekStart)} - ${toShort(lastWeekEnd)}`;
 
             let stats = {
-                thisWeek: { b: 0, t: 0, t_adj: 0 }, 
+                thisWeek: { b: 0, t: 0, t_adj: 0 },
                 lastWeek: { b: 0, t: 0, t_adj: 0 }
             };
-            
+
             let users = {};
             let projects = {};
 
@@ -315,36 +299,34 @@
                     dateStr = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
                 }
 
-                // WEEKLY STATS
                 if (dateStr >= thisWeekStart && dateStr <= thisWeekEnd) {
                     stats.thisWeek.t += e.h;
-                    if (!e.x) stats.thisWeek.t_adj += e.h; 
-                    if (e.b && !e.i) stats.thisWeek.b += e.h; 
-                } 
+                    if (!e.x) stats.thisWeek.t_adj += e.h;
+                    if (e.b && !e.i) stats.thisWeek.b += e.h;
+                }
                 else if (dateStr >= lastWeekStart && dateStr <= lastWeekEnd) {
                     stats.lastWeek.t += e.h;
                     if (!e.x) stats.lastWeek.t_adj += e.h;
                     if (e.b && !e.i) stats.lastWeek.b += e.h;
                 }
-                
-                // LIST POPULATION (Strict Filter: This Month + Billable + No Internal)
-                // Filter: Date >= Feb 1st
+
                 if (dateStr >= monthStartStr) {
-                    if (e.b && !e.i) { // Billable AND Not Internal
+                    if (e.b && !e.i) {
                         if(!users[e.u]) users[e.u]=0; users[e.u] += e.h;
                         if(!projects[e.p]) projects[e.p]={hours:0}; projects[e.p].hours += e.h;
                     }
                 }
             });
 
-            // MONTHLY TOTALS (From Stats API)
+            // Monthly Aggregates
             if (statsData && statsData.projects) {
                 let mRev = 0;
-                let mHours = 0;
+                let mBillable = 0;
+
                 statsData.projects.forEach(p => {
                     const h = parseFloat(p.hours);
                     const r = parseInt(p.rate);
-                    mHours += h; // Total Billable Hours
+                    mBillable += h;
                     mRev += h * r;
                 });
 
@@ -356,57 +338,69 @@
                     cur.setDate(cur.getDate()+1);
                 }
                 if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
-                const totalDays = 20; 
+                const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                let totalDays = 0;
+                cur = new Date(start);
+                while(cur <= end) {
+                    if(cur.getDay()!==0 && cur.getDay()!==6) totalDays++;
+                    cur.setDate(cur.getDate()+1);
+                }
                 const projRev = (mRev / daysPassed) * totalDays;
 
-                document.getElementById('month-rev').innerText = '$' + Math.round(mRev).toLocaleString();
+                document.getElementById('month-rev').innerText = 'Current: $' + Math.round(mRev).toLocaleString();
                 document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
-                document.getElementById('month-total-main').innerText = Math.round(mHours) + 'h';
+                document.getElementById('month-total-main').innerText = Math.round(mBillable) + 'h';
+                document.getElementById('month-pct').innerText = 'Billable Total';
             } else {
-                document.getElementById('month-rev').innerText = 'Err';
+                document.getElementById('month-rev').innerText = 'Error loading data';
             }
 
+            // Weekly Stats
             document.getElementById('week-billable').innerText = Math.round(stats.thisWeek.b);
             const wPct = stats.thisWeek.t_adj > 0 ? Math.round((stats.thisWeek.b / stats.thisWeek.t_adj) * 100) : 0;
             const wPctEl = document.getElementById('week-pct');
             wPctEl.innerText = wPct + '%';
-            wPctEl.className = `text-4xl font-bold mb-1 opacity-60 ${wPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
+            wPctEl.className = `text-4xl font-bold mb-1 ${wPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
 
             document.getElementById('last-billable').innerText = Math.round(stats.lastWeek.b);
             const lPct = stats.lastWeek.t_adj > 0 ? Math.round((stats.lastWeek.b / stats.lastWeek.t_adj) * 100) : 0;
             const lPctEl = document.getElementById('last-pct');
             lPctEl.innerText = lPct + '%';
-            lPctEl.className = `text-3xl font-bold mb-1 opacity-60 ${lPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
+            lPctEl.className = `text-3xl font-bold mb-1 ${lPct >= 50 ? 'text-green-500' : 'text-red-500'}`;
 
+            // Pace
             const updatePace = () => {
                 const goal = parseFloat(document.getElementById('goal-input').value) || 200;
                 const billable = stats.thisWeek.b || 0;
                 const pace = Math.round((billable / goal) * 100);
-                const el = document.getElementById('week-pace');
-                el.innerText = `Pace: ${pace}%`;
-                if (pace >= 100) el.style.color = "#10b981"; 
-                else if (pace >= 80) el.style.color = "#d97706"; 
-                else el.style.color = "inherit";
+                const el = document.getElementById('week-pace-value');
+                el.innerText = pace + '%';
+                if (pace >= 100) { el.className = "text-3xl font-bold text-green-600 dark:text-green-400"; }
+                else if (pace >= 80) { el.className = "text-3xl font-bold text-yellow-600 dark:text-yellow-400"; }
+                else { el.className = "text-3xl font-bold text-gray-900 dark:text-white"; }
             };
             updatePace();
             document.getElementById('goal-input').addEventListener('input', updatePace);
 
+            // Lists
             const renderList = (id, listObj) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
                 const sorted = Object.keys(listObj).map(k => ({ name: k, hours: listObj[k].hours || listObj[k] }));
                 sorted.sort((a,b) => b.hours - a.hours).slice(0,5).forEach((item, i) => {
                     el.innerHTML += `
-                        <tr class="hover:bg-white hover:bg-opacity-10 dark:border-gray-800">
-                            <td class="px-6 py-3 w-10 text-xs font-mono opacity-50">0${i+1}</td>
-                            <td class="px-6 py-3 font-medium">${item.name}</td>
-                            <td class="px-6 py-3 text-right font-mono opacity-80">${Math.round(item.hours)}h</td>
+                        <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                            <td class="px-5 py-3 text-xs font-mono text-gray-400">${i+1}</td>
+                            <td class="px-5 py-3 font-medium text-gray-900 dark:text-white">${item.name}</td>
+                            <td class="px-5 py-3 text-right text-gray-500 dark:text-gray-400">${item.hours.toFixed(1)}h</td>
                         </tr>`;
                 });
             };
             renderList('top-users', users);
             renderList('top-clients', projects);
         }
+
+        netlifyIdentity.init();
     </script>
 </body>
 </html>
