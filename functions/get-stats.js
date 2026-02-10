@@ -65,7 +65,7 @@ exports.handler = async function(event, context) {
         const projectList = Object.keys(projects).map(name => {
             const id = name.replace(/[^a-z0-9]/gi, '');
             const rate = savedRates[id] || savedRates[name] || GLOBAL_RATE;
-            return { id, name, hours: projects[name].hours, rate: parseInt(rate), def: 155 };
+            return { id, name, hours: projects[name].hours, rate: parseInt(rate), def: GLOBAL_RATE };
         });
 
         const responseData = {
