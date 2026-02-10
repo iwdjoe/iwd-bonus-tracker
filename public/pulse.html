@@ -66,6 +66,20 @@
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
                     </button>
+
+                    <!-- Nav Menu -->
+                    <div class="relative ml-1">
+                        <button onclick="document.getElementById('nav-menu').classList.toggle('hidden')" class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition" title="Reports">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                        <div id="nav-menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
+                            <a href="/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">Bonus Tracker</a>
+                            <a href="/pulse.html" class="block px-4 py-2 text-sm font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20">Pulse Report</a>
+                            <a href="/weekly.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">Weekly Pulse</a>
+                        </div>
+                    </div>
                 </div>
                 <div class="flex items-center gap-2 mt-1 ml-1 text-xs text-gray-400">
                     <span id="time-updated">Waiting for data...</span>
@@ -250,8 +264,6 @@
 
         function processData(pulseData, statsData) {
             const entries = pulseData.entries || [];
-            const rates = pulseData.rates || {};
-            const globalRate = pulseData.globalRate || 155;
 
             // Date Ranges
             const now = new Date();
@@ -291,9 +303,6 @@
                 lastWeek: { b: 0, t: 0, t_adj: 0 }
             };
 
-            let users = {};
-            let projects = {};
-
             entries.forEach(e => {
                 let dateStr = e.d;
                 if (!dateStr.includes('-') && dateStr.length === 8) {
@@ -309,13 +318,6 @@
                     stats.lastWeek.t += e.h;
                     if (!e.x) stats.lastWeek.t_adj += e.h;
                     if (e.b && !e.i) stats.lastWeek.b += e.h;
-                }
-
-                if (dateStr >= monthStartStr) {
-                    if (e.b && !e.i) {
-                        if(!users[e.u]) users[e.u]=0; users[e.u] += e.h;
-                        if(!projects[e.p]) projects[e.p]={hours:0}; projects[e.p].hours += e.h;
-                    }
                 }
             });
 
@@ -383,12 +385,11 @@
             updatePace();
             document.getElementById('goal-input').addEventListener('input', updatePace);
 
-            // Lists
-            const renderList = (id, listObj) => {
+            // Lists (use full-month get-stats data, not 15-day pulse data)
+            const renderList = (id, items) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
-                const sorted = Object.keys(listObj).map(k => ({ name: k, hours: listObj[k].hours || listObj[k] }));
-                sorted.sort((a,b) => b.hours - a.hours).slice(0,5).forEach((item, i) => {
+                items.sort((a,b) => b.hours - a.hours).slice(0,5).forEach((item, i) => {
                     el.innerHTML += `
                         <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
                             <td class="px-5 py-3 text-xs font-mono text-gray-400">${i+1}</td>
@@ -397,9 +398,17 @@
                         </tr>`;
                 });
             };
-            renderList('top-users', users);
-            renderList('top-clients', projects);
+            if (statsData) {
+                renderList('top-users', statsData.users || []);
+                renderList('top-clients', (statsData.projects || []).map(p => ({ name: p.name, hours: p.hours })));
+            }
         }
+
+        // Close nav menu on outside click
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('nav-menu');
+            if (!e.target.closest('.relative')) menu.classList.add('hidden');
+        });
 
         netlifyIdentity.init();
     </script>
