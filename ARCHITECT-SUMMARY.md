@@ -234,7 +234,7 @@ FRONTEND (User Experience):
 
 2. **Set environment variables** (Netlify Dashboard):
    ```
-   TEAMWORK_API_TOKEN = dryer498desert
+   TEAMWORK_API_TOKEN = <your-teamwork-api-token>
    GITHUB_PAT = <your-github-token>
    ```
 

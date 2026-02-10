@@ -19,7 +19,7 @@
 Set these in: **Netlify Dashboard → Site Settings → Environment Variables**
 
 ```
-TEAMWORK_API_TOKEN = dryer498desert
+TEAMWORK_API_TOKEN = <your-teamwork-api-token>
 GITHUB_PAT = <your-github-personal-access-token>
 ```
 

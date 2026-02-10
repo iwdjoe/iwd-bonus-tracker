@@ -6,3 +6,4 @@ Live Dashboard: https://iwd-bonus-tracker.netlify.app
 - Shared Rate Database (GitHub JSON)
 - Netlify Identity Gate (Google Workspace)
 - "What If" Calculator
+- Dark Mode Support
