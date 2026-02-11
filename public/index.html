@@ -547,7 +547,7 @@
                 document.getElementById('stat-proj').innerText = '$' + Math.round(state.totalRev).toLocaleString();
                 projLabel.innerText = 'Final Revenue';
                 poolLabel.innerText = 'Bonus Pool';
-                if (projBadge) { projBadge.innerText = 'Month Complete'; }
+                if (projBadge) { projBadge.innerText = 'Month Estimate'; }
 
                 const tierLabel = state.simPool > 0 ? `Tier reached: $${state.simPool.toLocaleString()} pool` : 'No bonus tier reached';
                 document.getElementById('stat-gap').innerText = tierLabel;
