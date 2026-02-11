@@ -58,13 +58,16 @@ exports.handler = async function(event, context) {
 
         let entries = twData1['time-entries'] || [];
 
-        // Fetch page 2 only if page 1 was full (500 entries)
-        if (entries.length === 500) {
-            const twRes2 = await fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } });
-            if (twRes2.ok) {
-                const twData2 = await twRes2.json();
-                entries = entries.concat(twData2['time-entries'] || []);
-            }
+        // Fetch all remaining pages until we get a partial page
+        let page = 2;
+        while (entries.length === (page - 1) * 500 && page <= 20) {
+            const res = await fetch(`https://${DOMAIN}/time_entries.json?page=${page}&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } });
+            if (!res.ok) break;
+            const data = await res.json();
+            const pageEntries = data['time-entries'] || [];
+            if (pageEntries.length === 0) break;
+            entries = entries.concat(pageEntries);
+            page++;
         }
 
         let users = {};

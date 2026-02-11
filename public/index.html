@@ -477,12 +477,15 @@
                 daysLeft = 0;
             }
 
+            const daysLabel = document.querySelector('[id="stat-days-left"]').parentElement.querySelector('h3');
             if (state.isCurrentMonth) {
+                daysLabel.innerText = 'Work Days Remaining';
                 document.getElementById('stat-days-left').innerHTML = `${daysLeft} <span class="text-sm font-normal text-gray-400">Days</span>`;
                 document.getElementById('stat-days-passed').innerText = `Day ${daysPassed} of ${totalMonthWorkDays}`;
             } else {
-                document.getElementById('stat-days-left').innerHTML = `<span class="text-lg font-bold text-gray-400">Complete</span>`;
-                document.getElementById('stat-days-passed').innerText = `${totalMonthWorkDays} work days`;
+                daysLabel.innerText = 'Work Days';
+                document.getElementById('stat-days-left').innerHTML = `${totalMonthWorkDays} <span class="text-sm font-normal text-gray-400">Days</span>`;
+                document.getElementById('stat-days-passed').innerText = `Month Complete`;
             }
 
             const globalRate = parseInt(document.getElementById('global-rate').value) || 155;
