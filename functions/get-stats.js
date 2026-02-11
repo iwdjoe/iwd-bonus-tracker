@@ -1,7 +1,7 @@
 // Main Dashboard Backend
-// Fetches billable hours for current month, with pagination
+// Fetches billable hours for a given month (defaults to current), with pagination
 
-let cache = { data: null, time: 0 };
+let cache = {};
 
 exports.handler = async function(event, context) {
     const fetch = require('node-fetch');
@@ -10,20 +10,44 @@ exports.handler = async function(event, context) {
     const GH_TOKEN = process.env.GITHUB_PAT;
     const REPO = "iwdjoe/iwd-bonus-tracker";
 
-    // CACHE: 60s
-    if (cache.data && (Date.now() - cache.time < 60000)) {
-        return { statusCode: 200, body: JSON.stringify(cache.data) };
+    // Parse optional month param (YYYY-MM) or default to current month
+    const now = new Date();
+    const qMonth = (event.queryStringParameters && event.queryStringParameters.month) || null;
+    let year, month;
+
+    if (qMonth && /^\d{4}-\d{2}$/.test(qMonth)) {
+        const parts = qMonth.split('-');
+        year = parseInt(parts[0]);
+        month = parseInt(parts[1]) - 1; // JS months are 0-indexed
+    } else {
+        year = now.getFullYear();
+        month = now.getMonth();
+    }
+
+    const cacheKey = `${year}-${month}`;
+    const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
+
+    // CACHE: 60s for current month, 5 min for past months
+    const cacheTTL = isCurrentMonth ? 60000 : 300000;
+    if (cache[cacheKey] && (Date.now() - cache[cacheKey].time < cacheTTL)) {
+        return { statusCode: 200, body: JSON.stringify(cache[cacheKey].data) };
     }
 
     try {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
-        const now = new Date();
-        const startMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0].replace(/-/g, '');
-        const today = now.toISOString().split('T')[0].replace(/-/g, '');
+        const startDate = new Date(year, month, 1).toISOString().split('T')[0].replace(/-/g, '');
+
+        // For current month use today; for past months use last day of that month
+        let endDate;
+        if (isCurrentMonth) {
+            endDate = now.toISOString().split('T')[0].replace(/-/g, '');
+        } else {
+            endDate = new Date(year, month + 1, 0).toISOString().split('T')[0].replace(/-/g, '');
+        }
 
         // Fetch page 1 + rates in parallel
         const [twRes1, ratesRes] = await Promise.all([
-            fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${startMonth}&toDate=${today}`, { headers: { 'Authorization': AUTH } }),
+            fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } }),
             fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
         ]);
 
@@ -36,7 +60,7 @@ exports.handler = async function(event, context) {
 
         // Fetch page 2 only if page 1 was full (500 entries)
         if (entries.length === 500) {
-            const twRes2 = await fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${startMonth}&toDate=${today}`, { headers: { 'Authorization': AUTH } });
+            const twRes2 = await fetch(`https://${DOMAIN}/time_entries.json?page=2&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } });
             if (twRes2.ok) {
                 const twData2 = await twRes2.json();
                 entries = entries.concat(twData2['time-entries'] || []);
@@ -71,11 +95,16 @@ exports.handler = async function(event, context) {
         const responseData = {
             users: userList,
             projects: projectList,
-            meta: { serverTime: new Date().toISOString(), globalRate: GLOBAL_RATE, cached: false }
+            meta: {
+                serverTime: new Date().toISOString(),
+                globalRate: GLOBAL_RATE,
+                cached: false,
+                month: `${year}-${String(month + 1).padStart(2, '0')}`,
+                isCurrentMonth
+            }
         };
 
-        cache.data = responseData;
-        cache.time = Date.now();
+        cache[cacheKey] = { data: responseData, time: Date.now() };
 
         return { statusCode: 200, body: JSON.stringify(responseData) };
 
