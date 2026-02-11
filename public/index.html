@@ -118,6 +118,10 @@
             
             <div class="flex items-center gap-6 text-sm bg-white dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-800 shadow-sm">
                 <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-gray-400">MONTH:</label>
+                    <select id="month-select" onchange="onMonthChange()" class="px-2 py-0.5 border rounded font-bold bg-transparent text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:outline-none focus:border-blue-500 text-xs cursor-pointer"></select>
+                </div>
+                <div class="flex items-center gap-2">
                     <label class="text-xs font-bold text-gray-400">BASE RATE:</label>
                     <div class="relative">
                         <span class="absolute left-2 top-1 text-gray-400">$</span>
@@ -306,8 +310,32 @@
         const TEAM_SIZE = 9;
         const PREVIEW_DATA = { users: [], projects: [] };
 
-        let state = { projects: [], users: [], totalRev: 0, projRev: 0, simProjRev: 0, pool: 0, simPool: 0 };
+        let state = { projects: [], users: [], totalRev: 0, projRev: 0, simProjRev: 0, pool: 0, simPool: 0, isCurrentMonth: true };
         let sortState = { key: 'hours', asc: false };
+
+        // Populate month dropdown with last 12 months
+        function populateMonthSelector() {
+            const sel = document.getElementById('month-select');
+            const now = new Date();
+            for (let i = 0; i < 12; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const val = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                const label = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.textContent = label;
+                if (i === 0) opt.selected = true;
+                sel.appendChild(opt);
+            }
+        }
+
+        function getSelectedMonth() {
+            return document.getElementById('month-select').value;
+        }
+
+        function onMonthChange() {
+            init(true);
+        }
 
         async function fetchData() {
             const indicator = document.getElementById('live-indicator');
@@ -317,7 +345,8 @@
             indicator.className = "text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase";
 
             try {
-                const response = await fetch('/.netlify/functions/get-stats');
+                const selectedMonth = getSelectedMonth();
+                const response = await fetch('/.netlify/functions/get-stats?month=' + selectedMonth);
                 if (!response.ok) throw new Error('Offline');
                 const data = await response.json();
                 
@@ -338,10 +367,16 @@
         }
 
         async function init(force = false) {
+            // Populate month selector on first load
+            if (!document.getElementById('month-select').options.length) {
+                populateMonthSelector();
+            }
+
             const data = await fetchData();
             state.projects = (data.projects || []);
             state.users = (data.users || []).filter(u => u.name && u.name.trim() !== "");
-            
+            state.isCurrentMonth = (data.meta && data.meta.isCurrentMonth !== undefined) ? data.meta.isCurrentMonth : true;
+
             // Fix: Add safe fallback for globalRate (it was crashing here)
             const globalRate = (data.meta && data.meta.globalRate) ? data.meta.globalRate : 155;
             document.getElementById('global-rate').value = globalRate;
@@ -351,7 +386,7 @@
             } else {
                 document.documentElement.classList.remove('dark');
             }
-            
+
             calc();
         }
 
@@ -416,24 +451,42 @@
         }
 
         function calc() {
+            const selectedMonth = getSelectedMonth();
+            const parts = selectedMonth.split('-');
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1;
             const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
+
             const start = new Date(year, month, 1);
             const end = new Date(year, month + 1, 0);
-            
-            let daysPassed = getWorkDays(start, now);
-            const totalMonthWorkDays = getWorkDays(start, end);
 
-            // ADJUSTMENT: Only count today if it's after 5 PM
-            if (now.getHours() < 17) {
-                daysPassed = Math.max(daysPassed - 1, 1);
+            let daysPassed, totalMonthWorkDays, daysLeft;
+
+            if (state.isCurrentMonth) {
+                daysPassed = getWorkDays(start, now);
+                totalMonthWorkDays = getWorkDays(start, end);
+                // ADJUSTMENT: Only count today if it's after 5 PM
+                if (now.getHours() < 17) {
+                    daysPassed = Math.max(daysPassed - 1, 1);
+                }
+                daysLeft = totalMonthWorkDays - daysPassed;
+            } else {
+                // Past month — all work days are complete
+                totalMonthWorkDays = getWorkDays(start, end);
+                daysPassed = totalMonthWorkDays;
+                daysLeft = 0;
             }
 
-            const daysLeft = totalMonthWorkDays - daysPassed;
-
-            document.getElementById('stat-days-left').innerHTML = `${daysLeft} <span class="text-sm font-normal text-gray-400">Days</span>`;
-            document.getElementById('stat-days-passed').innerText = `Day ${daysPassed} of ${totalMonthWorkDays}`;
+            const daysLabel = document.querySelector('[id="stat-days-left"]').parentElement.querySelector('h3');
+            if (state.isCurrentMonth) {
+                daysLabel.innerText = 'Work Days Remaining';
+                document.getElementById('stat-days-left').innerHTML = `${daysLeft} <span class="text-sm font-normal text-gray-400">Days</span>`;
+                document.getElementById('stat-days-passed').innerText = `Day ${daysPassed} of ${totalMonthWorkDays}`;
+            } else {
+                daysLabel.innerText = 'Work Days Remaining';
+                document.getElementById('stat-days-left').innerHTML = `0 <span class="text-sm font-normal text-gray-400">Days</span>`;
+                document.getElementById('stat-days-passed').innerText = `${totalMonthWorkDays} work days in month`;
+            }
 
             const globalRate = parseInt(document.getElementById('global-rate').value) || 155;
 
@@ -443,16 +496,21 @@
             }, 0);
 
             const totalHours = state.projects.reduce((s,p)=>s+p.hours,0);
-            
-            state.projRev = (state.totalRev / daysPassed) * totalMonthWorkDays;
-            
-            const addedHours = parseInt(document.getElementById('sim-slider').value) || 0;
-            const avgRate = (totalHours > 0) ? (state.totalRev / totalHours) : globalRate;
-            
-            state.simProjRev = state.projRev + (addedHours * avgRate);
+
+            if (state.isCurrentMonth) {
+                state.projRev = (state.totalRev / daysPassed) * totalMonthWorkDays;
+                const addedHours = parseInt(document.getElementById('sim-slider').value) || 0;
+                const avgRate = (totalHours > 0) ? (state.totalRev / totalHours) : globalRate;
+                state.simProjRev = state.projRev + (addedHours * avgRate);
+            } else {
+                // Past month — actual revenue IS final, no projection
+                state.projRev = state.totalRev;
+                state.simProjRev = state.totalRev;
+            }
+
             state.pool = getPool(state.projRev);
             state.simPool = getPool(state.simProjRev);
-            
+
             render(daysLeft);
         }
 
@@ -469,18 +527,57 @@
         function render(daysLeft) {
             document.getElementById('stat-revenue').innerText = '$' + Math.round(state.totalRev).toLocaleString();
             document.getElementById('stat-hours').innerText = state.projects.reduce((s,p)=>s+p.hours,0).toFixed(1);
-            document.getElementById('stat-proj').innerText = '$' + Math.round(state.simProjRev).toLocaleString();
             document.getElementById('stat-pool').innerText = '$' + state.simPool.toLocaleString();
-            
-            const nextGoal = [85000,100000,115000,130000,145000,160000].find(t => t > state.simProjRev) || 160000;
-            const gap = nextGoal - state.simProjRev;
-            document.getElementById('stat-gap').innerText = gap > 0 ? `Need $${Math.round(gap).toLocaleString()} for next tier` : 'Top Tier!';
 
-            const addedHours = document.getElementById('sim-slider').value;
-            const perPerson = addedHours / TEAM_SIZE / daysLeft;
-            document.getElementById('sim-hours-total').innerText = '+' + addedHours;
-            document.getElementById('sim-workload').innerText = '+' + (isFinite(perPerson) ? perPerson.toFixed(1) : 0);
-            document.getElementById('sim-pool-result').innerText = '$' + state.simPool.toLocaleString();
+            // Adapt KPI labels for past vs current month
+            const projLabel = document.querySelector('[id="stat-proj"]').parentElement.querySelector('h3');
+            const poolLabel = document.querySelector('[id="stat-pool"]').parentElement.querySelector('h3');
+            const projBadge = document.querySelector('[id="stat-proj"]').parentElement.querySelector('.text-blue-500');
+
+            if (state.isCurrentMonth) {
+                document.getElementById('stat-proj').innerText = '$' + Math.round(state.simProjRev).toLocaleString();
+                projLabel.innerText = 'Projected Revenue';
+                poolLabel.innerText = 'Projected Pool';
+                if (projBadge) { projBadge.innerText = 'Based on Pace'; projBadge.classList.remove('hidden'); }
+
+                const nextGoal = [85000,100000,115000,130000,145000,160000].find(t => t > state.simProjRev) || 160000;
+                const gap = nextGoal - state.simProjRev;
+                document.getElementById('stat-gap').innerText = gap > 0 ? `Need $${Math.round(gap).toLocaleString()} for next tier` : 'Top Tier!';
+            } else {
+                document.getElementById('stat-proj').innerText = '$' + Math.round(state.totalRev).toLocaleString();
+                projLabel.innerText = 'Final Revenue';
+                poolLabel.innerText = 'Bonus Pool';
+                if (projBadge) { projBadge.innerText = 'Month Estimate'; }
+
+                const tierLabel = state.simPool > 0 ? `Tier reached: $${state.simPool.toLocaleString()} pool` : 'No bonus tier reached';
+                document.getElementById('stat-gap').innerText = tierLabel;
+            }
+
+            // Show/hide "What If" calculator
+            const simPanel = document.querySelector('.lg\\:col-span-1');
+            if (state.isCurrentMonth) {
+                simPanel.classList.remove('hidden');
+                const addedHours = document.getElementById('sim-slider').value;
+                const perPerson = addedHours / TEAM_SIZE / daysLeft;
+                document.getElementById('sim-hours-total').innerText = '+' + addedHours;
+                document.getElementById('sim-workload').innerText = '+' + (isFinite(perPerson) ? perPerson.toFixed(1) : 0);
+                document.getElementById('sim-pool-result').innerText = '$' + state.simPool.toLocaleString();
+            } else {
+                simPanel.classList.add('hidden');
+            }
+
+            // Adjust leaderboard to full-width when sim is hidden
+            const leaderboard = document.querySelector('.lg\\:col-span-2') || document.querySelector('.lg\\:col-span-3');
+            const payoutLabel = leaderboard.querySelector('.font-mono');
+            if (state.isCurrentMonth) {
+                leaderboard.classList.remove('lg:col-span-3');
+                leaderboard.classList.add('lg:col-span-2');
+                if (payoutLabel) payoutLabel.innerText = 'Est. Payout';
+            } else {
+                leaderboard.classList.remove('lg:col-span-2');
+                leaderboard.classList.add('lg:col-span-3');
+                if (payoutLabel) payoutLabel.innerText = 'Actual Payout';
+            }
 
             const max = 160000;
             const actPct = Math.min((state.totalRev / max)*100, 100);
