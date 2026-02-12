@@ -1,0 +1,18 @@
+{
+  "name": "iwd-bonus-bot",
+  "version": "1.0.0",
+  "description": "Slack bot for IWD team bonus updates",
+  "main": "bonus-update.js",
+  "type": "commonjs",
+  "scripts": {
+    "update": "node bonus-update.js",
+    "dry-run": "node bonus-update.js --dry-run",
+    "test-slack": "node bonus-update.js --test",
+    "preview-green": "node bonus-update.js --dry-run --mode green",
+    "preview-yellow": "node bonus-update.js --dry-run --mode yellow",
+    "preview-red": "node bonus-update.js --dry-run --mode red"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}
