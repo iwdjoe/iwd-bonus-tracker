@@ -398,7 +398,9 @@
                 });
             };
             if (statsData) {
-                renderList('top-users', statsData.users || []);
+                // Exclude contractors from top contributors
+                const eligibleUsers = (statsData.users || []).filter(u => !u.contractor);
+                renderList('top-users', eligibleUsers);
                 renderList('top-clients', (statsData.projects || []).map(p => ({ name: p.name, hours: p.hours })));
             }
         }
