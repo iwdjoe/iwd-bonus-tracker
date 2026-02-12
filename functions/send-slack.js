@@ -2,10 +2,8 @@
 // POST /api/send-slack
 // Body: { mode: "auto"|"green"|"yellow"|"red", test: true/false, preview: true/false }
 //
-// Env vars needed: SLACK_WEBHOOK_URL, SLACK_TEST_WEBHOOK_URL
+// Env vars needed: SLACK_WEBHOOK_URL, SLACK_TEST_WEBHOOK_URL (optional, falls back to SLACK_WEBHOOK_URL)
 // (Plus existing TEAMWORK_API_TOKEN, GITHUB_PAT for data fetch)
-
-const fetch = require('node-fetch');
 
 // ─── Bonus Tier Config ────────────────────────────────────────
 const BONUS_TIERS = [
@@ -184,11 +182,14 @@ function formatMessage(stats, mode, modeDetails, dashboardUrl) {
 }
 
 // ─── Fetch Dashboard Data (reuses get-stats logic) ────────────
-async function fetchDashboardData(event) {
+async function fetchDashboardData() {
+    const fetch = require('node-fetch');
     const TOKEN = process.env.TEAMWORK_API_TOKEN;
     const DOMAIN = 'iwdagency.teamwork.com';
     const GH_TOKEN = process.env.GITHUB_PAT;
     const REPO = "iwdjoe/iwd-bonus-tracker";
+
+    if (!TOKEN) throw new Error("TEAMWORK_API_TOKEN is not configured");
 
     const now = new Date();
     const year = now.getFullYear();
@@ -304,11 +305,16 @@ exports.handler = async function(event) {
             };
         }
 
-        // Post to Slack
-        const webhookUrl = isTest ? process.env.SLACK_TEST_WEBHOOK_URL : process.env.SLACK_WEBHOOK_URL;
+        // Post to Slack — fall back to SLACK_WEBHOOK_URL if test URL isn't set
+        const fetch = require('node-fetch');
+        let webhookUrl;
+        if (isTest) {
+            webhookUrl = process.env.SLACK_TEST_WEBHOOK_URL || process.env.SLACK_WEBHOOK_URL;
+        } else {
+            webhookUrl = process.env.SLACK_WEBHOOK_URL;
+        }
         if (!webhookUrl) {
-            const varName = isTest ? 'SLACK_TEST_WEBHOOK_URL' : 'SLACK_WEBHOOK_URL';
-            return { statusCode: 500, body: JSON.stringify({ error: `${varName} is not configured in Netlify environment variables.` }) };
+            return { statusCode: 500, body: JSON.stringify({ error: 'SLACK_WEBHOOK_URL is not configured. Go to Netlify > Site settings > Environment variables and add it.' }) };
         }
 
         const slackRes = await fetch(webhookUrl, {
