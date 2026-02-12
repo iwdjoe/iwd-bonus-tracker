@@ -138,6 +138,7 @@ function formatMessage(stats, mode, modeDetails, dashboardUrl) {
     const lines = [];
     lines.push(`\u{1F680} *Team Bonus Update* \u2014 ${dayNames[date.getDay()]}, ${monthNames[date.getMonth()]} ${date.getDate()}`);
     lines.push('');
+    lines.push('');
 
     if (mode === 'green') {
         lines.push(`\u{1F4B0} *We're on track for a ${formatCurrency(modeDetails.pool)} bonus pool!* (${modeDetails.tierLabel})`);
@@ -147,10 +148,12 @@ function formatMessage(stats, mode, modeDetails, dashboardUrl) {
         lines.push(`\u{1F4CA} *Here's where we stand this month*`);
     }
     lines.push('');
+    lines.push('');
 
     lines.push(`\u{1F4CA} *Revenue:* ${formatCurrency(currentRevenue)} current \u2192 ${formatCurrency(projectedRevenue)} projected`);
     lines.push(`\u23F3 *Day ${currentWorkDay} of ${totalWorkDays}* \u2014 ${daysRemaining} days remaining`);
     lines.push(`\u{1F550} *Billable Hours:* ${formatHours(totalBillableHours)} hrs logged`);
+    lines.push('');
     lines.push('');
 
     const topN = Math.min(leaderboard.length, 3);
@@ -160,6 +163,7 @@ function formatMessage(stats, mode, modeDetails, dashboardUrl) {
             const { name, hours, sharePct } = leaderboard[i];
             lines.push(`${MEDALS[i]} ${name} \u2014 ${formatHours(hours)} hrs (${formatPct(sharePct)}%)`);
         }
+        lines.push('');
         lines.push('');
     }
 
@@ -175,6 +179,7 @@ function formatMessage(stats, mode, modeDetails, dashboardUrl) {
     } else {
         lines.push(`\u{1F4AA} Let's keep building momentum \u2014 every billable hour counts`);
     }
+    lines.push('');
     lines.push('');
     lines.push(`\u{1F449} <${dashboardUrl}|View Live Dashboard>`);
 
