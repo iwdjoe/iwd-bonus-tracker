@@ -80,27 +80,39 @@
                     <img src="iwd-logo-new.png" class="w-8 h-8 object-contain" alt="IWD">
                     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Team Bonus Tracker</h1>
                     <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300 uppercase" id="live-indicator">Loading...</span>
-                    
-                    <button onclick="toggleTheme()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition ml-2" title="Toggle Theme">
-                        <span class="dark:hidden">🌙</span><span class="hidden dark:inline">☀️</span>
-                    </button>
-                    
-                    <button onclick="netlifyIdentity.logout()" class="text-lg p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-red-500 transition" title="Logout">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                    </button>
 
                     <!-- Nav Menu -->
                     <div class="relative ml-2">
-                        <button onclick="document.getElementById('nav-menu').classList.toggle('hidden')" class="p-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition shadow-sm" title="Reports">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button onclick="document.getElementById('nav-menu').classList.toggle('hidden')" class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition shadow-sm" title="Menu">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
-                        <div id="nav-menu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
-                            <a href="/" class="block px-4 py-2 text-sm font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20">Bonus Tracker</a>
-                            <a href="/pulse.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">Weekly Pulse</a>
+                        <div id="nav-menu" class="hidden absolute right-0 mt-2 w-52 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 py-2">
+                            <div class="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Pages</div>
+                            <a href="/" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                                Bonus Tracker
+                            </a>
+                            <a href="/pulse.html" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                Weekly Pulse
+                            </a>
+                            <div class="border-t border-gray-100 dark:border-gray-800 my-2"></div>
+                            <div class="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Actions</div>
+                            <button onclick="exportCSV(); document.getElementById('nav-menu').classList.add('hidden')" class="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                Export CSV
+                            </button>
+                            <button onclick="toggleTheme(); document.getElementById('nav-menu').classList.add('hidden')" class="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                                <span class="dark:hidden">Dark Mode</span><span class="hidden dark:inline">Light Mode</span>
+                            </button>
+                            <div class="border-t border-gray-100 dark:border-gray-800 my-2"></div>
+                            <button onclick="netlifyIdentity.logout()" class="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition text-left">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                                Logout
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -652,7 +664,26 @@
             document.getElementById('total-billable').innerText = '$' + Math.round(state.totalRev).toLocaleString();
         }
 
-        function toggleTheme() { 
+        function exportCSV() {
+            const globalRate = parseInt(document.getElementById('global-rate').value) || 155;
+            const monthLabel = document.getElementById('month-select').selectedOptions[0]?.text || 'export';
+            const rows = [['Project', 'Hours', 'Rate', 'Revenue']];
+            state.projects.forEach(p => {
+                const rate = (p.rate === p.def) ? globalRate : p.rate;
+                rows.push(['"' + p.name.replace(/"/g, '""') + '"', p.hours.toFixed(2), rate, Math.round(p.hours * rate)]);
+            });
+            const totalHours = state.projects.reduce((s, p) => s + p.hours, 0);
+            rows.push(['"TOTAL"', totalHours.toFixed(2), '', Math.round(state.totalRev)]);
+            const csv = rows.map(r => r.join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'IWD-Bonus-' + monthLabel.replace(/\s+/g, '-') + '.csv';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        function toggleTheme() {
             document.documentElement.classList.toggle('dark'); 
             localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); 
         }
