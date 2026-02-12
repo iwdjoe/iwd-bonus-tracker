@@ -70,6 +70,9 @@ exports.handler = async function(event, context) {
             page++;
         }
 
+        // Contractors: included in billable hours/revenue but excluded from bonus payouts
+        const CONTRACTORS = ['Julian Stoddart'];
+
         let users = {};
         let projects = {};
 
@@ -81,14 +84,15 @@ exports.handler = async function(event, context) {
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
             const project = e['project-name'];
 
-            if (!users[user]) users[user] = 0;
-            users[user] += hours;
+            if (!users[user]) users[user] = { hours: 0, contractor: false };
+            users[user].hours += hours;
+            if (CONTRACTORS.includes(user)) users[user].contractor = true;
 
             if (!projects[project]) projects[project] = { hours: 0 };
             projects[project].hours += hours;
         });
 
-        const userList = Object.keys(users).map(name => ({ name, hours: users[name] }));
+        const userList = Object.keys(users).map(name => ({ name, hours: users[name].hours, contractor: users[name].contractor }));
         const projectList = Object.keys(projects).map(name => {
             const id = name.replace(/[^a-z0-9]/gi, '');
             const rate = savedRates[id] || savedRates[name] || GLOBAL_RATE;

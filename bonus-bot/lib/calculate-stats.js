@@ -82,8 +82,10 @@ function calculateStats(data, timezone) {
     const totalBillableHours = projects.reduce((sum, p) => sum + p.hours, 0);
 
     // Team leaderboard sorted by hours, with share percentages
-    const totalUserHours = users.reduce((sum, u) => sum + u.hours, 0);
-    const leaderboard = users
+    // Contractors are excluded from bonus payout calculations
+    const bonusEligible = users.filter(u => !u.contractor);
+    const totalUserHours = bonusEligible.reduce((sum, u) => sum + u.hours, 0);
+    const leaderboard = bonusEligible
         .sort((a, b) => b.hours - a.hours)
         .map(u => ({
             name: u.name,

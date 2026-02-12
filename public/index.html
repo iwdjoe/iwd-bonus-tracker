@@ -655,11 +655,12 @@
             document.getElementById('bar-actual').style.width = actPct + '%';
             document.getElementById('bar-proj').style.width = simPct + '%';
 
-            // Render Team Table
+            // Render Team Table (contractors excluded from bonus payouts)
             const tbody = document.getElementById('team-body');
             tbody.innerHTML = '';
-            const userTotal = state.users.reduce((s,u)=>s+u.hours,0);
-            state.users.sort((a,b)=>b.hours-a.hours).forEach(u => {
+            const bonusEligible = state.users.filter(u => !u.contractor);
+            const userTotal = bonusEligible.reduce((s,u)=>s+u.hours,0);
+            bonusEligible.sort((a,b)=>b.hours-a.hours).forEach(u => {
                 const share = u.hours / userTotal;
                 const bonus = Math.round(state.simPool * share);
                 const pct = (share * 100).toFixed(1) + '%';
