@@ -1,8 +1,8 @@
 // Send Slack Bonus Update — Netlify Serverless Function
 // POST /api/send-slack
-// Body: { mode: "auto"|"green"|"yellow"|"red", test: true/false, preview: true/false }
+// Body: { mode: "auto"|"green"|"yellow"|"red", preview: true/false }
 //
-// Env vars needed: SLACK_WEBHOOK_URL, SLACK_TEST_WEBHOOK_URL (optional, falls back to SLACK_WEBHOOK_URL)
+// Env vars needed: SLACK_WEBHOOK_URL
 // (Plus existing TEAMWORK_API_TOKEN, GITHUB_PAT for data fetch)
 
 // ─── Bonus Tier Config ────────────────────────────────────────
@@ -78,8 +78,10 @@ function calculateStats(data, timezone) {
     const projectedRevenue = currentWorkDay > 0 ? (currentRevenue / currentWorkDay) * totalWorkDays : 0;
     const totalBillableHours = projects.reduce((sum, p) => sum + p.hours, 0);
 
-    const totalUserHours = users.reduce((sum, u) => sum + u.hours, 0);
-    const leaderboard = users
+    // Contractors excluded from leaderboard/bonus payouts
+    const bonusEligible = users.filter(u => !u.contractor);
+    const totalUserHours = bonusEligible.reduce((sum, u) => sum + u.hours, 0);
+    const leaderboard = bonusEligible
         .sort((a, b) => b.hours - a.hours)
         .map(u => ({
             name: u.name,
@@ -227,6 +229,9 @@ async function fetchDashboardData() {
         page++;
     }
 
+    // Contractors: included in billable hours/revenue but excluded from bonus payouts
+    const CONTRACTORS = ['Julian Stoddart'];
+
     let users = {};
     let projects = {};
 
@@ -238,14 +243,15 @@ async function fetchDashboardData() {
         const user = e['person-first-name'] + ' ' + e['person-last-name'];
         const project = e['project-name'];
 
-        if (!users[user]) users[user] = 0;
-        users[user] += hours;
+        if (!users[user]) users[user] = { hours: 0, contractor: false };
+        users[user].hours += hours;
+        if (CONTRACTORS.includes(user)) users[user].contractor = true;
 
         if (!projects[project]) projects[project] = { hours: 0 };
         projects[project].hours += hours;
     });
 
-    const userList = Object.keys(users).map(name => ({ name, hours: users[name] }));
+    const userList = Object.keys(users).map(name => ({ name, hours: users[name].hours, contractor: users[name].contractor }));
     const projectList = Object.keys(projects).map(name => {
         const id = name.replace(/[^a-z0-9]/gi, '');
         const rate = savedRates[id] || savedRates[name] || GLOBAL_RATE;
@@ -269,7 +275,6 @@ exports.handler = async function(event) {
     try {
         const body = JSON.parse(event.body || '{}');
         const modeFlag = body.mode || 'auto';
-        const isTest = body.test === true;
         const isPreview = body.preview === true;
         const timezone = 'Europe/Madrid';
         const dashboardUrl = process.env.DASHBOARD_URL || 'https://iwd-bonus-tracker.netlify.app';
@@ -310,14 +315,9 @@ exports.handler = async function(event) {
             };
         }
 
-        // Post to Slack — fall back to SLACK_WEBHOOK_URL if test URL isn't set
+        // Post to Slack
         const fetch = require('node-fetch');
-        let webhookUrl;
-        if (isTest) {
-            webhookUrl = process.env.SLACK_TEST_WEBHOOK_URL || process.env.SLACK_WEBHOOK_URL;
-        } else {
-            webhookUrl = process.env.SLACK_WEBHOOK_URL;
-        }
+        const webhookUrl = process.env.SLACK_WEBHOOK_URL;
         if (!webhookUrl) {
             return { statusCode: 500, body: JSON.stringify({ error: 'SLACK_WEBHOOK_URL is not configured. Go to Netlify > Site settings > Environment variables and add it.' }) };
         }
@@ -333,14 +333,12 @@ exports.handler = async function(event) {
             throw new Error(`Slack webhook failed (${slackRes.status}): ${slackBody}`);
         }
 
-        const target = isTest ? 'test channel' : 'main channel';
         return {
             statusCode: 200,
             body: JSON.stringify({
                 success: true,
                 mode,
-                target,
-                message: `Posted to ${target} successfully!`,
+                message: 'Posted to Slack successfully!',
             })
         };
 

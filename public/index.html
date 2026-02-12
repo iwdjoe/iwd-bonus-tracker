@@ -283,23 +283,14 @@
             </div>
 
             <div class="px-6 py-5 space-y-4">
-                <div class="flex items-center gap-4">
-                    <div class="flex-1">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Mode</label>
-                        <select id="slack-mode" class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 text-sm focus:outline-none focus:border-blue-500">
-                            <option value="auto">Auto-detect</option>
-                            <option value="green">Green (On Track)</option>
-                            <option value="yellow">Yellow (Challenger)</option>
-                            <option value="red">Red (Effort-focused)</option>
-                        </select>
-                    </div>
-                    <div class="flex-1">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Channel</label>
-                        <select id="slack-channel" class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 text-sm focus:outline-none focus:border-blue-500">
-                            <option value="test">Test Channel</option>
-                            <option value="main">Main Channel</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Mode</label>
+                    <select id="slack-mode" class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 text-sm focus:outline-none focus:border-blue-500">
+                        <option value="auto">Auto-detect</option>
+                        <option value="green">Green (On Track)</option>
+                        <option value="yellow">Yellow (Challenger)</option>
+                        <option value="red">Red (Effort-focused)</option>
+                    </select>
                 </div>
 
                 <div id="slack-preview-area" class="hidden">
@@ -802,29 +793,24 @@
         }
 
         async function sendSlack() {
-            const channel = document.getElementById('slack-channel').value;
-            const channelLabel = channel === 'main' ? 'MAIN channel' : 'test channel';
-
-            if (channel === 'main') {
-                if (!confirm('This will post to the MAIN Slack channel visible to the whole team. Continue?')) return;
-            }
+            if (!confirm('This will post to the Slack channel visible to the whole team. Continue?')) return;
 
             const btn = document.getElementById('slack-send-btn');
             btn.disabled = true;
             btn.innerHTML = '<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sending...';
-            setSlackStatus('Posting to ' + channelLabel + '...', 'loading');
+            setSlackStatus('Posting to Slack...', 'loading');
 
             try {
                 const mode = document.getElementById('slack-mode').value;
                 const res = await fetch('/.netlify/functions/send-slack', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode, test: channel === 'test' })
+                    body: JSON.stringify({ mode })
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Send failed');
 
-                setSlackStatus('Posted to ' + channelLabel + ' (' + data.mode.toUpperCase() + ' mode)', 'success');
+                setSlackStatus('Posted to Slack (' + data.mode.toUpperCase() + ' mode)', 'success');
             } catch (e) {
                 setSlackStatus('Failed: ' + e.message, 'error');
             } finally {
