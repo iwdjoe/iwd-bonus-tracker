@@ -7,6 +7,10 @@
   to = "/.netlify/functions/:splat"
   status = 200
 
+# Scheduled Slack update — Mon & Thu at 9:00 UTC (10:00 Madrid)
+[functions."slack-cron"]
+  schedule = "0 9 * * 1,4"
+
 # FORCE NO-CACHE FOR HTML
 [[headers]]
   for = "/*.html"
