@@ -78,14 +78,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 relative overflow-hidden">
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
-                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Monthly Projection</h3>
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Monthly Revenue Projection</h3>
                 <div class="text-4xl font-black text-green-600 dark:text-green-400" id="month-proj">--</div>
-                <div class="text-xs text-gray-400 mt-1" id="month-rev">Current: --</div>
+                <div class="text-xs text-gray-400 mt-1" id="month-proj-hours">-- Hrs Projected</div>
             </div>
-            <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800">
-                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Month Billable</h3>
-                <div class="text-3xl font-bold text-gray-900 dark:text-white" id="month-total-main">--</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="month-pct">--</div>
+            <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 relative overflow-hidden">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Current Revenue</h3>
+                <div class="text-3xl font-bold text-gray-900 dark:text-white" id="month-rev">--</div>
+                <div class="text-xs text-gray-400 mt-1" id="month-current-hours">-- Hrs Billable</div>
             </div>
             <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800">
                 <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Weekly Pace</h3>
@@ -328,11 +329,12 @@
                     cur.setDate(cur.getDate()+1);
                 }
                 const projRev = (mRev / daysPassed) * totalDays;
+                const projHours = (mBillable / daysPassed) * totalDays;
 
-                document.getElementById('month-rev').innerText = 'Current: $' + Math.round(mRev).toLocaleString();
                 document.getElementById('month-proj').innerText = '$' + Math.round(projRev).toLocaleString();
-                document.getElementById('month-total-main').innerText = Math.round(mBillable) + 'h';
-                document.getElementById('month-pct').innerText = 'Billable Total';
+                document.getElementById('month-proj-hours').innerText = projHours.toFixed(1) + ' Hrs Projected';
+                document.getElementById('month-rev').innerText = '$' + Math.round(mRev).toLocaleString();
+                document.getElementById('month-current-hours').innerText = mBillable.toFixed(1) + ' Hrs Billable';
             } else {
                 document.getElementById('month-rev').innerText = 'Error loading data';
             }
