@@ -525,12 +525,14 @@
 
             if (state.isCurrentMonth) {
                 state.projRev = (state.totalRev / daysPassed) * totalMonthWorkDays;
+                state.projHours = (totalHours / daysPassed) * totalMonthWorkDays;
                 const addedHours = parseInt(document.getElementById('sim-slider').value) || 0;
                 const avgRate = (totalHours > 0) ? (state.totalRev / totalHours) : globalRate;
                 state.simProjRev = state.projRev + (addedHours * avgRate);
             } else {
                 // Past month — actual revenue IS final, no projection
                 state.projRev = state.totalRev;
+                state.projHours = totalHours;
                 state.simProjRev = state.totalRev;
             }
 
@@ -568,7 +570,7 @@
                 projLabel.innerText = 'Projected Revenue';
                 poolLabel.innerText = 'Projected Pool';
                 if (projBadge) { projBadge.innerText = 'Based on Pace'; projBadge.classList.remove('hidden'); }
-                if (projHoursEl) projHoursEl.innerText = (currentHours + addedSimHours).toFixed(1) + ' Hrs Total';
+                if (projHoursEl) projHoursEl.innerText = (state.projHours + addedSimHours).toFixed(1) + ' Hrs Total';
 
                 const nextGoal = [85000,100000,115000,130000,145000,160000].find(t => t > state.simProjRev) || 160000;
                 const gap = nextGoal - state.simProjRev;
