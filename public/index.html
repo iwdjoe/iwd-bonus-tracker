@@ -508,8 +508,8 @@
             const daysLabel = document.querySelector('[id="stat-days-left"]').parentElement.querySelector('h3');
             if (state.isCurrentMonth) {
                 daysLabel.innerText = 'Work Days Remaining';
-                document.getElementById('stat-days-left').innerHTML = `${daysLeft} <span class="text-sm font-normal text-gray-400">Days</span>`;
-                document.getElementById('stat-days-passed').innerText = `Day ${daysPassed} of ${totalMonthWorkDays}`;
+                document.getElementById('stat-days-left').innerHTML = `${Math.round(daysLeft * 100) / 100} <span class="text-sm font-normal text-gray-400">Days</span>`;
+                document.getElementById('stat-days-passed').innerText = `Day ${Math.round(daysPassed * 100) / 100} of ${totalMonthWorkDays}`;
             } else {
                 daysLabel.innerText = 'Work Days Remaining';
                 document.getElementById('stat-days-left').innerHTML = `0 <span class="text-sm font-normal text-gray-400">Days</span>`;
