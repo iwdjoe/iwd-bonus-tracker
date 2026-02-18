@@ -58,9 +58,11 @@ function calculateStats(data, timezone) {
     const totalWorkDays = getWorkDays(monthStart, monthEnd);
     let currentWorkDay = getWorkDays(monthStart, now);
 
-    // Match frontend logic: only count today as "done" if it's after 5 PM
-    if (now.getHours() < 17) {
-        currentWorkDay = Math.max(currentWorkDay - 1, 1);
+    // Match frontend logic: use fractional work day (9 AM–5 PM) for smoother projections
+    const hourDecimal = now.getHours() + now.getMinutes() / 60;
+    if (hourDecimal < 17) {
+        const fractionOfDay = Math.max(0, (hourDecimal - 9) / 8);
+        currentWorkDay = Math.max(currentWorkDay - 1 + fractionOfDay, 1);
     }
 
     const daysRemaining = Math.max(totalWorkDays - currentWorkDay, 0);
