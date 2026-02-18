@@ -67,7 +67,12 @@ function calculateStats(data, timezone) {
 
     const totalWorkDays = getWorkDays(monthStart, monthEnd);
     let currentWorkDay = getWorkDays(monthStart, now);
-    if (now.getHours() < 17) currentWorkDay = Math.max(currentWorkDay - 1, 1);
+    // Use fractional work day (9 AM–5 PM) for smoother projections
+    const hourDecimal = now.getHours() + now.getMinutes() / 60;
+    if (hourDecimal < 17) {
+        const fractionOfDay = Math.max(0, (hourDecimal - 9) / 8);
+        currentWorkDay = Math.max(currentWorkDay - 1 + fractionOfDay, 1);
+    }
     const daysRemaining = Math.max(totalWorkDays - currentWorkDay, 0);
 
     const projects = data.projects || [];

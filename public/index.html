@@ -491,9 +491,11 @@
             if (state.isCurrentMonth) {
                 daysPassed = getWorkDays(start, now);
                 totalMonthWorkDays = getWorkDays(start, end);
-                // ADJUSTMENT: Only count today if it's after 5 PM
-                if (now.getHours() < 17) {
-                    daysPassed = Math.max(daysPassed - 1, 1);
+                // ADJUSTMENT: Use fractional work day (9 AM–5 PM) for smoother projections
+                const hourDecimal = now.getHours() + now.getMinutes() / 60;
+                if (hourDecimal < 17) {
+                    const fractionOfDay = Math.max(0, (hourDecimal - 9) / 8);
+                    daysPassed = Math.max(daysPassed - 1 + fractionOfDay, 1);
                 }
                 daysLeft = totalMonthWorkDays - daysPassed;
             } else {
