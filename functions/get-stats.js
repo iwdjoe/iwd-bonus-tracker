@@ -4,6 +4,28 @@
 let cache = {};
 
 exports.handler = async function(event, context) {
+    // ── Authentication ────────────────────────────────────────────────────────
+    // Netlify Identity decodes the Bearer JWT and exposes it via clientContext
+    // when the request includes an Authorization header. We rely on that rather
+    // than re-verifying the token ourselves.
+    const user = context.clientContext && context.clientContext.user;
+
+    if (!user) {
+        return {
+            statusCode: 401,
+            body: JSON.stringify({ error: 'Unauthorized: login required' })
+        };
+    }
+
+    const email = (user.email || '').toLowerCase();
+    if (!email.endsWith('@iwdagency.com')) {
+        return {
+            statusCode: 403,
+            body: JSON.stringify({ error: 'Forbidden: @iwdagency.com account required' })
+        };
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     const fetch = require('node-fetch');
     const TOKEN = process.env.TEAMWORK_API_TOKEN;
     const DOMAIN = 'iwdagency.teamwork.com';

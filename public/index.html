@@ -366,13 +366,16 @@
         async function fetchData() {
             const indicator = document.getElementById('live-indicator');
             const updated = document.getElementById('last-updated');
-            
+
             indicator.innerText = 'CONNECTING...';
             indicator.className = "text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase";
 
             try {
                 const selectedMonth = getSelectedMonth();
-                const response = await fetch('/.netlify/functions/get-stats?month=' + selectedMonth);
+                const user = netlifyIdentity.currentUser();
+                const token = user ? await user.jwt() : null;
+                const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+                const response = await fetch('/.netlify/functions/get-stats?month=' + selectedMonth, { headers });
                 if (!response.ok) throw new Error('Offline');
                 const data = await response.json();
                 

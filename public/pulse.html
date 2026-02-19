@@ -218,9 +218,12 @@
             indicator.className = "text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase";
 
             try {
+                const user = netlifyIdentity.currentUser();
+                const token = user ? await user.jwt() : null;
+                const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
                 const [resPulse, resStats] = await Promise.all([
-                    fetch(API_PULSE),
-                    fetch(API_STATS)
+                    fetch(API_PULSE, { headers }),
+                    fetch(API_STATS, { headers })
                 ]);
 
                 if (!resPulse.ok) throw new Error("Pulse API Error");
