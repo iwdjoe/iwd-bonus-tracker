@@ -158,7 +158,7 @@ function formatMessage(stats, mode, modeDetails, dashboardUrl) {
     lines.push('');
 
     lines.push(`\u{1F4CA} *Revenue:* ${formatCurrency(currentRevenue)} current \u2192 ${formatCurrency(projectedRevenue)} projected`);
-    lines.push(`\u23F3 *Day ${currentWorkDay} of ${totalWorkDays}* \u2014 ${daysRemaining} days remaining`);
+    lines.push(`\u23F3 *Day ${currentWorkDay.toFixed(2)} of ${totalWorkDays}* \u2014 ${daysRemaining.toFixed(2)} days remaining`);
     lines.push(`\u{1F550} *Billable Hours:* ${formatHours(totalBillableHours)} hrs logged`);
     lines.push('');
     lines.push('');
@@ -182,7 +182,7 @@ function formatMessage(stats, mode, modeDetails, dashboardUrl) {
         }
     } else if (mode === 'yellow') {
         const { additionalHours, hoursPerPersonPerDay } = modeDetails;
-        lines.push(`\u{1F4A1} That's ~${Math.round(additionalHours)} extra billable hours, or *${hoursPerPersonPerDay.toFixed(1)} hrs/person/day* over the next ${daysRemaining} days`);
+        lines.push(`\u{1F4A1} That's ~${Math.round(additionalHours)} extra billable hours, or *${hoursPerPersonPerDay.toFixed(1)} hrs/person/day* over the next ${daysRemaining.toFixed(2)} days`);
     } else {
         lines.push(`\u{1F4AA} Let's keep building momentum \u2014 every billable hour counts`);
     }
