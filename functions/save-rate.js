@@ -30,9 +30,21 @@ exports.handler = async function(event, context) {
     
     try {
         const body = JSON.parse(event.body);
-        const { projectId, rate } = body; // expecting ID or Name
+        const { projectId, rate } = body;
 
-        if (!projectId || !rate) return { statusCode: 400, body: "Missing Data" };
+        if (!projectId || rate === undefined) return { statusCode: 400, body: JSON.stringify({ error: "Missing projectId or rate" }) };
+
+        // Validate projectId: alphanumeric + hyphens/underscores only, block prototype pollution keys
+        const BLOCKED_KEYS = ['__proto__', 'constructor', 'prototype', '__GLOBAL_RATE__'];
+        if (!/^[a-zA-Z0-9_-]+$/.test(projectId) || BLOCKED_KEYS.includes(projectId)) {
+            return { statusCode: 400, body: JSON.stringify({ error: "Invalid projectId" }) };
+        }
+
+        // Validate rate: must be a positive integer between 1 and 9999
+        const parsedRate = parseInt(rate, 10);
+        if (isNaN(parsedRate) || parsedRate < 1 || parsedRate > 9999) {
+            return { statusCode: 400, body: JSON.stringify({ error: "Rate must be a number between 1 and 9999" }) };
+        }
 
         // 1. Get Current File (Need SHA to update)
         const getUrl = `https://api.github.com/repos/${REPO}/contents/${PATH}`;
@@ -51,7 +63,7 @@ exports.handler = async function(event, context) {
         }
 
         // 3. Update Rate
-        currentRates[projectId] = parseInt(rate);
+        currentRates[projectId] = parsedRate;
 
         // 4. Commit Back
         const newContent = Buffer.from(JSON.stringify(currentRates, null, 2)).toString('base64');
