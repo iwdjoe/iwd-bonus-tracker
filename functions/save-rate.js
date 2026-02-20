@@ -5,8 +5,26 @@ exports.handler = async function(event, context) {
         return { statusCode: 405, body: "Method Not Allowed" };
     }
 
-    // AUTH
-    const GH_TOKEN = process.env.GITHUB_PAT; 
+    // ── Authentication ────────────────────────────────────────────────────────
+    const user = context.clientContext && context.clientContext.user;
+
+    if (!user) {
+        return {
+            statusCode: 401,
+            body: JSON.stringify({ error: 'Unauthorized: login required' })
+        };
+    }
+
+    const email = (user.email || '').toLowerCase();
+    if (!email.endsWith('@iwdagency.com')) {
+        return {
+            statusCode: 403,
+            body: JSON.stringify({ error: 'Forbidden: @iwdagency.com account required' })
+        };
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
+    const GH_TOKEN = process.env.GITHUB_PAT;
     const REPO = "iwdjoe/iwd-bonus-tracker";
     const PATH = "rates.json";
     

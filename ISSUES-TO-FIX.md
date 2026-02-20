@@ -5,8 +5,8 @@ _Based on Security Audit Report (Feb 16, 2026). `api/get-stats` auth already res
 
 ## CRITICAL
 
-1. **`save-rate` endpoint has no authentication** (`functions/save-rate.js`)
-   Anyone can POST to `/api/save-rate` and modify billing rates in GitHub. Add Netlify Identity JWT validation.
+1. ~~**`save-rate` endpoint has no authentication** (`functions/save-rate.js`)~~ ✅ FIXED
+   ~~Anyone can POST to `/api/save-rate` and modify billing rates in GitHub. Add Netlify Identity JWT validation.~~
 
 2. **`send-slack` endpoint has no authentication** (`functions/send-slack.js`)
    Anyone can POST to `/api/send-slack` and spam the team Slack channel with arbitrary content. Add JWT validation + rate limiting (1 post per 5 min).
