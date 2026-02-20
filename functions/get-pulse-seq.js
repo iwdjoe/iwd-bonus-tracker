@@ -3,6 +3,25 @@
 // Retries on failure? No, just fails gracefully.
 
 exports.handler = async function(event, context) {
+    // ── Authentication ────────────────────────────────────────────────────────
+    const user = context.clientContext && context.clientContext.user;
+
+    if (!user) {
+        return {
+            statusCode: 401,
+            body: JSON.stringify({ error: 'Unauthorized: login required' })
+        };
+    }
+
+    const email = (user.email || '').toLowerCase();
+    if (!email.endsWith('@iwdagency.com')) {
+        return {
+            statusCode: 403,
+            body: JSON.stringify({ error: 'Forbidden: @iwdagency.com account required' })
+        };
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     const fetch = require('node-fetch');
     const TOKEN = process.env.TEAMWORK_API_TOKEN;
     const DOMAIN = 'iwdagency.teamwork.com';
@@ -76,6 +95,7 @@ exports.handler = async function(event, context) {
         };
 
     } catch (error) {
-        return { statusCode: 500, body: JSON.stringify({ error: error.message, stack: error.stack }) };
+        console.error(error);
+        return { statusCode: 500, body: JSON.stringify({ error: 'Internal server error' }) };
     }
 };
