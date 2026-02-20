@@ -21,11 +21,11 @@ _Based on Security Audit Report (Feb 16, 2026). `api/get-stats` auth already res
 
 ## HIGH
 
-5. **DOM-based XSS in index.html** (`public/index.html:629-635, 670-681`)
-   User/project names from API injected via `innerHTML` without sanitization. Switch to `textContent` or add an escape function.
+5. ~~**DOM-based XSS in index.html** (`public/index.html:629-635, 670-681`)~~ ✅ FIXED
+   ~~User/project names from API injected via `innerHTML` without sanitization. Switch to `textContent` or add an escape function.~~
 
-6. **DOM-based XSS in pulse.html** (`public/pulse.html:372-377`)
-   Same XSS pattern — `item.name` injected via `innerHTML`. Apply same fix as above.
+6. ~~**DOM-based XSS in pulse.html** (`public/pulse.html:372-377`)~~ ✅ FIXED
+   ~~Same XSS pattern — `item.name` injected via `innerHTML`. Apply same fix as above.~~
 
 7. **No input validation on `save-rate` inputs** (`functions/save-rate.js:15-16, 36`)
    `projectId` is used directly as a JSON key with no validation, enabling prototype pollution. Validate against a regex allowlist; check `rate` is a positive integer within a sane range.
