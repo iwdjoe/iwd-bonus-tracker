@@ -43,8 +43,8 @@ _Based on Security Audit Report (Feb 16, 2026). `api/get-stats` auth already res
 
 ## MEDIUM
 
-11. **No CORS restrictions on serverless functions** (`get-stats.js`, `save-rate.js`, `send-slack.js`)
-    All origins are allowed by default. Restrict with `Access-Control-Allow-Origin: https://iwd-bonus-tracker.netlify.app` on all function responses.
+11. ~~**No CORS restrictions on serverless functions** (`get-stats.js`, `save-rate.js`, `send-slack.js`)~~ ✅ FIXED
+    ~~All origins are allowed by default. Restrict with `Access-Control-Allow-Origin: https://iwd-bonus-tracker.netlify.app` on all function responses.~~
 
 12. **Unbounded pagination can exhaust resources** (`get-stats.js:62-71`, `send-slack.js:222-230`)
     Pagination loop can make 20 × sequential Teamwork API calls per request. Add an entry limit, timeout, and function-level rate limiting.
@@ -58,8 +58,8 @@ _Based on Security Audit Report (Feb 16, 2026). `api/get-stats` auth already res
 15. **Sensitive data in public static files** (`public/data.json`, `rates.json`)
     `data.json` (employee names + hours) is publicly served. `rates.json` (all billing rates) is committed to the repo and NOT in `.gitignore`. Add `rates.json` to `.gitignore`; gate `data.json` behind Netlify Identity or move it out of `public/`.
 
-16. **Missing HTTP security headers** (`netlify.toml`)
-    No `Content-Security-Policy`, `X-Frame-Options`, `X-Content-Type-Options`, or `Referrer-Policy` configured. Add to `netlify.toml`.
+16. ~~**Missing HTTP security headers** (`netlify.toml`)~~ ✅ FIXED
+    ~~No `Content-Security-Policy`, `X-Frame-Options`, `X-Content-Type-Options`, or `Referrer-Policy` configured. Add to `netlify.toml`.~~
 
 17. **Prototype pollution risk in stats accumulators** (`get-stats.js:76-93`, `send-slack.js:235-252`)
     Teamwork API user/project names used as object keys with no validation. Use `Object.create(null)` instead of `{}` for these accumulators.
