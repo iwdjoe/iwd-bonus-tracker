@@ -3,3 +3,4 @@ node_modules/
 bonus-bot/node_modules/
 bonus-bot/.env
 pulse-cache.json
+rates.json

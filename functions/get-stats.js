@@ -39,8 +39,13 @@ exports.handler = async function(event, context) {
 
     if (qMonth && /^\d{4}-\d{2}$/.test(qMonth)) {
         const parts = qMonth.split('-');
-        year = parseInt(parts[0]);
-        month = parseInt(parts[1]) - 1; // JS months are 0-indexed
+        const parsedYear = parseInt(parts[0], 10);
+        const parsedMonth = parseInt(parts[1], 10);
+        if (parsedYear < 2020 || parsedYear > 2030 || parsedMonth < 1 || parsedMonth > 12) {
+            return { statusCode: 400, body: JSON.stringify({ error: 'Invalid month parameter. Year must be 2020–2030, month must be 01–12.' }) };
+        }
+        year = parsedYear;
+        month = parsedMonth - 1; // JS months are 0-indexed
     } else {
         year = now.getFullYear();
         month = now.getMonth();
@@ -95,8 +100,8 @@ exports.handler = async function(event, context) {
         // Contractors: included in billable hours/revenue but excluded from bonus payouts
         const CONTRACTORS = ['Julian Stoddart'];
 
-        let users = {};
-        let projects = {};
+        let users = Object.create(null);
+        let projects = Object.create(null);
 
         entries.forEach(e => {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
