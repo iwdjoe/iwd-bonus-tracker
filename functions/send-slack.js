@@ -271,11 +271,30 @@ async function fetchDashboardData() {
 }
 
 // ─── Handler ──────────────────────────────────────────────────
-exports.handler = async function(event) {
+exports.handler = async function(event, context) {
     // Only allow POST
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
     }
+
+    // ── Authentication ────────────────────────────────────────────────────────
+    const user = context.clientContext && context.clientContext.user;
+
+    if (!user) {
+        return {
+            statusCode: 401,
+            body: JSON.stringify({ error: 'Unauthorized: login required' })
+        };
+    }
+
+    const email = (user.email || '').toLowerCase();
+    if (!email.endsWith('@iwdagency.com')) {
+        return {
+            statusCode: 403,
+            body: JSON.stringify({ error: 'Forbidden: @iwdagency.com account required' })
+        };
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
     try {
         const body = JSON.parse(event.body || '{}');
