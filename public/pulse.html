@@ -176,6 +176,9 @@
     </div>
 
     <script>
+        // XSS escape helper — use for any API-sourced value injected into innerHTML
+        function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
         const API_PULSE = '/.netlify/functions/get-pulse-seq?v=' + Date.now();
         const API_STATS = '/.netlify/functions/get-stats?v=' + Date.now();
 
@@ -377,7 +380,7 @@
                     el.innerHTML += `
                         <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
                             <td class="px-5 py-3 text-xs font-mono text-gray-400">${i+1}</td>
-                            <td class="px-5 py-3 font-medium text-gray-900 dark:text-white">${item.name}</td>
+                            <td class="px-5 py-3 font-medium text-gray-900 dark:text-white">${esc(item.name)}</td>
                             <td class="px-5 py-3 text-right text-gray-500 dark:text-gray-400">${item.hours.toFixed(1)}h</td>
                         </tr>`;
                 });
