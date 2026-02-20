@@ -237,8 +237,8 @@ async function fetchDashboardData() {
     // Contractors: included in billable hours/revenue but excluded from bonus payouts
     const CONTRACTORS = ['Julian Stoddart'];
 
-    let users = {};
-    let projects = {};
+    let users = Object.create(null);
+    let projects = Object.create(null);
 
     entries.forEach(e => {
         if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;

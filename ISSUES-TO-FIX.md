@@ -52,17 +52,17 @@ _Based on Security Audit Report (Feb 16, 2026). `api/get-stats` auth already res
 13. **In-memory cache poisoning risk** (`functions/get-stats.js:4, 32-34, 114`)
     Module-level cache persists across warm Lambda invocations with no invalidation. Add a cache-bust parameter and validate cached data structure before serving.
 
-14. **Insufficient query param validation** (`functions/get-stats.js:15-25`)
-    `month` regex allows invalid values like month `99` or year `0001`. Add bounds checking (year 2020–2030, month 1–12).
+14. ~~**Insufficient query param validation** (`functions/get-stats.js:15-25`)~~ ✅ FIXED
+    ~~`month` regex allows invalid values like month `99` or year `0001`. Add bounds checking (year 2020–2030, month 1–12).~~
 
-15. **Sensitive data in public static files** (`public/data.json`, `rates.json`)
-    `data.json` (employee names + hours) is publicly served. `rates.json` (all billing rates) is committed to the repo and NOT in `.gitignore`. Add `rates.json` to `.gitignore`; gate `data.json` behind Netlify Identity or move it out of `public/`.
+15. ~~**Sensitive data in public static files** (`public/data.json`, `rates.json`)~~ ✅ FIXED (partial)
+    `rates.json` added to `.gitignore`. `data.json` gating deferred — requires larger frontend change.
 
 16. ~~**Missing HTTP security headers** (`netlify.toml`)~~ ✅ FIXED
     ~~No `Content-Security-Policy`, `X-Frame-Options`, `X-Content-Type-Options`, or `Referrer-Policy` configured. Add to `netlify.toml`.~~
 
-17. **Prototype pollution risk in stats accumulators** (`get-stats.js:76-93`, `send-slack.js:235-252`)
-    Teamwork API user/project names used as object keys with no validation. Use `Object.create(null)` instead of `{}` for these accumulators.
+17. ~~**Prototype pollution risk in stats accumulators** (`get-stats.js:76-93`, `send-slack.js:235-252`)~~ ✅ FIXED
+    ~~Teamwork API user/project names used as object keys with no validation. Use `Object.create(null)` instead of `{}` for these accumulators.~~
 
 ---
 
