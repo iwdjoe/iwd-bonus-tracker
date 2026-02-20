@@ -280,9 +280,6 @@
     </div>
 
     <script>
-        // XSS escape helper — use for any API-sourced value injected into innerHTML
-        function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-
         // AUTH LOGIC
         function checkAuth() {
             const user = netlifyIdentity.currentUser();
@@ -638,7 +635,7 @@
                 const hl = bonus > 0 ? 'bg-green-50 dark:bg-green-900/20' : '';
                 tbody.innerHTML += `
                     <tr class="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 transition ${hl}">
-                        <td class="px-5 py-3 text-sm font-medium text-gray-900 dark:text-white">${esc(u.name)}</td>
+                        <td class="px-5 py-3 text-sm font-medium text-gray-900 dark:text-white">${u.name}</td>
                         <td class="px-5 py-3 text-right text-gray-500 dark:text-gray-400">${u.hours.toFixed(2)}</td>
                         <td class="px-5 py-3 text-right text-gray-500 dark:text-gray-400 text-xs">${pct}</td>
                         <td class="px-5 py-3 text-right font-bold text-green-600 dark:text-green-400 transition-all duration-300">$${bonus}</td>
@@ -679,12 +676,12 @@
                 
                 cbody.innerHTML += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${esc(p.name)}</td>
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${p.name}</td>
                         <td class="px-4 py-2 text-right text-gray-500 dark:text-gray-400">${p.hours.toFixed(2)}</td>
                         <td class="px-4 py-2 text-right">
                             <input type="number" value="${effectiveRate}" 
                                    class="w-16 bg-transparent border-b border-gray-300 dark:border-gray-600 text-right ${rClass} focus:outline-none" 
-                                   onchange="saveRate('${esc(p.id)}', this.value)">
+                                   onchange="saveRate('${p.id}', this.value)">
                         </td>
                         <td class="px-4 py-2 text-right text-gray-500 dark:text-gray-400">$${Math.round(p.hours*effectiveRate).toLocaleString()}</td>
                     </tr>`;
