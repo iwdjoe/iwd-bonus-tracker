@@ -5,6 +5,18 @@
 // Env vars needed: SLACK_WEBHOOK_URL
 // (Plus existing TEAMWORK_API_TOKEN, GITHUB_PAT for data fetch)
 
+// ── Rate Limiter (1 Slack post per 5 min per IP) ──────────────────────────────
+const slackRateMap = {};
+function isSlackRateLimited(ip, windowMs = 300000) {
+    const now = Date.now();
+    if (!slackRateMap[ip] || now - slackRateMap[ip] > windowMs) {
+        slackRateMap[ip] = now;
+        return false;
+    }
+    return true;
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─── Bonus Tier Config ────────────────────────────────────────
 const BONUS_TIERS = [
     { threshold: 160000, pool: 6000, label: 'Top Tier' },
@@ -223,8 +235,10 @@ async function fetchDashboardData() {
 
     let entries = twData1['time-entries'] || [];
 
+    // Max 5 pages = 2,500 entries
+    const MAX_PAGES = 5;
     let page = 2;
-    while (entries.length === (page - 1) * 500 && page <= 20) {
+    while (entries.length === (page - 1) * 500 && page <= MAX_PAGES) {
         const res = await fetch(`https://${DOMAIN}/time_entries.json?page=${page}&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } });
         if (!res.ok) break;
         const data = await res.json();
@@ -295,6 +309,11 @@ exports.handler = async function(event, context) {
         };
     }
     // ─────────────────────────────────────────────────────────────────────────
+
+    const ip = (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'])) || 'unknown';
+    if (isSlackRateLimited(ip)) {
+        return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests. Please wait 5 minutes before posting again.' }) };
+    }
 
     try {
         const body = JSON.parse(event.body || '{}');

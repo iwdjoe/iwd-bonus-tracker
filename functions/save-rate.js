@@ -1,5 +1,18 @@
 const fetch = require('node-fetch');
 
+// ── Rate Limiter (10 requests/min per IP) ─────────────────────────────────────
+const rateLimitMap = {};
+function isRateLimited(ip, limit = 10, windowMs = 60000) {
+    const now = Date.now();
+    if (!rateLimitMap[ip] || now - rateLimitMap[ip].start > windowMs) {
+        rateLimitMap[ip] = { count: 1, start: now };
+        return false;
+    }
+    rateLimitMap[ip].count++;
+    return rateLimitMap[ip].count > limit;
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 exports.handler = async function(event, context) {
     if (event.httpMethod !== "POST") {
         return { statusCode: 405, body: "Method Not Allowed" };
@@ -23,6 +36,11 @@ exports.handler = async function(event, context) {
         };
     }
     // ─────────────────────────────────────────────────────────────────────────
+
+    const ip = (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'])) || 'unknown';
+    if (isRateLimited(ip)) {
+        return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests. Please wait a moment.' }) };
+    }
 
     const GH_TOKEN = process.env.GITHUB_PAT;
     const REPO = "iwdjoe/iwd-bonus-tracker";
