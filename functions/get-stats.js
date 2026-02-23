@@ -3,6 +3,19 @@
 
 let cache = {};
 
+// ── Rate Limiter (30 requests/min per IP) ─────────────────────────────────────
+const rateLimitMap = {};
+function isRateLimited(ip, limit = 30, windowMs = 60000) {
+    const now = Date.now();
+    if (!rateLimitMap[ip] || now - rateLimitMap[ip].start > windowMs) {
+        rateLimitMap[ip] = { count: 1, start: now };
+        return false;
+    }
+    rateLimitMap[ip].count++;
+    return rateLimitMap[ip].count > limit;
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 exports.handler = async function(event, context) {
     // ── Authentication ────────────────────────────────────────────────────────
     // Netlify Identity decodes the Bearer JWT and exposes it via clientContext
@@ -25,6 +38,11 @@ exports.handler = async function(event, context) {
         };
     }
     // ─────────────────────────────────────────────────────────────────────────
+
+    const ip = (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'])) || 'unknown';
+    if (isRateLimited(ip)) {
+        return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests. Please wait a moment.' }) };
+    }
 
     const fetch = require('node-fetch');
     const TOKEN = process.env.TEAMWORK_API_TOKEN;
@@ -85,9 +103,10 @@ exports.handler = async function(event, context) {
 
         let entries = twData1['time-entries'] || [];
 
-        // Fetch all remaining pages until we get a partial page
+        // Fetch all remaining pages until we get a partial page (max 5 pages = 2,500 entries)
+        const MAX_PAGES = 5;
         let page = 2;
-        while (entries.length === (page - 1) * 500 && page <= 20) {
+        while (entries.length === (page - 1) * 500 && page <= MAX_PAGES) {
             const res = await fetch(`https://${DOMAIN}/time_entries.json?page=${page}&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } });
             if (!res.ok) break;
             const data = await res.json();

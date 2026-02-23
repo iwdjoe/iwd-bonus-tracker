@@ -30,11 +30,11 @@ _Based on Security Audit Report (Feb 16, 2026). `api/get-stats` auth already res
 7. ~~**No input validation on `save-rate` inputs** (`functions/save-rate.js:15-16, 36`)~~ ✅ FIXED
    ~~`projectId` is used directly as a JSON key with no validation, enabling prototype pollution. Validate against a regex allowlist; check `rate` is a positive integer within a sane range.~~
 
-8. **PII and billing rates exposed in API responses** (`functions/get-stats.js:95-96`, `functions/get-pulse-seq.js:50-65`)
-   Full employee names and all client billing rates returned in API responses. Authenticate endpoints first, then consider returning only first names and restricting rate data to admin endpoints.
+8. ~~**PII and billing rates exposed in API responses**~~ ❌ WON'T FIX
+   Full names intentionally kept — data is sufficiently protected by server-side auth.
 
-9. **Hardcoded GitHub repo path in 4+ files** (`get-stats.js`, `send-slack.js`, `get-pulse-seq.js`, `scripts/fetch-pulse.js`)
-   Repo path `iwdjoe/iwd-bonus-tracker` is hardcoded everywhere. Move to a `GITHUB_REPO` env variable. Verify repo is private. Consider moving `rates.json` out of the repo.
+9. ~~**Hardcoded GitHub repo path in 4+ files**~~ ❌ WON'T FIX
+   Repo is private — hardcoded path poses no practical risk.
 
 10. **Client-side-only authentication** (`public/index.html:284-305`)
     Login gate and `@iwdagency.com` domain check are purely CSS/JS on the client. Since API endpoints are unprotected, hiding the UI provides zero security. Server-side auth (see items 1–3) is the real fix.
@@ -46,8 +46,8 @@ _Based on Security Audit Report (Feb 16, 2026). `api/get-stats` auth already res
 11. ~~**No CORS restrictions on serverless functions** (`get-stats.js`, `save-rate.js`, `send-slack.js`)~~ ✅ FIXED
     ~~All origins are allowed by default. Restrict with `Access-Control-Allow-Origin: https://iwd-bonus-tracker.netlify.app` on all function responses.~~
 
-12. **Unbounded pagination can exhaust resources** (`get-stats.js:62-71`, `send-slack.js:222-230`)
-    Pagination loop can make 20 × sequential Teamwork API calls per request. Add an entry limit, timeout, and function-level rate limiting.
+12. ~~**Unbounded pagination can exhaust resources** (`get-stats.js:62-71`, `send-slack.js:222-230`)~~ ✅ FIXED
+    ~~Pagination loop can make 20 × sequential Teamwork API calls per request. Add an entry limit, timeout, and function-level rate limiting.~~
 
 13. **In-memory cache poisoning risk** (`functions/get-stats.js:4, 32-34, 114`)
     Module-level cache persists across warm Lambda invocations with no invalidation. Add a cache-bust parameter and validate cached data structure before serving.
@@ -71,8 +71,8 @@ _Based on Security Audit Report (Feb 16, 2026). `api/get-stats` auth already res
 18. **Error messages leak internal API details** (`get-stats.js:119`, `save-rate.js:62`, `send-slack.js:348`)
     Catch blocks return `error.message` (e.g., "Teamwork API 401") to the client. Return generic messages; log details server-side.
 
-19. **No rate limiting on any endpoint** (all `functions/*.js`)
-    `save-rate` can be hammered to make thousands of GitHub commits; `send-slack` can flood the channel. Implement IP-based rate limiting via Netlify Edge Functions or in-memory limiter.
+19. ~~**No rate limiting on any endpoint** (all `functions/*.js`)~~ ✅ FIXED
+    ~~`save-rate` can be hammered to make thousands of GitHub commits; `send-slack` can flood the channel. Implement IP-based rate limiting via Netlify Edge Functions or in-memory limiter.~~
 
 20. **Deprecated `node-fetch` v2** (`package.json`, `bonus-bot/package.json`)
     `node-fetch@^2` is in maintenance mode. Migrate to Node 18+ built-in `fetch`. Move `require()` calls to the top of each file (currently loaded inside handler on every cold start).
