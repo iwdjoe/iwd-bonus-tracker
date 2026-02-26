@@ -47,6 +47,35 @@
         .dark .plan-support { background: #451a03; color: #fcd34d; }
         .dark .plan-light { background: #3b0764; color: #d8b4fe; }
 
+        /* Inline plan dropdown */
+        .plan-select {
+            appearance: none; -webkit-appearance: none;
+            font-size: 10px; font-weight: 700; padding: 2px 18px 2px 8px;
+            border-radius: 9999px; border: none; cursor: pointer;
+            background-repeat: no-repeat; background-position: right 5px center; background-size: 10px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z'/%3E%3C/svg%3E");
+        }
+        .plan-select:focus { outline: 2px solid #6366f1; outline-offset: -1px; }
+
+        /* Tooltip styles */
+        .th-tip { position: relative; cursor: help; }
+        .th-tip .tip-text {
+            visibility: hidden; opacity: 0;
+            position: absolute; z-index: 50;
+            bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: #f1f5f9; font-size: 11px; font-weight: 400;
+            text-transform: none; letter-spacing: normal;
+            padding: 6px 10px; border-radius: 6px; white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: opacity 0.15s, visibility 0.15s;
+            pointer-events: none;
+        }
+        .th-tip .tip-text::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 5px solid transparent; border-top-color: #1e293b;
+        }
+        .th-tip:hover .tip-text { visibility: visible; opacity: 1; }
+
         /* Sticky columns */
         .sticky-plan { position: sticky; left: 0; z-index: 10; }
         .sticky-client { position: sticky; left: 90px; z-index: 10; }
@@ -180,26 +209,26 @@
                             <th colspan="2" class="px-3 py-2 text-center text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-purple-50 dark:bg-purple-950/30">Performance</th>
                         </tr>
                         <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            <th class="px-3 py-2.5 text-left sticky-plan bg-gray-50 dark:bg-gray-800/50">Plan</th>
-                            <th class="px-3 py-2.5 text-left sticky-client bg-gray-50 dark:bg-gray-800/50">Client</th>
-                            <th class="px-3 py-2.5 text-right">Weight</th>
-                            <th class="px-3 py-2.5 text-right">Rate</th>
-                            <th class="px-3 py-2.5 text-right">Min Hrs</th>
+                            <th class="px-3 py-2.5 text-left sticky-plan bg-gray-50 dark:bg-gray-800/50 th-tip">Plan<span class="tip-text">Service tier: Core, Growth, Support, or Light Touch</span></th>
+                            <th class="px-3 py-2.5 text-left sticky-client bg-gray-50 dark:bg-gray-800/50 th-tip">Client<span class="tip-text">Client/project name from Teamwork</span></th>
+                            <th class="px-3 py-2.5 text-right th-tip">Weight<span class="tip-text">Client's planned hours as a % of total planned hours this month</span></th>
+                            <th class="px-3 py-2.5 text-right th-tip">Rate<span class="tip-text">Hourly billing rate for this client</span></th>
+                            <th class="px-3 py-2.5 text-right th-tip">Min Hrs<span class="tip-text">Minimum contracted hours per month</span></th>
 
-                            <th class="px-3 py-2.5 text-right bg-blue-50/50 dark:bg-blue-950/20">Hours</th>
-                            <th class="px-3 py-2.5 text-right bg-blue-50/50 dark:bg-blue-950/20">Revenue</th>
-                            <th class="px-3 py-2.5 text-right bg-blue-50/50 dark:bg-blue-950/20">Avg/Wk</th>
+                            <th class="px-3 py-2.5 text-right bg-blue-50/50 dark:bg-blue-950/20 th-tip">Hours<span class="tip-text">Total hours planned for this client this month</span></th>
+                            <th class="px-3 py-2.5 text-right bg-blue-50/50 dark:bg-blue-950/20 th-tip">Revenue<span class="tip-text">Planned Hours x Rate = target revenue</span></th>
+                            <th class="px-3 py-2.5 text-right bg-blue-50/50 dark:bg-blue-950/20 th-tip">Avg/Wk<span class="tip-text">Planned hours divided by weeks in the month</span></th>
 
-                            <th class="px-3 py-2.5 text-right bg-teal-50/50 dark:bg-teal-950/20">Used</th>
-                            <th class="px-3 py-2.5 text-right bg-teal-50/50 dark:bg-teal-950/20">Revenue</th>
-                            <th class="px-3 py-2.5 text-right bg-teal-50/50 dark:bg-teal-950/20">% Used</th>
+                            <th class="px-3 py-2.5 text-right bg-teal-50/50 dark:bg-teal-950/20 th-tip">Used<span class="tip-text">Billable hours logged in Teamwork so far</span></th>
+                            <th class="px-3 py-2.5 text-right bg-teal-50/50 dark:bg-teal-950/20 th-tip">Revenue<span class="tip-text">Used Hours x Rate = revenue earned to date</span></th>
+                            <th class="px-3 py-2.5 text-right bg-teal-50/50 dark:bg-teal-950/20 th-tip">% Used<span class="tip-text">Percentage of planned hours used so far</span></th>
 
-                            <th class="px-3 py-2.5 text-right bg-orange-50/50 dark:bg-orange-950/20">Hours</th>
-                            <th class="px-3 py-2.5 text-right bg-orange-50/50 dark:bg-orange-950/20">Revenue</th>
-                            <th class="px-3 py-2.5 text-right bg-orange-50/50 dark:bg-orange-950/20">EOM Gap</th>
+                            <th class="px-3 py-2.5 text-right bg-orange-50/50 dark:bg-orange-950/20 th-tip">Hours<span class="tip-text">Projected total hours by end of month based on current pace</span></th>
+                            <th class="px-3 py-2.5 text-right bg-orange-50/50 dark:bg-orange-950/20 th-tip">Revenue<span class="tip-text">Forecasted Hours x Rate = projected end-of-month revenue</span></th>
+                            <th class="px-3 py-2.5 text-right bg-orange-50/50 dark:bg-orange-950/20 th-tip">EOM Gap<span class="tip-text">End-of-Month Gap: Forecast Revenue minus Planned Revenue. Negative = shortfall, Positive = surplus</span></th>
 
-                            <th class="px-3 py-2.5 text-center bg-purple-50/50 dark:bg-purple-950/20">SPI</th>
-                            <th class="px-3 py-2.5 text-left bg-purple-50/50 dark:bg-purple-950/20">Status</th>
+                            <th class="px-3 py-2.5 text-center bg-purple-50/50 dark:bg-purple-950/20 th-tip">SPI<span class="tip-text">Schedule Performance Index: Used Hours / Expected Hours at this point. 1.0 = on track, &lt;1 = behind, &gt;1 = ahead</span></th>
+                            <th class="px-3 py-2.5 text-left bg-purple-50/50 dark:bg-purple-950/20 th-tip">Status<span class="tip-text">Editable status notes — click any cell to type</span></th>
                         </tr>
                     </thead>
                     <tbody id="velocity-table-body">
@@ -474,14 +503,12 @@
         const allClients = new Set([...Object.keys(clientConfig), ...apiData.projects.map(p => p.name)]);
 
         const rows = [];
-        let totalPlannedRevenue = 0;
+        let totalPlannedHours = 0;
 
-        // First pass: compute total planned revenue for weight calculation
+        // First pass: compute total planned hours for weight calculation
         allClients.forEach(name => {
             const cfg = getClientConfig(name);
-            const proj = projectMap[name];
-            const rate = cfg.rate || (proj ? proj.rate : apiData.meta.globalRate);
-            totalPlannedRevenue += (cfg.plannedHours || 0) * rate;
+            totalPlannedHours += (cfg.plannedHours || 0);
         });
 
         allClients.forEach(name => {
@@ -511,8 +538,8 @@
             const expectedAtThisPoint = plannedHours * meta.monthElapsed;
             const spi = expectedAtThisPoint > 0 ? usedHours / expectedAtThisPoint : (usedHours > 0 ? 1.2 : 0);
 
-            // Weight: share of total planned revenue
-            const weight = totalPlannedRevenue > 0 ? plannedRevenue / totalPlannedRevenue : 0;
+            // Weight: client planned hours / total planned hours for the month
+            const weight = totalPlannedHours > 0 ? plannedHours / totalPlannedHours : 0;
 
             rows.push({
                 name, plan, rate, minHours, plannedHours, plannedRevenue, avgPerWeek,
@@ -554,7 +581,8 @@
                 }
             }
 
-            const planClass = r.plan === 'Core' ? 'plan-core' : r.plan === 'Growth' ? 'plan-growth' : r.plan === 'Support' ? 'plan-support' : r.plan === 'Light Touch' ? 'plan-light' : '';
+            const planClass = r.plan === 'Core' ? 'plan-core' : r.plan === 'Growth' ? 'plan-growth' : r.plan === 'Support' ? 'plan-support' : r.plan === 'Light Touch' ? 'plan-light' : 'bg-gray-100 dark:bg-gray-800 text-gray-400';
+            const planOpts = PLAN_TYPES.map(p => `<option value="${p}"${r.plan === p ? ' selected' : ''}>${p}</option>`).join('');
             const weightColor = r.weight > 0.15 ? 'text-green-700 dark:text-green-400 font-bold' : r.weight > 0.08 ? 'text-green-600 dark:text-green-500' : 'text-gray-500 dark:text-gray-400';
             const weightBg = r.weight > 0.15 ? 'bg-green-50 dark:bg-green-950/20' : r.weight > 0.08 ? 'bg-green-50/50 dark:bg-green-950/10' : '';
 
@@ -569,8 +597,11 @@
             const statusVal = statusData[r.name] || '';
 
             html += `<tr class="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                <td class="px-3 py-2.5 sticky-plan bg-white dark:bg-gray-900" style="min-width:90px">
-                    ${r.plan ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${planClass}">${escHtml(r.plan)}</span>` : '<span class="text-gray-300 dark:text-gray-600 text-[10px]">—</span>'}
+                <td class="px-3 py-2.5 sticky-plan bg-white dark:bg-gray-900" style="min-width:100px">
+                    <select class="plan-select ${planClass}" data-client="${escHtml(r.name)}" onchange="changePlan(this)">
+                        <option value=""${!r.plan ? ' selected' : ''}>—</option>
+                        ${planOpts}
+                    </select>
                 </td>
                 <td class="px-3 py-2.5 font-semibold text-gray-900 dark:text-white sticky-client bg-white dark:bg-gray-900 whitespace-nowrap">${escHtml(r.name)}</td>
                 <td class="px-3 py-2.5 text-right ${weightColor} ${weightBg}">${r.weight > 0 ? fmtPct(r.weight) : '—'}</td>
@@ -624,6 +655,17 @@
             <td class="px-3 py-3 text-center bg-purple-50/50 dark:bg-purple-950/20"><span class="font-bold">${totalSPI.toFixed(2)}</span></td>
             <td class="px-3 py-3 bg-purple-50/50 dark:bg-purple-950/20"></td>
         </tr>`;
+    }
+
+    // ── Inline Plan Editing ──────────────────────────────────────────────────
+    function changePlan(sel) {
+        const client = sel.dataset.client;
+        const plan = sel.value;
+        if (!clientConfig[client]) clientConfig[client] = { plan: '', rate: null, minHours: 0, plannedHours: 0 };
+        clientConfig[client].plan = plan;
+        saveConfigToStorage();
+        // Update the dropdown styling
+        sel.className = 'plan-select ' + (plan === 'Core' ? 'plan-core' : plan === 'Growth' ? 'plan-growth' : plan === 'Support' ? 'plan-support' : plan === 'Light Touch' ? 'plan-light' : 'bg-gray-100 dark:bg-gray-800 text-gray-400');
     }
 
     // ── Status Editing ────────────────────────────────────────────────────────
