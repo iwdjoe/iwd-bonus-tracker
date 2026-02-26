@@ -102,14 +102,13 @@
 
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 
-    // ---- User / Auth ----
+    // ---- User ----
     function getUser() {
-        try { return JSON.parse(localStorage.getItem(USER_KEY)); } catch (e) { return null; }
+        return { name: 'Joe', role: 'admin' };
     }
 
     function setUser(name, role) {
         var user = { name: name, role: role };
-        localStorage.setItem(USER_KEY, JSON.stringify(user));
         currentUser = user;
         updateUserUI();
     }
@@ -122,27 +121,6 @@
         document.getElementById('menuUserRole').textContent = cap(currentUser.role);
     }
 
-    function showLogin() {
-        document.getElementById('loginScreen').classList.remove('hidden');
-    }
-
-    function hideLogin() {
-        document.getElementById('loginScreen').classList.add('hidden');
-    }
-
-    document.getElementById('loginBtn').addEventListener('click', function () {
-        var name = document.getElementById('loginName').value.trim();
-        if (!name) { toast('Please enter your name', 'warning'); return; }
-        var role = document.getElementById('loginRole').value;
-        setUser(name, role);
-        hideLogin();
-        initApp();
-    });
-
-    document.getElementById('loginName').addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') document.getElementById('loginBtn').click();
-    });
-
     // ---- User menu ----
     document.getElementById('userMenuBtn').addEventListener('click', function (e) {
         e.stopPropagation();
@@ -150,12 +128,6 @@
     });
     document.addEventListener('click', function () {
         document.getElementById('userMenu').classList.add('hidden');
-    });
-
-    document.getElementById('btnSwitchUser').addEventListener('click', function () {
-        document.getElementById('userMenu').classList.add('hidden');
-        document.getElementById('loginName').value = '';
-        showLogin();
     });
 
     document.getElementById('btnDbSettings').addEventListener('click', function () {
@@ -1060,11 +1032,7 @@
     // ---- Boot ----
     initTheme();
     currentUser = getUser();
-    if (!currentUser) {
-        showLogin();
-    } else {
-        updateUserUI();
-        initApp();
-    }
+    updateUserUI();
+    initApp();
 
 })();
