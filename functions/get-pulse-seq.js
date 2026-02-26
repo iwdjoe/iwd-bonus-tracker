@@ -4,7 +4,20 @@
 
 exports.handler = async function(event, context) {
     // ── Authentication ────────────────────────────────────────────────────────
-    const user = context.clientContext && context.clientContext.user;
+    // Prefer Netlify Identity's clientContext (auto-decoded JWT). If unavailable
+    // (e.g. Identity middleware not populating context), fall back to manually
+    // decoding the JWT from the Authorization header.
+    let user = context.clientContext && context.clientContext.user;
+
+    if (!user) {
+        const authHeader = event.headers && (event.headers.authorization || event.headers.Authorization);
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            try {
+                const payload = authHeader.substring(7).split('.')[1];
+                user = JSON.parse(Buffer.from(payload, 'base64').toString());
+            } catch (_) { /* malformed token */ }
+        }
+    }
 
     if (!user) {
         return {
