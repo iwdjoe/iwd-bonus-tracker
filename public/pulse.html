@@ -33,12 +33,18 @@
         }
 
         /* Hide all Netlify Identity widget injected UI (login bar, signup bar, notifications) */
+        /* Hide all Netlify Identity widget injected UI */
         .netlify-identity-alert,
         .netlify-identity-button,
         .netlify-identity-signup,
+        .netlify-identity-widget,
         .netlify-identity-widget-init,
+        .netlify-identity-menu,
         div[data-netlify-identity-menu],
-        div[data-netlify-identity-button] { display: none !important; }
+        div[data-netlify-identity-button],
+        div[class*="netlify-identity"],
+        body > div[style*="position: fixed"][style*="bottom"],
+        body > div[style*="background"][style*="padding"][style*="text-align"] { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 transition-colors duration-300">

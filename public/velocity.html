@@ -20,9 +20,18 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        .netlify-identity-alert, .netlify-identity-button, .netlify-identity-signup,
-        .netlify-identity-widget-init, div[data-netlify-identity-menu],
-        div[data-netlify-identity-button] { display: none !important; }
+        /* Hide ALL Netlify Identity widget injected UI */
+        .netlify-identity-alert,
+        .netlify-identity-button,
+        .netlify-identity-signup,
+        .netlify-identity-widget,
+        .netlify-identity-widget-init,
+        .netlify-identity-menu,
+        div[data-netlify-identity-menu],
+        div[data-netlify-identity-button],
+        div[class*="netlify-identity"],
+        body > div[style*="position: fixed"][style*="bottom"],
+        body > div[style*="background"][style*="padding"][style*="text-align"] { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
 
         /* Custom scrollbar */
         .table-wrap::-webkit-scrollbar { height: 8px; }
