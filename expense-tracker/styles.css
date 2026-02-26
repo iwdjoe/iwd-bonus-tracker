@@ -1,0 +1,114 @@
+/* ============================================================
+   IWD Agency Expense Tracker — Styles
+   Standalone — no shared nav, no Netlify Identity widget
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+.dark ::-webkit-scrollbar-thumb { background: #334155; }
+
+/* KPI Cards */
+.kpi-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.08);
+}
+.dark .kpi-card:hover {
+    box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Tab buttons */
+.tab-btn { color: #64748b; }
+.tab-btn:hover { background-color: #f1f5f9; color: #334155; }
+.dark .tab-btn:hover { background-color: #1e293b; color: #e2e8f0; }
+.tab-btn.active { background-color: #eef4ff; color: #3366ff; }
+.dark .tab-btn.active { background-color: rgba(51, 102, 255, 0.15); color: #5989ff; }
+
+/* Chart range buttons */
+.chart-range-btn { color: #64748b; }
+.chart-range-btn:hover { background-color: #f1f5f9; }
+.dark .chart-range-btn:hover { background-color: #1e293b; }
+.chart-range-btn.active { background-color: #eef4ff; color: #3366ff; font-weight: 500; }
+.dark .chart-range-btn.active { background-color: rgba(51, 102, 255, 0.15); color: #5989ff; }
+
+/* Table */
+table th { user-select: none; }
+tbody tr { transition: background-color 0.15s ease; }
+
+/* Modal animations */
+.modal-overlay { animation: fadeIn 0.2s ease; }
+.modal-content { animation: slideUp 0.3s ease; }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Toast */
+#toastContainer > div { min-width: 240px; }
+
+/* Inline owner dropdown */
+.inline-owner-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+    padding-right: 18px;
+    transition: all 0.15s ease;
+}
+.inline-owner-select:hover {
+    border-color: #3366ff;
+}
+.inline-owner-select:focus {
+    border-color: #3366ff;
+}
+
+/* Action buttons */
+.action-btn { transition: all 0.15s ease; }
+.action-btn:hover svg { transform: scale(1.1); }
+
+/* Selection */
+::selection { background-color: rgba(51, 102, 255, 0.2); }
+
+/* Spin animation for QuickBooks sync */
+@keyframes spin { to { transform: rotate(360deg); } }
+.animate-spin { animation: spin 1s linear infinite; }
+
+/* Print */
+@media print {
+    header, .tab-btn, button, #paginationControls, .action-btn, #dbBanner,
+    .inline-owner-select, #loginScreen { display: none !important; }
+    body { background: white !important; color: black !important; }
+    .shadow-sm, .shadow-lg, .shadow-xl, .shadow-2xl { box-shadow: none !important; }
+    main { padding: 0 !important; }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .kpi-card { padding: 0.75rem; }
+    .kpi-card .text-2xl { font-size: 1.125rem; }
+    table { font-size: 0.75rem; }
+    table th, table td { padding: 0.5rem 0.75rem; }
+}
+
+/* Page load */
+main { animation: fadeIn 0.3s ease; }
