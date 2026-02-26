@@ -307,8 +307,10 @@
     <script>
     // ── Global State ──────────────────────────────────────────────────────────
     let apiData = null;
-    let clientConfig = {};
-    let statusData = {};
+    let allMonthConfig = {};  // { "2026-01": { "Client": { plan, rate, minHours, plannedHours } } }
+    let allMonthStatus = {};  // { "2026-01": { "Client": "status text" } }
+    let clientConfig = {};    // Resolved config for the currently selected month
+    let statusData = {};      // Status for the currently selected month
 
     const PLAN_TYPES = ['Core', 'Growth', 'Support', 'Light Touch'];
     const PLAN_ORDER = { 'Core': 0, 'Growth': 1, 'Support': 2, 'Light Touch': 3, '': 4 };
@@ -355,32 +357,73 @@
         loadConfig();
         loadStatusData();
         populateMonthSelector();
+        resolveMonthConfig(document.getElementById('month-select').value);
         loadData();
         // Fetch shared config from cloud (overwrites localStorage cache)
         await loadSharedConfig();
         render();
     }
 
-    // ── Month Selector ────────────────────────────────────────────────────────
+    // ── Month Selector (Jan 2026 → current month, auto-grows) ────────────────
     function populateMonthSelector() {
         const sel = document.getElementById('month-select');
         const now = new Date();
         sel.innerHTML = '';
-        for (let i = 0; i < 12; i++) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const val = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-            const label = d.toLocaleString('default', { month: 'long', year: 'numeric' });
-            sel.innerHTML += `<option value="${val}"${i === 0 ? ' selected' : ''}>${label}</option>`;
+        // From current month back to January 2026
+        let y = now.getFullYear(), m = now.getMonth();
+        while (y > 2026 || (y === 2026 && m >= 0)) {
+            const val = y + '-' + String(m + 1).padStart(2, '0');
+            const label = new Date(y, m, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+            const isCurrent = y === now.getFullYear() && m === now.getMonth();
+            sel.innerHTML += `<option value="${val}"${isCurrent ? ' selected' : ''}>${label}</option>`;
+            m--;
+            if (m < 0) { m = 11; y--; }
         }
     }
 
-    // ── Config (shared via GitHub backend) ─────────────────────────────────────
+    // ── Config (shared via GitHub backend, per-month with inheritance) ────────
+
+    // Migrate legacy flat format → month-keyed format
+    function migrateIfNeeded(obj) {
+        const keys = Object.keys(obj);
+        if (keys.length > 0 && !/^\d{4}-\d{2}$/.test(keys[0])) {
+            const now = new Date();
+            const month = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+            return { [month]: obj };
+        }
+        return obj;
+    }
+
     function loadConfig() {
-        // Load from localStorage as immediate cache; cloud fetch overwrites in onLogin
-        try { clientConfig = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { clientConfig = {}; }
+        try { allMonthConfig = migrateIfNeeded(JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}); } catch(e) { allMonthConfig = {}; }
     }
     function loadStatusData() {
-        try { statusData = JSON.parse(localStorage.getItem(STATUS_KEY)) || {}; } catch(e) { statusData = {}; }
+        try { allMonthStatus = migrateIfNeeded(JSON.parse(localStorage.getItem(STATUS_KEY)) || {}); } catch(e) { allMonthStatus = {}; }
+    }
+
+    // Resolve config for a given month: use explicit data, or inherit from the most recent previous month
+    function resolveMonthConfig(month) {
+        if (allMonthConfig[month]) {
+            clientConfig = JSON.parse(JSON.stringify(allMonthConfig[month]));
+        } else {
+            const prev = Object.keys(allMonthConfig).filter(m => m < month).sort().pop();
+            if (prev) {
+                clientConfig = JSON.parse(JSON.stringify(allMonthConfig[prev]));
+                // Carry forward plan, rate, minHours; default plannedHours to minHours for a new month
+                for (const cfg of Object.values(clientConfig)) {
+                    cfg.plannedHours = cfg.minHours || 0;
+                }
+            } else {
+                clientConfig = {};
+            }
+        }
+        // Enforce plannedHours >= minHours
+        for (const cfg of Object.values(clientConfig)) {
+            if ((cfg.plannedHours || 0) < (cfg.minHours || 0)) {
+                cfg.plannedHours = cfg.minHours;
+            }
+        }
+        statusData = allMonthStatus[month] ? JSON.parse(JSON.stringify(allMonthStatus[month])) : {};
     }
 
     async function loadSharedConfig() {
@@ -390,11 +433,13 @@
             const res = await fetch('/api/get-velocity-config', { headers });
             if (!res.ok) throw new Error('API ' + res.status);
             const data = await res.json();
-            clientConfig = data.config || {};
-            statusData = data.status || {};
-            // Mirror to localStorage for instant next-load
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(clientConfig));
-            localStorage.setItem(STATUS_KEY, JSON.stringify(statusData));
+            allMonthConfig = migrateIfNeeded(data.config || {});
+            allMonthStatus = migrateIfNeeded(data.status || {});
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(allMonthConfig));
+            localStorage.setItem(STATUS_KEY, JSON.stringify(allMonthStatus));
+            // Resolve for currently selected month
+            const month = document.getElementById('month-select').value;
+            resolveMonthConfig(month);
         } catch(e) {
             console.warn('Cloud config load failed, using local cache:', e);
             loadConfig();
@@ -403,11 +448,15 @@
     }
 
     function saveConfigToStorage() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(clientConfig));
+        const month = document.getElementById('month-select').value;
+        allMonthConfig[month] = JSON.parse(JSON.stringify(clientConfig));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(allMonthConfig));
         debouncedCloudSave();
     }
     function saveStatusData() {
-        localStorage.setItem(STATUS_KEY, JSON.stringify(statusData));
+        const month = document.getElementById('month-select').value;
+        allMonthStatus[month] = JSON.parse(JSON.stringify(statusData));
+        localStorage.setItem(STATUS_KEY, JSON.stringify(allMonthStatus));
         debouncedCloudSave();
     }
 
@@ -428,7 +477,7 @@
             const res = await fetch('/api/save-velocity-config', {
                 method: 'POST',
                 headers,
-                body: JSON.stringify({ config: clientConfig, status: statusData })
+                body: JSON.stringify({ config: allMonthConfig, status: allMonthStatus })
             });
             if (!res.ok) throw new Error('Save failed: ' + res.status);
             showSaveIndicator('saved');
@@ -475,6 +524,9 @@
         ind.textContent = 'Loading...';
         ind.className = 'text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase';
 
+        // Resolve config for the selected month (with inheritance from previous months)
+        resolveMonthConfig(month);
+
         try {
             const token = getToken();
             const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
@@ -498,16 +550,19 @@
     // Auto-add new clients from Teamwork that aren't in config yet
     function autoDetectNewClients() {
         if (!apiData) return;
+        let changed = false;
         apiData.projects.forEach(p => {
             if (!clientConfig[p.name]) {
                 clientConfig[p.name] = { plan: '', rate: p.rate, minHours: 0, plannedHours: 0 };
+                changed = true;
             }
             // Always sync rate from Teamwork/rates.json if not overridden
             if (!clientConfig[p.name].rate) {
                 clientConfig[p.name].rate = p.rate;
+                changed = true;
             }
         });
-        saveConfigToStorage();
+        if (changed) saveConfigToStorage();
     }
 
     // ── Render Report ─────────────────────────────────────────────────────────
@@ -845,7 +900,9 @@
             const plan = row.querySelector('.config-plan').value;
             const rate = parseInt(row.querySelector('.config-rate').value) || 155;
             const minHours = parseFloat(row.querySelector('.config-min').value) || 0;
-            const plannedHours = parseFloat(row.querySelector('.config-planned').value) || 0;
+            let plannedHours = parseFloat(row.querySelector('.config-planned').value) || 0;
+            // Enforce plannedHours >= minHours
+            if (plannedHours < minHours) plannedHours = minHours;
             clientConfig[name] = { plan, rate, minHours, plannedHours };
         });
         saveConfigToStorage();
@@ -854,13 +911,15 @@
     }
 
     function resetConfig() {
-        if (!confirm('Reset all client configuration? This cannot be undone.')) return;
-        clientConfig = {};
-        statusData = {};
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(STATUS_KEY);
+        if (!confirm('Reset configuration for this month? This cannot be undone.')) return;
+        const month = document.getElementById('month-select').value;
+        delete allMonthConfig[month];
+        delete allMonthStatus[month];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(allMonthConfig));
+        localStorage.setItem(STATUS_KEY, JSON.stringify(allMonthStatus));
         debouncedCloudSave();
         closeConfigModal();
+        resolveMonthConfig(month);
         if (apiData) { autoDetectNewClients(); render(); }
     }
 

@@ -65,30 +65,47 @@ exports.handler = async function(event, context) {
             return { statusCode: 400, body: JSON.stringify({ error: 'Missing or invalid status object' }) };
         }
 
-        // Validate config entries
+        // Validate month-keyed config: { "2026-01": { "Client": { plan, rate, ... } } }
+        const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
         const BLOCKED_KEYS = ['__proto__', 'constructor', 'prototype'];
-        for (const [key, val] of Object.entries(config)) {
-            if (BLOCKED_KEYS.includes(key)) {
-                return { statusCode: 400, body: JSON.stringify({ error: 'Invalid client name: ' + key }) };
+
+        for (const [month, clients] of Object.entries(config)) {
+            if (!MONTH_RE.test(month)) {
+                return { statusCode: 400, body: JSON.stringify({ error: 'Invalid month key: ' + month }) };
             }
-            if (typeof val !== 'object' || val === null) {
-                return { statusCode: 400, body: JSON.stringify({ error: 'Invalid config for: ' + key }) };
+            if (typeof clients !== 'object' || clients === null) {
+                return { statusCode: 400, body: JSON.stringify({ error: 'Invalid config for month: ' + month }) };
             }
-            // Sanitize values
-            config[key] = {
-                plan: typeof val.plan === 'string' ? val.plan.slice(0, 50) : '',
-                rate: typeof val.rate === 'number' && val.rate >= 1 && val.rate <= 9999 ? Math.round(val.rate) : null,
-                minHours: typeof val.minHours === 'number' && val.minHours >= 0 && val.minHours <= 999 ? val.minHours : 0,
-                plannedHours: typeof val.plannedHours === 'number' && val.plannedHours >= 0 && val.plannedHours <= 9999 ? val.plannedHours : 0
-            };
+            for (const [clientName, val] of Object.entries(clients)) {
+                if (BLOCKED_KEYS.includes(clientName)) {
+                    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid client name: ' + clientName }) };
+                }
+                if (typeof val !== 'object' || val === null) {
+                    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid config for: ' + clientName }) };
+                }
+                clients[clientName] = {
+                    plan: typeof val.plan === 'string' ? val.plan.slice(0, 50) : '',
+                    rate: typeof val.rate === 'number' && val.rate >= 1 && val.rate <= 9999 ? Math.round(val.rate) : null,
+                    minHours: typeof val.minHours === 'number' && val.minHours >= 0 && val.minHours <= 999 ? val.minHours : 0,
+                    plannedHours: typeof val.plannedHours === 'number' && val.plannedHours >= 0 && val.plannedHours <= 9999 ? val.plannedHours : 0
+                };
+            }
         }
 
-        // Validate status entries (string values, max 200 chars)
-        for (const [key, val] of Object.entries(status)) {
-            if (BLOCKED_KEYS.includes(key)) {
-                return { statusCode: 400, body: JSON.stringify({ error: 'Invalid client name: ' + key }) };
+        // Validate month-keyed status: { "2026-01": { "Client": "status text" } }
+        for (const [month, clients] of Object.entries(status)) {
+            if (!MONTH_RE.test(month)) {
+                return { statusCode: 400, body: JSON.stringify({ error: 'Invalid status month key: ' + month }) };
             }
-            status[key] = typeof val === 'string' ? val.slice(0, 200) : '';
+            if (typeof clients !== 'object' || clients === null) {
+                return { statusCode: 400, body: JSON.stringify({ error: 'Invalid status for month: ' + month }) };
+            }
+            for (const [clientName, val] of Object.entries(clients)) {
+                if (BLOCKED_KEYS.includes(clientName)) {
+                    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid client name: ' + clientName }) };
+                }
+                clients[clientName] = typeof val === 'string' ? val.slice(0, 200) : '';
+            }
         }
 
         // 1. Get current file SHA
