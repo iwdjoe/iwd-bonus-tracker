@@ -348,9 +348,15 @@
                 const todayHours = (statsData.meta && statsData.meta.todayBillableHours) || 0;
                 let daysPassed;
                 if (isWeekday && completedDays > 0) {
-                    const priorDaysHours = mBillable - todayHours;
-                    const avgDailyHours = priorDaysHours / completedDays;
-                    const todayFraction = avgDailyHours > 0 ? Math.min(todayHours / avgDailyHours, 1) : 0;
+                    let todayFraction;
+                    if (todayHours > 0) {
+                        const priorDaysHours = mBillable - todayHours;
+                        const avgDailyHours = priorDaysHours / completedDays;
+                        todayFraction = avgDailyHours > 0 ? Math.min(todayHours / avgDailyHours, 1) : 0;
+                    } else {
+                        const hourDecimal = now.getHours() + now.getMinutes() / 60;
+                        todayFraction = Math.max(0, Math.min((hourDecimal - 9) / 8, 1));
+                    }
                     daysPassed = completedDays + todayFraction;
                 } else {
                     daysPassed = Math.max(completedDays, 1);
