@@ -1,4 +1,91 @@
 {
-  "config": {},
+  "config": {
+    "2026-02": {
+      "SchoolFix - Migration to Adobe Live Search": {
+        "plan": "",
+        "rate": 160,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "Inyo Pools - Project Hammerhead MVP": {
+        "plan": "",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "School Fix - Maintenance": {
+        "plan": "",
+        "rate": 165,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "Pryor - SEO Migration Recovery": {
+        "plan": "",
+        "rate": 160,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "PSU Extension - Maintenance": {
+        "plan": "",
+        "rate": 160,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "DMC Tools - Maintenance": {
+        "plan": "",
+        "rate": 140,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "BinMaster - Maintenance": {
+        "plan": "",
+        "rate": 180,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "Purdue - Maintenance": {
+        "plan": "",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "Warner Press - Maintenance": {
+        "plan": "",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "Europa Eyewear - General": {
+        "plan": "",
+        "rate": 150,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "US Camera Pro - Maintenance": {
+        "plan": "",
+        "rate": 165,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "Europa Eyewear - EyeBobs to Bloomingdale’s Integration": {
+        "plan": "",
+        "rate": 150,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "School Fix - Google Pay and Apple Pay to Express Checkout": {
+        "plan": "",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "Europa Eyewear – Image Curation": {
+        "plan": "",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
+      }
+    }
+  },
   "status": {}
 }
