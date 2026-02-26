@@ -78,22 +78,39 @@ function calculateStats(data, timezone) {
     const monthEnd = new Date(year, month + 1, 0);
 
     const totalWorkDays = getWorkDays(monthStart, monthEnd);
-    let currentWorkDay = getWorkDays(monthStart, now);
-    // Use fractional work day (9 AM–5 PM) for smoother projections
-    const hourDecimal = now.getHours() + now.getMinutes() / 60;
-    if (hourDecimal < 17) {
-        const fractionOfDay = Math.max(0, (hourDecimal - 9) / 8);
-        currentWorkDay = Math.max(currentWorkDay - 1 + fractionOfDay, 1);
-    }
-    const daysRemaining = Math.max(totalWorkDays - currentWorkDay, 0);
 
+    // Timezone-neutral projection: use actual hours logged today vs daily average
     const projects = data.projects || [];
     const users = (data.users || []).filter(u => u.name && u.name.trim() !== '');
     const globalRate = (data.meta && data.meta.globalRate) || 155;
+    const todayHours = (data.meta && data.meta.todayBillableHours) || 0;
 
     const currentRevenue = projects.reduce((sum, p) => sum + (p.hours * p.rate), 0);
-    const projectedRevenue = currentWorkDay > 0 ? (currentRevenue / currentWorkDay) * totalWorkDays : 0;
     const totalBillableHours = projects.reduce((sum, p) => sum + p.hours, 0);
+
+    const isWeekday = (now.getDay() !== 0 && now.getDay() !== 6);
+    const yesterday = new Date(year, month, now.getDate() - 1);
+    const completedDays = getWorkDays(monthStart, yesterday);
+    let currentWorkDay;
+
+    if (isWeekday && completedDays > 0) {
+        let todayFraction;
+        if (todayHours > 0) {
+            const priorDaysHours = totalBillableHours - todayHours;
+            const avgDailyHours = priorDaysHours / completedDays;
+            todayFraction = avgDailyHours > 0 ? Math.min(todayHours / avgDailyHours, 1) : 0;
+        } else {
+            // Fallback: use time-of-day when no hours logged yet today
+            const hourDecimal = now.getHours() + now.getMinutes() / 60;
+            todayFraction = Math.max(0, Math.min((hourDecimal - 9) / 8, 1));
+        }
+        currentWorkDay = completedDays + todayFraction;
+    } else {
+        currentWorkDay = Math.max(completedDays, 1);
+    }
+
+    const daysRemaining = Math.max(totalWorkDays - currentWorkDay, 0);
+    const projectedRevenue = currentWorkDay > 0 ? (currentRevenue / currentWorkDay) * totalWorkDays : 0;
 
     // Contractors excluded from leaderboard/bonus payouts
     const bonusEligible = users.filter(u => !u.contractor);
@@ -254,6 +271,10 @@ async function fetchDashboardData() {
     let users = Object.create(null);
     let projects = Object.create(null);
 
+    // Track today's billable hours for timezone-neutral projections
+    const todayStr = endDate; // endDate is already today in YYYYMMDD format
+    let todayBillableHours = 0;
+
     entries.forEach(e => {
         if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
         if (e['isbillable'] !== '1') return;
@@ -261,6 +282,10 @@ async function fetchDashboardData() {
         const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
         const user = e['person-first-name'] + ' ' + e['person-last-name'];
         const project = e['project-name'];
+
+        if (e.date === todayStr) {
+            todayBillableHours += hours;
+        }
 
         if (!users[user]) users[user] = { hours: 0, contractor: false };
         users[user].hours += hours;
@@ -280,7 +305,7 @@ async function fetchDashboardData() {
     return {
         users: userList,
         projects: projectList,
-        meta: { globalRate: GLOBAL_RATE }
+        meta: { globalRate: GLOBAL_RATE, todayBillableHours }
     };
 }
 

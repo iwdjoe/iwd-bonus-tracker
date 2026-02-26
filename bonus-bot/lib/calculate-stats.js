@@ -56,32 +56,42 @@ function calculateStats(data, timezone) {
     const monthEnd = new Date(year, month + 1, 0);
 
     const totalWorkDays = getWorkDays(monthStart, monthEnd);
-    let currentWorkDay = getWorkDays(monthStart, now);
 
-    // Match frontend logic: use fractional work day (9 AM–5 PM) for smoother projections
-    const hourDecimal = now.getHours() + now.getMinutes() / 60;
-    if (hourDecimal < 17) {
-        const fractionOfDay = Math.max(0, (hourDecimal - 9) / 8);
-        currentWorkDay = Math.max(currentWorkDay - 1 + fractionOfDay, 1);
+    // Timezone-neutral projection: use actual hours logged today vs daily average
+    const projects = data.projects || [];
+    const users = (data.users || []).filter(u => u.name && u.name.trim() !== '');
+    const globalRate = (data.meta && data.meta.globalRate) || 155;
+    const todayHours = (data.meta && data.meta.todayBillableHours) || 0;
+
+    const currentRevenue = projects.reduce((sum, p) => sum + (p.hours * p.rate), 0);
+    const totalBillableHours = projects.reduce((sum, p) => sum + p.hours, 0);
+
+    const isWeekday = (now.getDay() !== 0 && now.getDay() !== 6);
+    const yesterday = new Date(year, month, now.getDate() - 1);
+    const completedDays = getWorkDays(monthStart, yesterday);
+    let currentWorkDay;
+
+    if (isWeekday && completedDays > 0) {
+        let todayFraction;
+        if (todayHours > 0) {
+            const priorDaysHours = totalBillableHours - todayHours;
+            const avgDailyHours = priorDaysHours / completedDays;
+            todayFraction = avgDailyHours > 0 ? Math.min(todayHours / avgDailyHours, 1) : 0;
+        } else {
+            // Fallback: use time-of-day when no hours logged yet today
+            const hourDecimal = now.getHours() + now.getMinutes() / 60;
+            todayFraction = Math.max(0, Math.min((hourDecimal - 9) / 8, 1));
+        }
+        currentWorkDay = completedDays + todayFraction;
+    } else {
+        currentWorkDay = Math.max(completedDays, 1);
     }
 
     const daysRemaining = Math.max(totalWorkDays - currentWorkDay, 0);
 
-    const projects = data.projects || [];
-    const users = (data.users || []).filter(u => u.name && u.name.trim() !== '');
-    const globalRate = (data.meta && data.meta.globalRate) || 155;
-
-    // Revenue = sum(hours * rate) for each billable project
-    // The API already filters for billable-only, non-internal projects
-    const currentRevenue = projects.reduce((sum, p) => sum + (p.hours * p.rate), 0);
-
-    // Projected revenue = extrapolate current pace across the full month
     const projectedRevenue = currentWorkDay > 0
         ? (currentRevenue / currentWorkDay) * totalWorkDays
         : 0;
-
-    // Total billable hours (from projects, not users — users include all hours)
-    const totalBillableHours = projects.reduce((sum, p) => sum + p.hours, 0);
 
     // Team leaderboard sorted by hours, with share percentages
     // Contractors are excluded from bonus payout calculations

@@ -122,6 +122,10 @@ exports.handler = async function(event, context) {
         let users = Object.create(null);
         let projects = Object.create(null);
 
+        // Track today's billable hours separately for timezone-neutral projections
+        const todayStr = isCurrentMonth ? now.toISOString().split('T')[0].replace(/-/g, '') : '';
+        let todayBillableHours = 0;
+
         entries.forEach(e => {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
             if (e['isbillable'] !== '1') return;
@@ -129,6 +133,10 @@ exports.handler = async function(event, context) {
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
             const project = e['project-name'];
+
+            if (isCurrentMonth && e.date === todayStr) {
+                todayBillableHours += hours;
+            }
 
             if (!users[user]) users[user] = { hours: 0, contractor: false };
             users[user].hours += hours;
@@ -153,7 +161,8 @@ exports.handler = async function(event, context) {
                 globalRate: GLOBAL_RATE,
                 cached: false,
                 month: `${year}-${String(month + 1).padStart(2, '0')}`,
-                isCurrentMonth
+                isCurrentMonth,
+                todayBillableHours: isCurrentMonth ? todayBillableHours : 0
             }
         };
 

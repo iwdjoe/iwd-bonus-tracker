@@ -55,6 +55,14 @@
 
         th.sortable { cursor: pointer; user-select: none; transition: color 0.2s; }
         th.sortable:hover { color: #3b82f6; background-color: rgba(59, 130, 246, 0.05); }
+
+        /* Hide all Netlify Identity widget injected UI (login bar, signup bar, notifications) */
+        .netlify-identity-alert,
+        .netlify-identity-button,
+        .netlify-identity-signup,
+        .netlify-identity-widget-init,
+        div[data-netlify-identity-menu],
+        div[data-netlify-identity-button] { display: none !important; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 transition-colors duration-300">
@@ -307,21 +315,34 @@
             }
         }
 
-        // HACK: Monitor DOM for Netlify Widget and inject Styles/Behavior
+        // HACK: Monitor DOM for Netlify Widget — inject styles into login modal
+        // and remove any widget-injected bars/banners from the page body
+        const KNOWN_IDS = ['login-screen', 'dashboard-content', 'slack-modal'];
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
-                if (mutation.addedNodes.length) {
-                    const iframe = document.querySelector('#netlify-identity-widget');
-                    if (iframe) {
-                        const style = document.createElement('style');
-                        style.textContent = `
-                            .formGroup, .btn.btn-primary, .signup-login-toggle, .hr, .providers-header, .netlify-identity-modal-footer { display: none !important; }
-                            .btn-provider { width: 100% !important; border-radius: 9999px !important; padding: 12px !important; }
-                        `;
-                        try {
-                            iframe.contentDocument.head.appendChild(style);
-                        } catch(e) {} // Cross-origin block might prevent this
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType !== 1) return;
+                    // Remove any widget-injected divs added to body (but not the login modal iframe)
+                    if (node.tagName === 'DIV' && node.parentElement === document.body &&
+                        !KNOWN_IDS.includes(node.id) && !node.querySelector('iframe')) {
+                        node.remove();
+                        return;
                     }
+                });
+                // Style the login modal iframe
+                const iframe = document.querySelector('#netlify-identity-widget');
+                if (iframe) {
+                    try {
+                        if (!iframe.contentDocument.querySelector('#iwd-custom-styles')) {
+                            const style = document.createElement('style');
+                            style.id = 'iwd-custom-styles';
+                            style.textContent = `
+                                .formGroup, .btn.btn-primary, .signup-login-toggle, .hr, .providers-header, .netlify-identity-modal-footer { display: none !important; }
+                                .btn-provider { width: 100% !important; border-radius: 9999px !important; padding: 12px !important; }
+                            `;
+                            iframe.contentDocument.head.appendChild(style);
+                        }
+                    } catch(e) {} // Cross-origin block might prevent this
                 }
             });
         });
@@ -408,6 +429,7 @@
             state.projects = (data.projects || []);
             state.users = (data.users || []).filter(u => u.name && u.name.trim() !== "");
             state.isCurrentMonth = (data.meta && data.meta.isCurrentMonth !== undefined) ? data.meta.isCurrentMonth : true;
+            state.todayBillableHours = (data.meta && data.meta.todayBillableHours) || 0;
 
             // Fix: Add safe fallback for globalRate (it was crashing here)
             const globalRate = (data.meta && data.meta.globalRate) ? data.meta.globalRate : 155;
@@ -495,13 +517,28 @@
             let daysPassed, totalMonthWorkDays, daysLeft;
 
             if (state.isCurrentMonth) {
-                daysPassed = getWorkDays(start, now);
                 totalMonthWorkDays = getWorkDays(start, end);
-                // ADJUSTMENT: Use fractional work day (9 AM–5 PM) for smoother projections
-                const hourDecimal = now.getHours() + now.getMinutes() / 60;
-                if (hourDecimal < 17) {
-                    const fractionOfDay = Math.max(0, (hourDecimal - 9) / 8);
-                    daysPassed = Math.max(daysPassed - 1 + fractionOfDay, 1);
+                // Timezone-neutral projection: use actual hours logged today vs daily average
+                const isWeekday = (now.getDay() !== 0 && now.getDay() !== 6);
+                const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                const completedDays = getWorkDays(start, yesterday);
+                const totalHoursEarly = state.projects.reduce((s, p) => s + p.hours, 0);
+                const todayHours = state.todayBillableHours || 0;
+
+                if (isWeekday && completedDays > 0) {
+                    let todayFraction;
+                    if (todayHours > 0) {
+                        const priorDaysHours = totalHoursEarly - todayHours;
+                        const avgDailyHours = priorDaysHours / completedDays;
+                        todayFraction = avgDailyHours > 0 ? Math.min(todayHours / avgDailyHours, 1) : 0;
+                    } else {
+                        // Fallback: use time-of-day when no hours logged yet today
+                        const hourDecimal = now.getHours() + now.getMinutes() / 60;
+                        todayFraction = Math.max(0, Math.min((hourDecimal - 9) / 8, 1));
+                    }
+                    daysPassed = completedDays + todayFraction;
+                } else {
+                    daysPassed = Math.max(completedDays, 1);
                 }
                 daysLeft = totalMonthWorkDays - daysPassed;
             } else {
