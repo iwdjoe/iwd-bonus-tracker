@@ -130,70 +130,6 @@
         document.getElementById('userMenu').classList.add('hidden');
     });
 
-    document.getElementById('btnDbSettings').addEventListener('click', function () {
-        document.getElementById('userMenu').classList.add('hidden');
-        openDBSettings();
-    });
-
-    // ---- DB Settings ----
-    function openDBSettings() {
-        var config = DB.getConfig();
-        document.getElementById('dbUrl').value = config ? config.url : '';
-        document.getElementById('dbKey').value = config ? config.key : '';
-        document.getElementById('dbTestResult').classList.add('hidden');
-        document.getElementById('dbDisconnectBtn').classList.toggle('hidden', DB.getMode() !== 'supabase');
-        openModal('modalDB');
-    }
-
-    document.getElementById('dbBannerSetup') && document.getElementById('dbBannerSetup').addEventListener('click', openDBSettings);
-
-    document.getElementById('dbTestBtn').addEventListener('click', async function () {
-        var url = document.getElementById('dbUrl').value.trim();
-        var key = document.getElementById('dbKey').value.trim();
-        if (!url || !key) { toast('Enter both URL and key', 'warning'); return; }
-        var res = document.getElementById('dbTestResult');
-        res.classList.remove('hidden', 'bg-emerald-50', 'dark:bg-emerald-900/20', 'text-emerald-700', 'dark:text-emerald-400', 'bg-red-50', 'dark:bg-red-900/20', 'text-red-700', 'dark:text-red-400');
-        res.textContent = 'Testing...';
-        res.classList.add('bg-surface-50', 'dark:bg-surface-900', 'text-surface-600');
-        var result = await DB.testConnection(url, key);
-        res.classList.remove('bg-surface-50', 'dark:bg-surface-900', 'text-surface-600');
-        if (result.ok) {
-            res.textContent = result.message;
-            res.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20', 'text-emerald-700', 'dark:text-emerald-400');
-        } else {
-            res.textContent = result.message;
-            res.classList.add('bg-red-50', 'dark:bg-red-900/20', 'text-red-700', 'dark:text-red-400');
-        }
-    });
-
-    document.getElementById('dbSaveBtn').addEventListener('click', async function () {
-        var url = document.getElementById('dbUrl').value.trim();
-        var key = document.getElementById('dbKey').value.trim();
-        if (!url || !key) { toast('Enter both URL and key', 'warning'); return; }
-        var result = await DB.connect(url, key);
-        if (result.ok) {
-            toast('Database connected!', 'success');
-            closeAllModals();
-            updateDBBanner();
-            expenses = await DB.loadAll();
-            monthlyBudget = await DB.getBudget();
-            render();
-        } else {
-            toast('Connection failed: ' + result.message, 'error');
-        }
-    });
-
-    document.getElementById('dbDisconnectBtn').addEventListener('click', function () {
-        DB.clearConfig();
-        toast('Disconnected — using local storage', 'info');
-        closeAllModals();
-        updateDBBanner();
-    });
-
-    function updateDBBanner() {
-        var banner = document.getElementById('dbBanner');
-        banner.classList.toggle('hidden', DB.getMode() === 'supabase');
-    }
 
     // ---- Modal helpers ----
     function openModal(id) {
@@ -1022,7 +958,6 @@
     // ---- Init App ----
     async function initApp() {
         DB.init();
-        updateDBBanner();
         expenses = await DB.loadAll();
         monthlyBudget = await DB.getBudget();
         seedSample();

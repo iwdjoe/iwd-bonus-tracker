@@ -95,7 +95,7 @@ tbody tr { transition: background-color 0.15s ease; }
 
 /* Print */
 @media print {
-    header, .tab-btn, button, #paginationControls, .action-btn, #dbBanner,
+    header, .tab-btn, button, #paginationControls, .action-btn,
     .inline-owner-select, #loginScreen { display: none !important; }
     body { background: white !important; color: black !important; }
     .shadow-sm, .shadow-lg, .shadow-xl, .shadow-2xl { box-shadow: none !important; }

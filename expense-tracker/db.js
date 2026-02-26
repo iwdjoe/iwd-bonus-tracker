@@ -1,75 +1,31 @@
 // ============================================================
 // IWD Expense Tracker — Database Abstraction Layer
-// Supports: Supabase (cloud) or localStorage (fallback)
+// Connects to Supabase with localStorage as fallback/cache
 // ============================================================
 var DB = (function () {
     'use strict';
 
+    var SUPABASE_URL = 'https://ynrpkvhroaeiomxuksyw.supabase.co';
+    var SUPABASE_KEY = 'sb_publishable_mtUWtxgIIhWN0kQc2xZbMQ_EStR6jkG';
+
     var STORAGE_KEY = 'iwd_expenses';
     var BUDGET_KEY = 'iwd_monthly_budget';
-    var DB_CONFIG_KEY = 'iwd_db_config';
     var supabase = null;
     var mode = 'local'; // 'local' or 'supabase'
 
     // ---- Init ----
     function init() {
-        var config = getConfig();
-        if (config && config.url && config.key) {
-            try {
-                supabase = window.supabase.createClient(config.url, config.key);
-                mode = 'supabase';
-            } catch (e) {
-                console.warn('Supabase init failed, falling back to local:', e);
-                mode = 'local';
-            }
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            mode = 'supabase';
+        } catch (e) {
+            console.warn('Supabase init failed, falling back to local:', e);
+            mode = 'local';
         }
         return mode;
     }
 
-    function getConfig() {
-        try { return JSON.parse(localStorage.getItem(DB_CONFIG_KEY)); }
-        catch (e) { return null; }
-    }
-
-    function saveConfig(url, key) {
-        localStorage.setItem(DB_CONFIG_KEY, JSON.stringify({ url: url, key: key }));
-    }
-
-    function clearConfig() {
-        localStorage.removeItem(DB_CONFIG_KEY);
-        supabase = null;
-        mode = 'local';
-    }
-
     function getMode() { return mode; }
-
-    // ---- Test connection ----
-    async function testConnection(url, key) {
-        try {
-            var client = window.supabase.createClient(url, key);
-            var result = await client.from('expenses').select('id', { count: 'exact', head: true });
-            if (result.error) throw new Error(result.error.message);
-            return { ok: true, message: 'Connected! Found expenses table.' };
-        } catch (e) {
-            return { ok: false, message: e.message || 'Connection failed' };
-        }
-    }
-
-    // ---- Connect ----
-    async function connect(url, key) {
-        var test = await testConnection(url, key);
-        if (!test.ok) return test;
-        saveConfig(url, key);
-        supabase = window.supabase.createClient(url, key);
-        mode = 'supabase';
-
-        // Migrate local data to cloud if any
-        var localData = loadLocal();
-        if (localData.length > 0) {
-            await supabase.from('expenses').upsert(localData, { onConflict: 'id' });
-        }
-        return { ok: true, message: 'Connected and synced!' };
-    }
 
     // ---- Local storage helpers ----
     function loadLocal() {
@@ -166,10 +122,6 @@ var DB = (function () {
     return {
         init: init,
         getMode: getMode,
-        getConfig: getConfig,
-        testConnection: testConnection,
-        connect: connect,
-        clearConfig: clearConfig,
         loadAll: loadAll,
         saveExpense: saveExpense,
         saveBulk: saveBulk,
