@@ -18,10 +18,20 @@ function isRateLimited(ip, limit = 30, windowMs = 60000) {
 
 exports.handler = async function(event, context) {
     // ── Authentication ────────────────────────────────────────────────────────
-    // Netlify Identity decodes the Bearer JWT and exposes it via clientContext
-    // when the request includes an Authorization header. We rely on that rather
-    // than re-verifying the token ourselves.
-    const user = context.clientContext && context.clientContext.user;
+    // Prefer Netlify Identity's clientContext (auto-decoded JWT). If unavailable
+    // (e.g. Identity middleware not populating context), fall back to manually
+    // decoding the JWT from the Authorization header.
+    let user = context.clientContext && context.clientContext.user;
+
+    if (!user) {
+        const authHeader = event.headers && (event.headers.authorization || event.headers.Authorization);
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            try {
+                const payload = authHeader.substring(7).split('.')[1];
+                user = JSON.parse(Buffer.from(payload, 'base64').toString());
+            } catch (_) { /* malformed token */ }
+        }
+    }
 
     if (!user) {
         return {
