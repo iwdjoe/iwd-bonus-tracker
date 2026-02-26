@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocity & Unblocker Report — IWD Agency</title>
+    <link rel="icon" type="image/png" href="iwd-logo-new.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { astro: { 900: '#0b0f19', 800: '#111827' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .netlify-identity-alert, .netlify-identity-button, .netlify-identity-signup,
+        .netlify-identity-widget-init, div[data-netlify-identity-menu],
+        div[data-netlify-identity-button] { display: none !important; }
+
+        /* Custom scrollbar */
+        .table-wrap::-webkit-scrollbar { height: 8px; }
+        .table-wrap::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .table-wrap::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        .dark .table-wrap::-webkit-scrollbar-track { background: #1e293b; }
+        .dark .table-wrap::-webkit-scrollbar-thumb { background: #475569; }
+
+        /* Status cell editing */
+        .status-cell { min-width: 140px; cursor: text; }
+        .status-cell:hover { outline: 2px solid #6366f1; outline-offset: -2px; border-radius: 4px; }
+        .status-cell:focus { outline: 2px solid #6366f1; outline-offset: -2px; border-radius: 4px; background: #eef2ff; }
+        .dark .status-cell:focus { background: #312e81; }
+
+        /* Plan badge colors */
+        .plan-core { background: #dbeafe; color: #1e40af; }
+        .plan-growth { background: #dcfce7; color: #166534; }
+        .plan-support { background: #fef3c7; color: #92400e; }
+        .plan-light { background: #f3e8ff; color: #6b21a8; }
+        .dark .plan-core { background: #1e3a5f; color: #93c5fd; }
+        .dark .plan-growth { background: #14532d; color: #86efac; }
+        .dark .plan-support { background: #451a03; color: #fcd34d; }
+        .dark .plan-light { background: #3b0764; color: #d8b4fe; }
+
+        /* Sticky columns */
+        .sticky-plan { position: sticky; left: 0; z-index: 10; }
+        .sticky-client { position: sticky; left: 90px; z-index: 10; }
+
+        /* Row hover */
+        tbody tr:hover td { background-color: #f8fafc !important; }
+        .dark tbody tr:hover td { background-color: #1e293b !important; }
+
+        /* Config modal */
+        .config-input {
+            width: 100%; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 6px;
+            font-size: 13px; background: white; transition: border-color 0.2s;
+        }
+        .config-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+        .dark .config-input { background: #1e293b; border-color: #475569; color: #e2e8f0; }
+        .dark .config-input:focus { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(129,140,248,0.15); }
+
+        /* Print styles */
+        @media print {
+            body { padding: 0; background: white !important; color: black !important; }
+            #login-screen, #global-nav, .no-print { display: none !important; }
+            .table-wrap { overflow: visible; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-6 transition-colors duration-300">
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="fixed inset-0 bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center z-50">
+        <img src="iwd-logo-new.png" class="w-24 h-auto mb-6" alt="IWD Agency">
+        <h1 class="text-2xl font-bold mb-2">Velocity & Unblocker Report</h1>
+        <p class="text-gray-500 mb-8 text-sm">Internal Access Only</p>
+        <button onclick="netlifyIdentity.open('login')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition shadow-md flex items-center gap-2 transform hover:scale-105">
+            Login with Google
+        </button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="dashboard-content" class="max-w-[1600px] mx-auto hidden">
+
+        <!-- HEADER -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <div class="flex items-center gap-3">
+                    <img src="iwd-logo-new.png" class="w-8 h-8 object-contain" alt="IWD">
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">Velocity & Unblocker Report</h1>
+                    <span id="live-indicator" class="text-[10px] font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full dark:bg-indigo-900 dark:text-indigo-300 uppercase">Loading...</span>
+                    <div id="global-nav" class="relative ml-2"></div>
+                </div>
+                <div class="flex items-center gap-2 mt-1 ml-1 text-xs text-gray-400">
+                    <span id="last-updated">Waiting for data...</span>
+                    <button onclick="loadData(true)" class="hover:text-indigo-500 transition" title="Refresh">
+                        <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 no-print">
+                <select id="month-select" onchange="loadData()" class="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500">
+                </select>
+                <button onclick="openConfigModal()" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition flex items-center gap-2 shadow-sm">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Configure Clients
+                </button>
+                <button onclick="exportCSV()" class="text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Export
+                </button>
+            </div>
+        </div>
+
+        <!-- SUMMARY CARDS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-6">
+            <div class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Planned</div>
+                <div id="card-planned" class="text-lg font-bold text-gray-900 dark:text-white">—</div>
+            </div>
+            <div class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Real Forecast</div>
+                <div id="card-forecast" class="text-lg font-bold text-gray-900 dark:text-white">—</div>
+            </div>
+            <div class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Hours Expected</div>
+                <div id="card-hours-expected" class="text-lg font-bold text-gray-900 dark:text-white">—</div>
+            </div>
+            <div class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Hrs/Week Expected</div>
+                <div id="card-hours-week" class="text-lg font-bold text-gray-900 dark:text-white">—</div>
+            </div>
+            <div class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Hours Used</div>
+                <div id="card-hours-used" class="text-lg font-bold text-gray-900 dark:text-white">—</div>
+                <div id="card-hours-pct" class="text-[10px] font-medium text-gray-400 mt-0.5">—</div>
+            </div>
+            <div class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Month Elapsed</div>
+                <div id="card-elapsed" class="text-lg font-bold text-gray-900 dark:text-white">—</div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-2">
+                    <div id="elapsed-bar" class="bg-indigo-500 h-1.5 rounded-full transition-all" style="width:0%"></div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Pace Variance</div>
+                <div id="card-pace" class="text-lg font-bold">—</div>
+                <div class="text-[9px] text-gray-400 mt-0.5">Goal: -5% to 0%</div>
+            </div>
+            <div class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Revenue on Table</div>
+                <div id="card-revenue-table" class="text-lg font-bold">—</div>
+            </div>
+        </div>
+
+        <!-- RECOVERY PRIORITIES -->
+        <div id="recovery-section" class="mb-6 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-950/30 dark:to-orange-950/30 border border-red-200 dark:border-red-900/50 rounded-xl p-4 hidden">
+            <div class="flex items-center gap-2 mb-3">
+                <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                <h3 class="text-sm font-bold text-red-800 dark:text-red-300">Revenue Recovery Priorities</h3>
+            </div>
+            <div id="recovery-list" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- MAIN TABLE -->
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden mb-6">
+            <div class="table-wrap overflow-x-auto">
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="bg-gray-50 dark:bg-gray-800/80">
+                            <th colspan="5" class="px-3 py-2 text-left text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800"></th>
+                            <th colspan="3" class="px-3 py-2 text-center text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-950/30">Planned</th>
+                            <th colspan="3" class="px-3 py-2 text-center text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-teal-50 dark:bg-teal-950/30">To Date</th>
+                            <th colspan="3" class="px-3 py-2 text-center text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-orange-50 dark:bg-orange-950/30">Forecast</th>
+                            <th colspan="2" class="px-3 py-2 text-center text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 bg-purple-50 dark:bg-purple-950/30">Performance</th>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            <th class="px-3 py-2.5 text-left sticky-plan bg-gray-50 dark:bg-gray-800/50">Plan</th>
+                            <th class="px-3 py-2.5 text-left sticky-client bg-gray-50 dark:bg-gray-800/50">Client</th>
+                            <th class="px-3 py-2.5 text-right">Weight</th>
+                            <th class="px-3 py-2.5 text-right">Rate</th>
+                            <th class="px-3 py-2.5 text-right">Min Hrs</th>
+
+                            <th class="px-3 py-2.5 text-right bg-blue-50/50 dark:bg-blue-950/20">Hours</th>
+                            <th class="px-3 py-2.5 text-right bg-blue-50/50 dark:bg-blue-950/20">Revenue</th>
+                            <th class="px-3 py-2.5 text-right bg-blue-50/50 dark:bg-blue-950/20">Avg/Wk</th>
+
+                            <th class="px-3 py-2.5 text-right bg-teal-50/50 dark:bg-teal-950/20">Used</th>
+                            <th class="px-3 py-2.5 text-right bg-teal-50/50 dark:bg-teal-950/20">Revenue</th>
+                            <th class="px-3 py-2.5 text-right bg-teal-50/50 dark:bg-teal-950/20">% Used</th>
+
+                            <th class="px-3 py-2.5 text-right bg-orange-50/50 dark:bg-orange-950/20">Hours</th>
+                            <th class="px-3 py-2.5 text-right bg-orange-50/50 dark:bg-orange-950/20">Revenue</th>
+                            <th class="px-3 py-2.5 text-right bg-orange-50/50 dark:bg-orange-950/20">EOM Gap</th>
+
+                            <th class="px-3 py-2.5 text-center bg-purple-50/50 dark:bg-purple-950/20">SPI</th>
+                            <th class="px-3 py-2.5 text-left bg-purple-50/50 dark:bg-purple-950/20">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="velocity-table-body">
+                        <tr><td colspan="16" class="px-6 py-12 text-center text-gray-400">Loading data...</td></tr>
+                    </tbody>
+                    <tfoot id="velocity-table-foot" class="border-t-2 border-gray-300 dark:border-gray-600 font-bold bg-gray-50 dark:bg-gray-800/50">
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- LEGEND -->
+        <div class="flex flex-wrap gap-4 text-[10px] text-gray-400 mb-4 no-print">
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-700"></span> Planned</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-teal-100 dark:bg-teal-900 border border-teal-300 dark:border-teal-700"></span> To Date</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-orange-100 dark:bg-orange-900 border border-orange-300 dark:border-orange-700"></span> Forecast</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full" style="background:#22c55e"></span> SPI &ge; 0.95</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full" style="background:#eab308"></span> SPI 0.80 – 0.95</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full" style="background:#ef4444"></span> SPI &lt; 0.80</div>
+            <div class="ml-auto">Click any <strong>Status</strong> cell to edit</div>
+        </div>
+    </div>
+
+    <!-- CONFIG MODAL -->
+    <div id="config-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Client Configuration</h2>
+                    <p class="text-xs text-gray-400 mt-0.5">Set plan types, planned hours, minimums, and rates for each client</p>
+                </div>
+                <button onclick="closeConfigModal()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="overflow-y-auto flex-1 p-5">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
+                            <th class="pb-2 text-left">Client</th>
+                            <th class="pb-2 text-left">Plan</th>
+                            <th class="pb-2 text-right">Rate ($)</th>
+                            <th class="pb-2 text-right">Min Hours</th>
+                            <th class="pb-2 text-right">Planned Hours</th>
+                            <th class="pb-2 text-center w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="config-table-body"></tbody>
+                </table>
+                <button onclick="addConfigRow()" class="mt-4 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 font-medium transition">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Add Client Manually
+                </button>
+            </div>
+            <div class="p-5 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <span class="text-xs text-gray-400">Changes are saved to your browser</span>
+                <div class="flex gap-3">
+                    <button onclick="resetConfig()" class="text-sm text-red-500 hover:text-red-700 px-4 py-2 rounded-lg transition">Reset All</button>
+                    <button onclick="saveConfig()" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition shadow-sm font-medium">Save & Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="nav.js"></script>
+    <script>
+    // ── Global State ──────────────────────────────────────────────────────────
+    let apiData = null;
+    let clientConfig = {};
+    let statusData = {};
+
+    const PLAN_TYPES = ['Core', 'Growth', 'Support', 'Light Touch'];
+    const PLAN_ORDER = { 'Core': 0, 'Growth': 1, 'Support': 2, 'Light Touch': 3, '': 4 };
+    const STORAGE_KEY = 'iwd-velocity-config';
+    const STATUS_KEY = 'iwd-velocity-status';
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function fmt$(n) { return '$' + Math.round(n).toLocaleString(); }
+    function fmtPct(n) { return (n * 100).toFixed(1) + '%'; }
+    function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    function getToken() {
+        const u = netlifyIdentity.currentUser();
+        return u && u.token ? u.token.access_token : null;
+    }
+
+    // ── Theme ─────────────────────────────────────────────────────────────────
+    function toggleTheme() {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    }
+
+    // ── Auth ──────────────────────────────────────────────────────────────────
+    netlifyIdentity.on('init', user => { if (user) onLogin(); });
+    netlifyIdentity.on('login', () => { onLogin(); netlifyIdentity.close(); });
+    netlifyIdentity.on('logout', () => location.reload());
+
+    function onLogin() {
+        const user = netlifyIdentity.currentUser();
+        if (!user || !user.email.endsWith('@iwdagency.com')) {
+            netlifyIdentity.logout();
+            return;
+        }
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('dashboard-content').classList.remove('hidden');
+        loadConfig();
+        loadStatusData();
+        populateMonthSelector();
+        loadData();
+    }
+
+    // ── Month Selector ────────────────────────────────────────────────────────
+    function populateMonthSelector() {
+        const sel = document.getElementById('month-select');
+        const now = new Date();
+        sel.innerHTML = '';
+        for (let i = 0; i < 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const val = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+            const label = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+            sel.innerHTML += `<option value="${val}"${i === 0 ? ' selected' : ''}>${label}</option>`;
+        }
+    }
+
+    // ── Config (localStorage) ─────────────────────────────────────────────────
+    function loadConfig() {
+        try { clientConfig = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { clientConfig = {}; }
+    }
+    function saveConfigToStorage() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(clientConfig));
+    }
+    function loadStatusData() {
+        try { statusData = JSON.parse(localStorage.getItem(STATUS_KEY)) || {}; } catch(e) { statusData = {}; }
+    }
+    function saveStatusData() {
+        localStorage.setItem(STATUS_KEY, JSON.stringify(statusData));
+    }
+
+    function getClientConfig(projectName) {
+        return clientConfig[projectName] || { plan: '', rate: null, minHours: 0, plannedHours: 0 };
+    }
+
+    // ── Fetch Data ────────────────────────────────────────────────────────────
+    async function loadData(force) {
+        const month = document.getElementById('month-select').value;
+        const ind = document.getElementById('live-indicator');
+        ind.textContent = 'Loading...';
+        ind.className = 'text-[10px] font-bold bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300 uppercase';
+
+        try {
+            const token = getToken();
+            const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+            const res = await fetch(`/api/get-velocity?month=${month}`, { headers });
+            if (!res.ok) throw new Error('API error ' + res.status);
+            apiData = await res.json();
+
+            ind.textContent = 'Live';
+            ind.className = 'text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase';
+            document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+
+            autoDetectNewClients();
+            render();
+        } catch(e) {
+            console.error(e);
+            ind.textContent = 'Error';
+            ind.className = 'text-[10px] font-bold bg-red-100 text-red-800 px-2 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300 uppercase';
+        }
+    }
+
+    // Auto-add new clients from Teamwork that aren't in config yet
+    function autoDetectNewClients() {
+        if (!apiData) return;
+        apiData.projects.forEach(p => {
+            if (!clientConfig[p.name]) {
+                clientConfig[p.name] = { plan: '', rate: p.rate, minHours: 0, plannedHours: 0 };
+            }
+            // Always sync rate from Teamwork/rates.json if not overridden
+            if (!clientConfig[p.name].rate) {
+                clientConfig[p.name].rate = p.rate;
+            }
+        });
+        saveConfigToStorage();
+    }
+
+    // ── Render Report ─────────────────────────────────────────────────────────
+    function render() {
+        if (!apiData) return;
+        const meta = apiData.meta;
+
+        // Build rows with calculations
+        const rows = buildRows();
+
+        // Totals
+        const totals = {
+            plannedHours: 0, plannedRevenue: 0,
+            usedHours: 0, revenueToDate: 0,
+            forecastHours: 0, forecastRevenue: 0
+        };
+        rows.forEach(r => {
+            totals.plannedHours += r.plannedHours;
+            totals.plannedRevenue += r.plannedRevenue;
+            totals.usedHours += r.usedHours;
+            totals.revenueToDate += r.revenueToDate;
+            totals.forecastHours += r.forecastHours;
+            totals.forecastRevenue += r.forecastRevenue;
+        });
+
+        const revenueOnTable = totals.forecastRevenue - totals.plannedRevenue;
+        const hoursExpectedPerWeek = meta.weeksInMonth > 0 ? totals.plannedHours / meta.weeksInMonth : 0;
+        const pctUsed = totals.plannedHours > 0 ? totals.usedHours / totals.plannedHours : 0;
+        const expectedUsed = totals.plannedHours * meta.monthElapsed;
+        const paceVariance = expectedUsed > 0 ? (totals.usedHours - expectedUsed) / expectedUsed : 0;
+
+        // Update cards
+        document.getElementById('card-planned').textContent = fmt$(totals.plannedRevenue);
+        document.getElementById('card-forecast').textContent = fmt$(totals.forecastRevenue);
+        document.getElementById('card-forecast').className = 'text-lg font-bold ' + (totals.forecastRevenue >= totals.plannedRevenue ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400');
+        document.getElementById('card-hours-expected').textContent = Math.round(totals.plannedHours).toLocaleString();
+        document.getElementById('card-hours-week').textContent = Math.round(hoursExpectedPerWeek).toLocaleString();
+        document.getElementById('card-hours-used').textContent = Math.round(totals.usedHours).toLocaleString();
+        document.getElementById('card-hours-pct').textContent = fmtPct(pctUsed) + ' of plan';
+
+        document.getElementById('card-elapsed').textContent = fmtPct(meta.monthElapsed);
+        document.getElementById('elapsed-bar').style.width = (meta.monthElapsed * 100) + '%';
+
+        const paceEl = document.getElementById('card-pace');
+        paceEl.textContent = (paceVariance >= 0 ? '+' : '') + fmtPct(paceVariance);
+        if (paceVariance >= -0.05 && paceVariance <= 0) {
+            paceEl.className = 'text-lg font-bold text-green-600 dark:text-green-400';
+        } else if (paceVariance > 0 && paceVariance <= 0.05) {
+            paceEl.className = 'text-lg font-bold text-green-600 dark:text-green-400';
+        } else if (paceVariance > 0.05) {
+            paceEl.className = 'text-lg font-bold text-blue-600 dark:text-blue-400';
+        } else {
+            paceEl.className = 'text-lg font-bold text-red-600 dark:text-red-400';
+        }
+
+        const revTableEl = document.getElementById('card-revenue-table');
+        revTableEl.textContent = (revenueOnTable >= 0 ? '+' : '') + fmt$(revenueOnTable);
+        revTableEl.className = 'text-lg font-bold ' + (revenueOnTable >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400');
+
+        // Recovery priorities (clients with biggest negative EOM gap)
+        const recoveryClients = rows.filter(r => r.eomGap < -100 && r.plannedHours > 0).sort((a, b) => a.eomGap - b.eomGap).slice(0, 5);
+        const recSection = document.getElementById('recovery-section');
+        if (recoveryClients.length > 0) {
+            recSection.classList.remove('hidden');
+            document.getElementById('recovery-list').innerHTML = recoveryClients.map((r, i) => `
+                <div class="flex items-center gap-2 bg-white dark:bg-gray-900 rounded-lg px-3 py-2 border border-red-200 dark:border-red-800 shadow-sm">
+                    <span class="text-sm font-bold text-red-500">${i + 1}.</span>
+                    <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">${escHtml(r.name)}</span>
+                    <span class="text-xs font-bold text-red-600 dark:text-red-400">${fmt$(r.eomGap)}</span>
+                </div>
+            `).join('');
+        } else {
+            recSection.classList.add('hidden');
+        }
+
+        // Render table
+        renderTable(rows, totals, meta);
+    }
+
+    function buildRows() {
+        if (!apiData) return [];
+        const meta = apiData.meta;
+        const projectMap = {};
+        apiData.projects.forEach(p => { projectMap[p.name] = p; });
+
+        // Get all configured clients + any from API
+        const allClients = new Set([...Object.keys(clientConfig), ...apiData.projects.map(p => p.name)]);
+
+        const rows = [];
+        let totalPlannedRevenue = 0;
+
+        // First pass: compute total planned revenue for weight calculation
+        allClients.forEach(name => {
+            const cfg = getClientConfig(name);
+            const proj = projectMap[name];
+            const rate = cfg.rate || (proj ? proj.rate : apiData.meta.globalRate);
+            totalPlannedRevenue += (cfg.plannedHours || 0) * rate;
+        });
+
+        allClients.forEach(name => {
+            const cfg = getClientConfig(name);
+            const proj = projectMap[name];
+            const rate = cfg.rate || (proj ? proj.rate : meta.globalRate);
+            const usedHours = proj ? proj.hours : 0;
+            const plannedHours = cfg.plannedHours || 0;
+            const minHours = cfg.minHours || 0;
+            const plan = cfg.plan || '';
+            const plannedRevenue = plannedHours * rate;
+            const avgPerWeek = meta.weeksInMonth > 0 ? plannedHours / meta.weeksInMonth : 0;
+            const revenueToDate = usedHours * rate;
+            const pctUsed = plannedHours > 0 ? usedHours / plannedHours : (usedHours > 0 ? 1 : 0);
+
+            // Forecast: extrapolate based on current pace
+            let forecastHours;
+            if (meta.monthElapsed > 0) {
+                forecastHours = usedHours / meta.monthElapsed;
+            } else {
+                forecastHours = usedHours;
+            }
+            const forecastRevenue = forecastHours * rate;
+            const eomGap = forecastRevenue - plannedRevenue;
+
+            // SPI: Schedule Performance Index
+            const expectedAtThisPoint = plannedHours * meta.monthElapsed;
+            const spi = expectedAtThisPoint > 0 ? usedHours / expectedAtThisPoint : (usedHours > 0 ? 1.2 : 0);
+
+            // Weight: share of total planned revenue
+            const weight = totalPlannedRevenue > 0 ? plannedRevenue / totalPlannedRevenue : 0;
+
+            rows.push({
+                name, plan, rate, minHours, plannedHours, plannedRevenue, avgPerWeek,
+                usedHours, revenueToDate, pctUsed, forecastHours, forecastRevenue, eomGap,
+                spi, weight
+            });
+        });
+
+        // Sort: by plan order, then by planned revenue desc
+        rows.sort((a, b) => {
+            const pa = PLAN_ORDER[a.plan] ?? 4;
+            const pb = PLAN_ORDER[b.plan] ?? 4;
+            if (pa !== pb) return pa - pb;
+            return b.plannedRevenue - a.plannedRevenue;
+        });
+
+        return rows;
+    }
+
+    function renderTable(rows, totals, meta) {
+        const tbody = document.getElementById('velocity-table-body');
+        const tfoot = document.getElementById('velocity-table-foot');
+
+        if (rows.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="16" class="px-6 py-12 text-center text-gray-400">No client data. Click <strong>Configure Clients</strong> to set up planned hours.</td></tr>`;
+            tfoot.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+        let currentPlan = null;
+
+        rows.forEach(r => {
+            // Plan group separator
+            if (r.plan !== currentPlan) {
+                currentPlan = r.plan;
+                if (r.plan) {
+                    html += `<tr class="bg-gray-50 dark:bg-gray-800/30"><td colspan="16" class="px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">${escHtml(r.plan)}</td></tr>`;
+                }
+            }
+
+            const planClass = r.plan === 'Core' ? 'plan-core' : r.plan === 'Growth' ? 'plan-growth' : r.plan === 'Support' ? 'plan-support' : r.plan === 'Light Touch' ? 'plan-light' : '';
+            const weightColor = r.weight > 0.15 ? 'text-green-700 dark:text-green-400 font-bold' : r.weight > 0.08 ? 'text-green-600 dark:text-green-500' : 'text-gray-500 dark:text-gray-400';
+            const weightBg = r.weight > 0.15 ? 'bg-green-50 dark:bg-green-950/20' : r.weight > 0.08 ? 'bg-green-50/50 dark:bg-green-950/10' : '';
+
+            const pctColor = r.pctUsed >= 1 ? 'text-green-600 dark:text-green-400 font-bold' : r.pctUsed >= 0.7 ? 'text-teal-600 dark:text-teal-400' : r.pctUsed >= 0.4 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-500 dark:text-red-400';
+            const eomColor = r.eomGap >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400 font-bold';
+
+            let spiColor, spiBg;
+            if (r.spi >= 0.95) { spiColor = 'text-green-700 dark:text-green-400'; spiBg = 'bg-green-100 dark:bg-green-900/30'; }
+            else if (r.spi >= 0.80) { spiColor = 'text-yellow-700 dark:text-yellow-400'; spiBg = 'bg-yellow-100 dark:bg-yellow-900/30'; }
+            else { spiColor = 'text-red-700 dark:text-red-400'; spiBg = 'bg-red-100 dark:bg-red-900/30'; }
+
+            const statusVal = statusData[r.name] || '';
+
+            html += `<tr class="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+                <td class="px-3 py-2.5 sticky-plan bg-white dark:bg-gray-900" style="min-width:90px">
+                    ${r.plan ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${planClass}">${escHtml(r.plan)}</span>` : '<span class="text-gray-300 dark:text-gray-600 text-[10px]">—</span>'}
+                </td>
+                <td class="px-3 py-2.5 font-semibold text-gray-900 dark:text-white sticky-client bg-white dark:bg-gray-900 whitespace-nowrap">${escHtml(r.name)}</td>
+                <td class="px-3 py-2.5 text-right ${weightColor} ${weightBg}">${r.weight > 0 ? fmtPct(r.weight) : '—'}</td>
+                <td class="px-3 py-2.5 text-right text-gray-600 dark:text-gray-400">$${r.rate}</td>
+                <td class="px-3 py-2.5 text-right text-gray-600 dark:text-gray-400">${r.minHours || '—'}</td>
+
+                <td class="px-3 py-2.5 text-right bg-blue-50/30 dark:bg-blue-950/10 text-gray-800 dark:text-gray-200">${r.plannedHours || '—'}</td>
+                <td class="px-3 py-2.5 text-right bg-blue-50/30 dark:bg-blue-950/10 font-medium text-gray-800 dark:text-gray-200">${r.plannedRevenue ? fmt$(r.plannedRevenue) : '—'}</td>
+                <td class="px-3 py-2.5 text-right bg-blue-50/30 dark:bg-blue-950/10 text-gray-500 dark:text-gray-400">${r.avgPerWeek ? r.avgPerWeek.toFixed(1) : '—'}</td>
+
+                <td class="px-3 py-2.5 text-right bg-teal-50/30 dark:bg-teal-950/10 font-semibold text-teal-700 dark:text-teal-400">${r.usedHours ? r.usedHours.toFixed(1) : '0'}</td>
+                <td class="px-3 py-2.5 text-right bg-teal-50/30 dark:bg-teal-950/10 text-teal-600 dark:text-teal-400">${fmt$(r.revenueToDate)}</td>
+                <td class="px-3 py-2.5 text-right bg-teal-50/30 dark:bg-teal-950/10 ${pctColor}">${r.plannedHours > 0 ? fmtPct(r.pctUsed) : '—'}</td>
+
+                <td class="px-3 py-2.5 text-right bg-orange-50/30 dark:bg-orange-950/10 text-gray-800 dark:text-gray-200">${r.forecastHours.toFixed(1)}</td>
+                <td class="px-3 py-2.5 text-right bg-orange-50/30 dark:bg-orange-950/10 font-medium text-gray-800 dark:text-gray-200">${fmt$(r.forecastRevenue)}</td>
+                <td class="px-3 py-2.5 text-right bg-orange-50/30 dark:bg-orange-950/10 ${eomColor}">${r.plannedHours > 0 ? ((r.eomGap >= 0 ? '+' : '') + fmt$(r.eomGap)) : '—'}</td>
+
+                <td class="px-3 py-2.5 text-center bg-purple-50/30 dark:bg-purple-950/10">
+                    <span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-full ${spiColor} ${spiBg}">${r.plannedHours > 0 ? r.spi.toFixed(2) : '—'}</span>
+                </td>
+                <td class="px-3 py-2.5 bg-purple-50/30 dark:bg-purple-950/10">
+                    <div class="status-cell text-[11px] px-2 py-1 rounded bg-indigo-50 dark:bg-indigo-950/30 text-gray-700 dark:text-gray-300 min-h-[28px]" contenteditable="true" data-client="${escHtml(r.name)}" onblur="saveStatus(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}">${escHtml(statusVal)}</div>
+                </td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html;
+
+        // Totals row
+        const totalForecastRevenue = rows.reduce((s, r) => s + r.forecastRevenue, 0);
+        const totalPlannedRevenue = totals.plannedRevenue;
+        const totalEomGap = totalForecastRevenue - totalPlannedRevenue;
+        const totalSPI = (totals.plannedHours * meta.monthElapsed) > 0 ? totals.usedHours / (totals.plannedHours * meta.monthElapsed) : 0;
+
+        tfoot.innerHTML = `<tr class="text-xs">
+            <td class="px-3 py-3 sticky-plan bg-gray-50 dark:bg-gray-800/50"></td>
+            <td class="px-3 py-3 font-bold text-gray-900 dark:text-white sticky-client bg-gray-50 dark:bg-gray-800/50">TOTAL</td>
+            <td class="px-3 py-3 text-right font-bold">100%</td>
+            <td class="px-3 py-3"></td>
+            <td class="px-3 py-3"></td>
+            <td class="px-3 py-3 text-right font-bold bg-blue-50/50 dark:bg-blue-950/20">${Math.round(totals.plannedHours)}</td>
+            <td class="px-3 py-3 text-right font-bold bg-blue-50/50 dark:bg-blue-950/20">${fmt$(totals.plannedRevenue)}</td>
+            <td class="px-3 py-3 text-right bg-blue-50/50 dark:bg-blue-950/20">${meta.weeksInMonth > 0 ? (totals.plannedHours / meta.weeksInMonth).toFixed(1) : '—'}</td>
+            <td class="px-3 py-3 text-right font-bold text-teal-700 dark:text-teal-400 bg-teal-50/50 dark:bg-teal-950/20">${Math.round(totals.usedHours)}</td>
+            <td class="px-3 py-3 text-right font-bold bg-teal-50/50 dark:bg-teal-950/20">${fmt$(totals.revenueToDate)}</td>
+            <td class="px-3 py-3 text-right font-bold bg-teal-50/50 dark:bg-teal-950/20">${totals.plannedHours > 0 ? fmtPct(totals.usedHours / totals.plannedHours) : '—'}</td>
+            <td class="px-3 py-3 text-right font-bold bg-orange-50/50 dark:bg-orange-950/20">${Math.round(totals.forecastHours)}</td>
+            <td class="px-3 py-3 text-right font-bold bg-orange-50/50 dark:bg-orange-950/20">${fmt$(totalForecastRevenue)}</td>
+            <td class="px-3 py-3 text-right font-bold ${totalEomGap >= 0 ? 'text-green-600' : 'text-red-600'} bg-orange-50/50 dark:bg-orange-950/20">${(totalEomGap >= 0 ? '+' : '') + fmt$(totalEomGap)}</td>
+            <td class="px-3 py-3 text-center bg-purple-50/50 dark:bg-purple-950/20"><span class="font-bold">${totalSPI.toFixed(2)}</span></td>
+            <td class="px-3 py-3 bg-purple-50/50 dark:bg-purple-950/20"></td>
+        </tr>`;
+    }
+
+    // ── Status Editing ────────────────────────────────────────────────────────
+    function saveStatus(el) {
+        const client = el.dataset.client;
+        const val = el.textContent.trim();
+        statusData[client] = val;
+        saveStatusData();
+    }
+
+    // ── Config Modal ──────────────────────────────────────────────────────────
+    function openConfigModal() {
+        const tbody = document.getElementById('config-table-body');
+        const allClients = new Set([...Object.keys(clientConfig)]);
+        if (apiData) apiData.projects.forEach(p => allClients.add(p.name));
+
+        const sorted = [...allClients].sort((a, b) => {
+            const ca = getClientConfig(a);
+            const cb = getClientConfig(b);
+            const pa = PLAN_ORDER[ca.plan] ?? 4;
+            const pb = PLAN_ORDER[cb.plan] ?? 4;
+            if (pa !== pb) return pa - pb;
+            return a.localeCompare(b);
+        });
+
+        tbody.innerHTML = sorted.map(name => configRowHtml(name)).join('');
+        document.getElementById('config-modal').classList.remove('hidden');
+    }
+
+    function configRowHtml(name) {
+        const cfg = getClientConfig(name);
+        const proj = apiData ? apiData.projects.find(p => p.name === name) : null;
+        const rate = cfg.rate || (proj ? proj.rate : 155);
+        const planOptions = PLAN_TYPES.map(p => `<option value="${p}"${cfg.plan === p ? ' selected' : ''}>${p}</option>`).join('');
+
+        return `<tr class="border-b border-gray-100 dark:border-gray-800" data-config-client="${escHtml(name)}">
+            <td class="py-2 pr-3">
+                <div class="font-medium text-gray-900 dark:text-white text-sm">${escHtml(name)}</div>
+                ${proj ? `<div class="text-[10px] text-gray-400">${proj.hours.toFixed(1)} hrs logged</div>` : ''}
+            </td>
+            <td class="py-2 pr-3">
+                <select class="config-input config-plan" data-client="${escHtml(name)}">
+                    <option value="">— None —</option>
+                    ${planOptions}
+                </select>
+            </td>
+            <td class="py-2 pr-3">
+                <input type="number" class="config-input config-rate text-right" value="${rate}" min="1" max="9999" data-client="${escHtml(name)}">
+            </td>
+            <td class="py-2 pr-3">
+                <input type="number" class="config-input config-min text-right" value="${cfg.minHours || ''}" min="0" max="999" placeholder="0" data-client="${escHtml(name)}">
+            </td>
+            <td class="py-2 pr-3">
+                <input type="number" class="config-input config-planned text-right" value="${cfg.plannedHours || ''}" min="0" max="999" placeholder="0" data-client="${escHtml(name)}">
+            </td>
+            <td class="py-2 text-center">
+                <button onclick="removeConfigRow(this, '${escHtml(name)}')" class="text-gray-300 hover:text-red-500 transition" title="Remove">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+            </td>
+        </tr>`;
+    }
+
+    function addConfigRow() {
+        const name = prompt('Enter client/project name:');
+        if (!name || !name.trim()) return;
+        const trimmed = name.trim();
+        if (clientConfig[trimmed]) { alert('Client already exists.'); return; }
+        clientConfig[trimmed] = { plan: '', rate: 155, minHours: 0, plannedHours: 0 };
+        const tbody = document.getElementById('config-table-body');
+        tbody.insertAdjacentHTML('beforeend', configRowHtml(trimmed));
+    }
+
+    function removeConfigRow(btn, name) {
+        if (!confirm(`Remove "${name}" from configuration?`)) return;
+        delete clientConfig[name];
+        btn.closest('tr').remove();
+    }
+
+    function saveConfig() {
+        document.querySelectorAll('#config-table-body tr[data-config-client]').forEach(row => {
+            const name = row.dataset.configClient;
+            const plan = row.querySelector('.config-plan').value;
+            const rate = parseInt(row.querySelector('.config-rate').value) || 155;
+            const minHours = parseFloat(row.querySelector('.config-min').value) || 0;
+            const plannedHours = parseFloat(row.querySelector('.config-planned').value) || 0;
+            clientConfig[name] = { plan, rate, minHours, plannedHours };
+        });
+        saveConfigToStorage();
+        closeConfigModal();
+        render();
+    }
+
+    function resetConfig() {
+        if (!confirm('Reset all client configuration? This cannot be undone.')) return;
+        clientConfig = {};
+        localStorage.removeItem(STORAGE_KEY);
+        closeConfigModal();
+        if (apiData) { autoDetectNewClients(); render(); }
+    }
+
+    function closeConfigModal() {
+        document.getElementById('config-modal').classList.add('hidden');
+    }
+
+    // Close modal on Escape
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeConfigModal();
+    });
+
+    // ── CSV Export ─────────────────────────────────────────────────────────────
+    function exportCSV() {
+        const rows = buildRows();
+        if (!rows.length) return;
+
+        const headers = ['Plan', 'Client', 'Weight', 'Rate', 'Min Hours', 'Planned Hours', 'Planned Revenue', 'Avg/Week', 'Used Hours', 'Revenue To Date', '% Used', 'Forecast Hours', 'Forecast Revenue', 'EOM Gap', 'SPI', 'Status'];
+        const csvRows = [headers.join(',')];
+
+        rows.forEach(r => {
+            csvRows.push([
+                r.plan, `"${r.name}"`, (r.weight * 100).toFixed(1) + '%', r.rate, r.minHours,
+                r.plannedHours, Math.round(r.plannedRevenue), r.avgPerWeek.toFixed(1),
+                r.usedHours.toFixed(1), Math.round(r.revenueToDate), (r.pctUsed * 100).toFixed(1) + '%',
+                r.forecastHours.toFixed(1), Math.round(r.forecastRevenue), Math.round(r.eomGap),
+                r.spi.toFixed(2), `"${statusData[r.name] || ''}"`
+            ].join(','));
+        });
+
+        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `velocity-report-${document.getElementById('month-select').value}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    </script>
+</body>
+</html>
