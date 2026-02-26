@@ -6,7 +6,7 @@ var DB = (function () {
     'use strict';
 
     var SUPABASE_URL = 'https://ynrpkvhroaeiomxuksyw.supabase.co';
-    var SUPABASE_KEY = 'sb_publishable_mtUWtxgIIhWN0kQc2xZbMQ_EStR6jkG';
+    var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucnBrdmhyb2FlaW9teHVrc3l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzU2NDMsImV4cCI6MjA4NzcxMTY0M30.Ko2J922AOTGHNl_naRGs3Q3pYcpVkL-airaDMjdqedk';
 
     var STORAGE_KEY = 'iwd_expenses';
     var BUDGET_KEY = 'iwd_monthly_budget';
