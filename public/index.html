@@ -408,6 +408,7 @@
             state.projects = (data.projects || []);
             state.users = (data.users || []).filter(u => u.name && u.name.trim() !== "");
             state.isCurrentMonth = (data.meta && data.meta.isCurrentMonth !== undefined) ? data.meta.isCurrentMonth : true;
+            state.todayBillableHours = (data.meta && data.meta.todayBillableHours) || 0;
 
             // Fix: Add safe fallback for globalRate (it was crashing here)
             const globalRate = (data.meta && data.meta.globalRate) ? data.meta.globalRate : 155;
@@ -495,13 +496,21 @@
             let daysPassed, totalMonthWorkDays, daysLeft;
 
             if (state.isCurrentMonth) {
-                daysPassed = getWorkDays(start, now);
                 totalMonthWorkDays = getWorkDays(start, end);
-                // ADJUSTMENT: Use fractional work day (9 AM–5 PM) for smoother projections
-                const hourDecimal = now.getHours() + now.getMinutes() / 60;
-                if (hourDecimal < 17) {
-                    const fractionOfDay = Math.max(0, (hourDecimal - 9) / 8);
-                    daysPassed = Math.max(daysPassed - 1 + fractionOfDay, 1);
+                // Timezone-neutral projection: use actual hours logged today vs daily average
+                const isWeekday = (now.getDay() !== 0 && now.getDay() !== 6);
+                const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                const completedDays = getWorkDays(start, yesterday);
+                const totalHoursEarly = state.projects.reduce((s, p) => s + p.hours, 0);
+                const todayHours = state.todayBillableHours || 0;
+
+                if (isWeekday && completedDays > 0) {
+                    const priorDaysHours = totalHoursEarly - todayHours;
+                    const avgDailyHours = priorDaysHours / completedDays;
+                    const todayFraction = avgDailyHours > 0 ? Math.min(todayHours / avgDailyHours, 1) : 0;
+                    daysPassed = completedDays + todayFraction;
+                } else {
+                    daysPassed = Math.max(completedDays, 1);
                 }
                 daysLeft = totalMonthWorkDays - daysPassed;
             } else {

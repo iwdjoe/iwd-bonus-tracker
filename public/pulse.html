@@ -320,20 +320,34 @@
                 });
 
                 const start = new Date(now.getFullYear(), now.getMonth(), 1);
-                let daysPassed = 0;
-                let cur = new Date(start);
-                while(cur <= now) {
-                    if(cur.getDay()!==0 && cur.getDay()!==6) daysPassed++;
-                    cur.setDate(cur.getDate()+1);
-                }
-                if (now.getHours() < 17) daysPassed = Math.max(daysPassed - 1, 1);
                 const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
                 let totalDays = 0;
-                cur = new Date(start);
+                let cur = new Date(start);
                 while(cur <= end) {
                     if(cur.getDay()!==0 && cur.getDay()!==6) totalDays++;
                     cur.setDate(cur.getDate()+1);
                 }
+
+                // Timezone-neutral projection: use actual hours logged today vs daily average
+                const isWeekday = (now.getDay() !== 0 && now.getDay() !== 6);
+                const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                let completedDays = 0;
+                cur = new Date(start);
+                while(cur <= yesterday) {
+                    if(cur.getDay()!==0 && cur.getDay()!==6) completedDays++;
+                    cur.setDate(cur.getDate()+1);
+                }
+                const todayHours = (statsData.meta && statsData.meta.todayBillableHours) || 0;
+                let daysPassed;
+                if (isWeekday && completedDays > 0) {
+                    const priorDaysHours = mBillable - todayHours;
+                    const avgDailyHours = priorDaysHours / completedDays;
+                    const todayFraction = avgDailyHours > 0 ? Math.min(todayHours / avgDailyHours, 1) : 0;
+                    daysPassed = completedDays + todayFraction;
+                } else {
+                    daysPassed = Math.max(completedDays, 1);
+                }
+
                 const projRev = (mRev / daysPassed) * totalDays;
                 const projHours = (mBillable / daysPassed) * totalDays;
 
