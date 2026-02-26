@@ -32,8 +32,13 @@
             margin: 0;
         }
 
-        /* Hide Netlify Identity widget's persistent notification bar */
-        .netlify-identity-alert { display: none !important; }
+        /* Hide all Netlify Identity widget injected UI (login bar, signup bar, notifications) */
+        .netlify-identity-alert,
+        .netlify-identity-button,
+        .netlify-identity-signup,
+        .netlify-identity-widget-init,
+        div[data-netlify-identity-menu],
+        div[data-netlify-identity-button] { display: none !important; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-4 md:p-8 transition-colors duration-300">
@@ -409,6 +414,20 @@
                 renderList('top-clients', (statsData.projects || []).map(p => ({ name: p.name, hours: p.hours })));
             }
         }
+
+        // Remove any Netlify Identity widget bars injected into body
+        const KNOWN_IDS = ['login-screen', 'dashboard-content'];
+        new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1 && node.tagName === 'DIV' &&
+                        node.parentElement === document.body &&
+                        !KNOWN_IDS.includes(node.id) && !node.querySelector('iframe')) {
+                        node.remove();
+                    }
+                });
+            });
+        }).observe(document.body, { childList: true });
 
         // Close nav menu on outside click
         document.addEventListener('click', (e) => {
