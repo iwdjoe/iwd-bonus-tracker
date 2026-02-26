@@ -32,13 +32,13 @@
         "plannedHours": 0
       },
       "DMC Tools - Maintenance": {
-        "plan": "",
+        "plan": "Core",
         "rate": 140,
         "minHours": 0,
         "plannedHours": 0
       },
       "BinMaster - Maintenance": {
-        "plan": "",
+        "plan": "Growth",
         "rate": 180,
         "minHours": 0,
         "plannedHours": 0
@@ -68,7 +68,7 @@
         "plannedHours": 0
       },
       "Europa Eyewear - EyeBobs to Bloomingdale’s Integration": {
-        "plan": "",
+        "plan": "Growth",
         "rate": 150,
         "minHours": 0,
         "plannedHours": 0
