@@ -2,88 +2,88 @@
   "config": {
     "2026-02": {
       "SchoolFix - Migration to Adobe Live Search": {
-        "plan": "",
+        "plan": "Core",
         "rate": 160,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 141
       },
       "Inyo Pools - Project Hammerhead MVP": {
-        "plan": "",
+        "plan": "Core",
         "rate": 155,
-        "minHours": 0,
-        "plannedHours": 0
+        "minHours": 44,
+        "plannedHours": 151
       },
       "School Fix - Maintenance": {
-        "plan": "",
+        "plan": "Core",
         "rate": 165,
-        "minHours": 0,
-        "plannedHours": 0
+        "minHours": 100,
+        "plannedHours": 100
       },
       "Pryor - SEO Migration Recovery": {
-        "plan": "",
+        "plan": "Growth",
         "rate": 160,
-        "minHours": 0,
-        "plannedHours": 0
+        "minHours": 100,
+        "plannedHours": 105
       },
       "PSU Extension - Maintenance": {
-        "plan": "",
+        "plan": "Growth",
         "rate": 160,
-        "minHours": 0,
-        "plannedHours": 0
+        "minHours": 40,
+        "plannedHours": 40
       },
       "DMC Tools - Maintenance": {
         "plan": "",
         "rate": 140,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 39
       },
       "BinMaster - Maintenance": {
-        "plan": "",
+        "plan": "Support",
         "rate": 180,
-        "minHours": 0,
-        "plannedHours": 0
+        "minHours": 20,
+        "plannedHours": 20
       },
       "Purdue - Maintenance": {
-        "plan": "",
-        "rate": 155,
-        "minHours": 0,
-        "plannedHours": 0
+        "plan": "Support",
+        "rate": 150,
+        "minHours": 20,
+        "plannedHours": 20
       },
       "Warner Press - Maintenance": {
-        "plan": "",
-        "rate": 155,
+        "plan": "Light Touch",
+        "rate": 150,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 6
       },
       "Europa Eyewear - General": {
-        "plan": "",
+        "plan": "Support",
         "rate": 150,
-        "minHours": 0,
-        "plannedHours": 0
+        "minHours": 40,
+        "plannedHours": 40
       },
       "US Camera Pro - Maintenance": {
-        "plan": "",
-        "rate": 165,
-        "minHours": 0,
-        "plannedHours": 0
+        "plan": "Support",
+        "rate": 160,
+        "minHours": 10,
+        "plannedHours": 10
       },
       "Europa Eyewear - EyeBobs to Bloomingdale’s Integration": {
-        "plan": "",
+        "plan": "Support",
         "rate": 150,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 32
       },
       "School Fix - Google Pay and Apple Pay to Express Checkout": {
-        "plan": "",
+        "plan": "Core",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 22
       },
       "Europa Eyewear – Image Curation": {
-        "plan": "",
+        "plan": "Support",
         "rate": 155,
-        "minHours": 0,
-        "plannedHours": 0
+        "minHours": 10,
+        "plannedHours": 10
       }
     }
   },
