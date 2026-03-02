@@ -149,12 +149,15 @@ exports.handler = async function(event, context) {
         const totalMonthEnd = new Date(year, month + 1, 0);
 
         function countBusinessDays(start, end) {
+            // Use UTC to avoid DST boundary issues (spring-forward can shift
+            // the hour on setDate, causing the final day comparison to miss a day)
+            const msPerDay = 86400000;
+            const s = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+            const e = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
             let count = 0;
-            const d = new Date(start);
-            while (d <= end) {
-                const dow = d.getDay();
+            for (let t = s; t <= e; t += msPerDay) {
+                const dow = new Date(t).getUTCDay();
                 if (dow !== 0 && dow !== 6) count++;
-                d.setDate(d.getDate() + 1);
             }
             return count;
         }

@@ -335,22 +335,25 @@
 
                 const start = new Date(now.getFullYear(), now.getMonth(), 1);
                 const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-                let totalDays = 0;
-                let cur = new Date(start);
-                while(cur <= end) {
-                    if(cur.getDay()!==0 && cur.getDay()!==6) totalDays++;
-                    cur.setDate(cur.getDate()+1);
+                // Use UTC to avoid DST boundary issues (spring-forward can shift
+                // the hour on setDate, causing the final day comparison to miss a day)
+                const msPerDay = 86400000;
+                function countWorkDays(a, b) {
+                    const s = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+                    const e = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+                    let c = 0;
+                    for (let t = s; t <= e; t += msPerDay) {
+                        const d = new Date(t).getUTCDay();
+                        if (d !== 0 && d !== 6) c++;
+                    }
+                    return c;
                 }
+                let totalDays = countWorkDays(start, end);
 
                 // Timezone-neutral projection: use actual hours logged today vs daily average
                 const isWeekday = (now.getDay() !== 0 && now.getDay() !== 6);
                 const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-                let completedDays = 0;
-                cur = new Date(start);
-                while(cur <= yesterday) {
-                    if(cur.getDay()!==0 && cur.getDay()!==6) completedDays++;
-                    cur.setDate(cur.getDate()+1);
-                }
+                let completedDays = countWorkDays(start, yesterday);
                 const todayHours = (statsData.meta && statsData.meta.todayBillableHours) || 0;
                 let daysPassed;
                 if (isWeekday && completedDays > 0) {

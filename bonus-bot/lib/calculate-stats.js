@@ -34,12 +34,15 @@ function getTimezoneNow(timezone) {
  * Count business days (Mon-Fri) between two dates, inclusive
  */
 function getWorkDays(start, end) {
+    // Use UTC to avoid DST boundary issues (spring-forward can shift
+    // the hour on setDate, causing the final day comparison to miss a day)
+    const msPerDay = 86400000;
+    const s = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+    const e = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
     let count = 0;
-    const cur = new Date(start);
-    while (cur <= end) {
-        const day = cur.getDay();
+    for (let t = s; t <= e; t += msPerDay) {
+        const day = new Date(t).getUTCDay();
         if (day !== 0 && day !== 6) count++;
-        cur.setDate(cur.getDate() + 1);
     }
     return count;
 }
