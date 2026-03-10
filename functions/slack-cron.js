@@ -8,7 +8,7 @@ exports.handler = async function(event) {
     const result = await sendSlack.handler({
         httpMethod: 'POST',
         body: JSON.stringify({ mode: 'auto' })
-    });
+    }, { _internalCron: true });
 
     console.log('[slack-cron]', result.statusCode, result.body);
     return result;

@@ -59,12 +59,15 @@ function getTimezoneNow(timezone) {
 }
 
 function getWorkDays(start, end) {
+    // Use UTC to avoid DST boundary issues (spring-forward can shift
+    // the hour on setDate, causing the final day comparison to miss a day)
+    const msPerDay = 86400000;
+    const s = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+    const e = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
     let count = 0;
-    const cur = new Date(start);
-    while (cur <= end) {
-        const day = cur.getDay();
+    for (let t = s; t <= e; t += msPerDay) {
+        const day = new Date(t).getUTCDay();
         if (day !== 0 && day !== 6) count++;
-        cur.setDate(cur.getDate() + 1);
     }
     return count;
 }
@@ -317,37 +320,45 @@ exports.handler = async function(event, context) {
     }
 
     // ── Authentication ────────────────────────────────────────────────────────
-    let user = context.clientContext && context.clientContext.user;
+    // Internal cron calls (from slack-cron.js) bypass auth — they run
+    // server-side in the same process, so the flag can't be forged via HTTP.
+    const isInternalCron = context && context._internalCron === true;
 
-    if (!user) {
-        const authHeader = event.headers && (event.headers.authorization || event.headers.Authorization);
-        if (authHeader && authHeader.startsWith('Bearer ')) {
-            try {
-                const payload = authHeader.substring(7).split('.')[1];
-                user = JSON.parse(Buffer.from(payload, 'base64').toString());
-            } catch (_) { /* malformed token */ }
+    if (!isInternalCron) {
+        let user = context && context.clientContext && context.clientContext.user;
+
+        if (!user) {
+            const authHeader = event.headers && (event.headers.authorization || event.headers.Authorization);
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                try {
+                    const payload = authHeader.substring(7).split('.')[1];
+                    user = JSON.parse(Buffer.from(payload, 'base64').toString());
+                } catch (_) { /* malformed token */ }
+            }
         }
-    }
 
-    if (!user) {
-        return {
-            statusCode: 401,
-            body: JSON.stringify({ error: 'Unauthorized: login required' })
-        };
-    }
+        if (!user) {
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ error: 'Unauthorized: login required' })
+            };
+        }
 
-    const email = (user.email || '').toLowerCase();
-    if (!email.endsWith('@iwdagency.com')) {
-        return {
-            statusCode: 403,
-            body: JSON.stringify({ error: 'Forbidden: @iwdagency.com account required' })
-        };
+        const email = (user.email || '').toLowerCase();
+        if (!email.endsWith('@iwdagency.com')) {
+            return {
+                statusCode: 403,
+                body: JSON.stringify({ error: 'Forbidden: @iwdagency.com account required' })
+            };
+        }
     }
     // ─────────────────────────────────────────────────────────────────────────
 
-    const ip = (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'])) || 'unknown';
-    if (isSlackRateLimited(ip)) {
-        return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests. Please wait 5 minutes before posting again.' }) };
+    if (!isInternalCron) {
+        const ip = (event.headers && (event.headers['x-forwarded-for'] || event.headers['client-ip'])) || 'unknown';
+        if (isSlackRateLimited(ip)) {
+            return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests. Please wait 5 minutes before posting again.' }) };
+        }
     }
 
     try {
