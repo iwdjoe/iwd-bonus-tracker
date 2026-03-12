@@ -317,31 +317,38 @@ exports.handler = async function(event, context) {
     }
 
     // ── Authentication ────────────────────────────────────────────────────────
-    let user = context.clientContext && context.clientContext.user;
+    // Allow internal cron calls via CRON_SECRET header (no JWT available in scheduled functions)
+    const cronSecret = process.env.CRON_SECRET;
+    const incomingCronSecret = event.headers && event.headers['x-cron-secret'];
+    const isCronCall = cronSecret && incomingCronSecret && incomingCronSecret === cronSecret;
 
-    if (!user) {
-        const authHeader = event.headers && (event.headers.authorization || event.headers.Authorization);
-        if (authHeader && authHeader.startsWith('Bearer ')) {
-            try {
-                const payload = authHeader.substring(7).split('.')[1];
-                user = JSON.parse(Buffer.from(payload, 'base64').toString());
-            } catch (_) { /* malformed token */ }
+    if (!isCronCall) {
+        let user = context.clientContext && context.clientContext.user;
+
+        if (!user) {
+            const authHeader = event.headers && (event.headers.authorization || event.headers.Authorization);
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                try {
+                    const payload = authHeader.substring(7).split('.')[1];
+                    user = JSON.parse(Buffer.from(payload, 'base64').toString());
+                } catch (_) { /* malformed token */ }
+            }
         }
-    }
 
-    if (!user) {
-        return {
-            statusCode: 401,
-            body: JSON.stringify({ error: 'Unauthorized: login required' })
-        };
-    }
+        if (!user) {
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ error: 'Unauthorized: login required' })
+            };
+        }
 
-    const email = (user.email || '').toLowerCase();
-    if (!email.endsWith('@iwdagency.com')) {
-        return {
-            statusCode: 403,
-            body: JSON.stringify({ error: 'Forbidden: @iwdagency.com account required' })
-        };
+        const email = (user.email || '').toLowerCase();
+        if (!email.endsWith('@iwdagency.com')) {
+            return {
+                statusCode: 403,
+                body: JSON.stringify({ error: 'Forbidden: @iwdagency.com account required' })
+            };
+        }
     }
     // ─────────────────────────────────────────────────────────────────────────
 
