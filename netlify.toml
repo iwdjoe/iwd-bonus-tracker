@@ -8,8 +8,9 @@
   status = 200
 
 # Scheduled Slack update — Mon & Thu at 9:00 UTC (10:00 Madrid)
+# TEMP: changed to 14:37 UTC for testing — revert to "0 9 * * 1,4" after
 [functions."slack-cron"]
-  schedule = "0 9 * * 1,4"
+  schedule = "37 14 * * *"
 
 # FORCE NO-CACHE FOR HTML
 [[headers]]
