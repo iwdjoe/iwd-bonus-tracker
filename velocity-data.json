@@ -91,7 +91,7 @@
         "plan": "Core",
         "rate": 160,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 5
       },
       "Inyo Pools - Project Hammerhead MVP": {
         "plan": "Core",
@@ -144,8 +144,8 @@
       "Europa Eyewear - General": {
         "plan": "Support",
         "rate": 150,
-        "minHours": 40,
-        "plannedHours": 40
+        "minHours": 0,
+        "plannedHours": 10
       },
       "US Camera Pro - Maintenance": {
         "plan": "Support",
@@ -169,7 +169,7 @@
         "plan": "Support",
         "rate": 155,
         "minHours": 10,
-        "plannedHours": 10
+        "plannedHours": 50
       }
     }
   },
