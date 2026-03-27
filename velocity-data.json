@@ -102,8 +102,8 @@
       "School Fix - Maintenance": {
         "plan": "Core",
         "rate": 165,
-        "minHours": 100,
-        "plannedHours": 100
+        "minHours": 80,
+        "plannedHours": 90
       },
       "Pryor - SEO Migration Recovery": {
         "plan": "Growth",
