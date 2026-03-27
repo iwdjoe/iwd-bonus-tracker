@@ -170,6 +170,18 @@
         "rate": 155,
         "minHours": 10,
         "plannedHours": 50
+      },
+      "Pryor - SEO Migration Recovery | Content": {
+        "plan": "",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "PSU Creamery - Maintenance": {
+        "plan": "",
+        "rate": 160,
+        "minHours": 0,
+        "plannedHours": 0
       }
     }
   },
