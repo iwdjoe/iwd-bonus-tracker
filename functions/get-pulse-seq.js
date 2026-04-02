@@ -73,13 +73,31 @@ exports.handler = async function(event, context) {
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
-        // 5. MERGE
+        // 5. FETCH TEAMS — build allowedPersonIds from approved teams only
+        // Entries from users outside these teams are excluded from all calculations.
+        const ALLOWED_TEAMS = ['DEVs', 'PMs', 'QAs', 'SA', 'SEO', 'AM', 'DSN'];
+        const teamsRes = await fetch(`https://${DOMAIN}/teams.json`, { headers: { 'Authorization': AUTH } });
+        let allowedPersonIds = null; // null = allow all (safe fallback if teams API fails)
+        if (teamsRes.ok) {
+            const teamsData = await teamsRes.json();
+            allowedPersonIds = new Set();
+            (teamsData.teams || [])
+                .filter(t => ALLOWED_TEAMS.includes(t.name))
+                .forEach(t => (t.members || []).forEach(m => allowedPersonIds.add(String(m.id))));
+        }
+
+        // 6. MERGE
         const entries = [
             ...(d1['time-entries'] || []),
             ...(d2['time-entries'] || [])
         ];
-        
-        const cleanEntries = entries.map(e => {
+
+        // Exclude entries from users who do not belong to an allowed team
+        const teamFiltered = allowedPersonIds === null
+            ? entries
+            : entries.filter(e => allowedPersonIds.has(String(e['person-id'])));
+
+        const cleanEntries = teamFiltered.map(e => {
             const user = e['person-first-name'] + ' ' + e['person-last-name'];
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             const isIsah = user.match(/Isah/i) && user.match(/Ramos/i);

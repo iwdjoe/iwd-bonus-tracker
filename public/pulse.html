@@ -312,12 +312,12 @@
                 if (dateStr >= thisWeekStart && dateStr <= thisWeekEnd) {
                     stats.thisWeek.t += e.h;
                     if (!e.x) stats.thisWeek.t_adj += e.h;
-                    if (e.b && !e.i) stats.thisWeek.b += e.h;
+                    if (e.b) stats.thisWeek.b += e.h;
                 }
                 else if (dateStr >= lastWeekStart && dateStr <= lastWeekEnd) {
                     stats.lastWeek.t += e.h;
                     if (!e.x) stats.lastWeek.t_adj += e.h;
-                    if (e.b && !e.i) stats.lastWeek.b += e.h;
+                    if (e.b) stats.lastWeek.b += e.h;
                 }
             });
 
@@ -423,9 +423,7 @@
                 });
             };
             if (statsData) {
-                // Exclude contractors from top contributors
-                const eligibleUsers = (statsData.users || []).filter(u => !u.contractor);
-                renderList('top-users', eligibleUsers);
+                renderList('top-users', (statsData.users || []));
                 renderList('top-clients', (statsData.projects || []).map(p => ({ name: p.name, hours: p.hours })));
             }
         }
