@@ -409,7 +409,6 @@
             updatePace();
             document.getElementById('goal-input').addEventListener('input', updatePace);
 
-            // Lists (use full-month get-stats data, not 15-day pulse data)
             const renderList = (id, items) => {
                 const el = document.getElementById(id);
                 el.innerHTML = '';
@@ -422,10 +421,26 @@
                         </tr>`;
                 });
             };
+
+            // Top Contributors: aggregate billable hours from pulse entries
+            // using the same thisWeekStart → thisWeekEnd window as the weekly comparison,
+            // so both panels always reflect the same date range.
+            const weeklyUsers = {};
+            entries.forEach(e => {
+                let dateStr = e.d;
+                if (!dateStr.includes('-') && dateStr.length === 8) {
+                    dateStr = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
+                }
+                if (dateStr >= thisWeekStart && dateStr <= thisWeekEnd && e.b) {
+                    if (!weeklyUsers[e.u]) weeklyUsers[e.u] = 0;
+                    weeklyUsers[e.u] += e.h;
+                }
+            });
+            const weeklyUserList = Object.keys(weeklyUsers).map(name => ({ name, hours: weeklyUsers[name] }));
+            renderList('top-users', weeklyUserList);
+
+            // Top Clients: keep using full-month get-stats data (revenue projection depends on it)
             if (statsData) {
-                // Exclude contractors from top contributors
-                const eligibleUsers = (statsData.users || []).filter(u => !u.contractor);
-                renderList('top-users', eligibleUsers);
                 renderList('top-clients', (statsData.projects || []).map(p => ({ name: p.name, hours: p.hours })));
             }
         }
