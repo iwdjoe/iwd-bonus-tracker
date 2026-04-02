@@ -100,28 +100,15 @@ exports.handler = async function(event, context) {
             endDate = new Date(year, month + 1, 0).toISOString().split('T')[0].replace(/-/g, '');
         }
 
-        // Fetch page 1, rates, and teams in parallel
-        const ALLOWED_TEAMS = ['DEVs', 'PMs', 'QAs', 'SA', 'SEO', 'AM', 'DSN'];
-        const [twRes1, ratesRes, teamsRes] = await Promise.all([
+        // Fetch page 1 + rates in parallel
+        const [twRes1, ratesRes] = await Promise.all([
             fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } }),
-            fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } }),
-            fetch(`https://${DOMAIN}/teams.json`, { headers: { 'Authorization': AUTH } })
+            fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
         ]);
 
         if(!twRes1.ok) throw new Error("Teamwork API " + twRes1.status);
         const twData1 = await twRes1.json();
         const savedRates = ratesRes.ok ? await ratesRes.json() : {};
-
-        // Build allowedPersonIds from approved teams only.
-        // Entries from users outside these teams are excluded from all calculations.
-        let allowedPersonIds = null; // null = allow all (safe fallback if teams API fails)
-        if (teamsRes.ok) {
-            const teamsData = await teamsRes.json();
-            allowedPersonIds = new Set();
-            (teamsData.teams || [])
-                .filter(t => ALLOWED_TEAMS.includes(t.name))
-                .forEach(t => (t.members || []).forEach(m => allowedPersonIds.add(String(m.id))));
-        }
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
         let entries = twData1['time-entries'] || [];
@@ -152,7 +139,6 @@ exports.handler = async function(event, context) {
         entries.forEach(e => {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
             if (e['isbillable'] !== '1') return;
-            if (allowedPersonIds !== null && !allowedPersonIds.has(String(e['person-id']))) return;
 
             const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
             const user = e['person-first-name'] + ' ' + e['person-last-name'];

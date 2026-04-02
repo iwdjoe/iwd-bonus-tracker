@@ -4,6 +4,3 @@ bonus-bot/node_modules/
 bonus-bot/.env
 pulse-cache.json
 rates.json
-
-# Local Netlify folder
-.netlify
