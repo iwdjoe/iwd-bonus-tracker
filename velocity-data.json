@@ -186,7 +186,7 @@
     },
     "2026-04": {
       "SchoolFix - Migration to Adobe Live Search": {
-        "plan": "Core",
+        "plan": "",
         "rate": 160,
         "minHours": 0,
         "plannedHours": 0
@@ -194,8 +194,8 @@
       "Inyo Pools - Project Hammerhead MVP": {
         "plan": "Core",
         "rate": 155,
-        "minHours": 44,
-        "plannedHours": 44
+        "minHours": 0,
+        "plannedHours": 430
       },
       "School Fix - Maintenance": {
         "plan": "Core",
@@ -248,8 +248,8 @@
       "US Camera Pro - Maintenance": {
         "plan": "Support",
         "rate": 160,
-        "minHours": 10,
-        "plannedHours": 10
+        "minHours": 20,
+        "plannedHours": 20
       },
       "Europa Eyewear - EyeBobs to Bloomingdale’s Integration": {
         "plan": "Support",
@@ -261,13 +261,13 @@
         "plan": "Core",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 75
       },
       "Europa Eyewear – Image Curation": {
         "plan": "Support",
         "rate": 155,
-        "minHours": 10,
-        "plannedHours": 10
+        "minHours": 0,
+        "plannedHours": 50
       },
       "Pryor - SEO Migration Recovery | Content": {
         "plan": "",
