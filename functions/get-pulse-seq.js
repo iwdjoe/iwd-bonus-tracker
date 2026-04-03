@@ -88,7 +88,7 @@ exports.handler = async function(event, context) {
             return {
                 u: user,
                 p: e['project-name'],
-                pid: e['project-name'].replace(/[^a-z0-9]/gi, ''),
+                pid: String(e['project-id']),
                 d: e.date,
                 h: hours,
                 b: e['isbillable'] === '1',

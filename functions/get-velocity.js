@@ -115,31 +115,37 @@ exports.handler = async function(event, context) {
             if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
             if (e['isbillable'] !== '1') return;
 
-            const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
-            const project = e['project-name'];
+            const hours  = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
+            const pid    = String(e['project-id']); // stable Teamwork project ID
+            const name   = e['project-name'];       // display name — may change over time
 
-            if (!projects[project]) {
-                projects[project] = { hours: 0, people: Object.create(null) };
+            // Group by project ID so renamed projects don't create duplicate entries.
+            // Always overwrite name so the latest Teamwork name is shown.
+            if (!projects[pid]) {
+                projects[pid] = { name, hours: 0, people: Object.create(null) };
+            } else {
+                projects[pid].name = name;
             }
-            projects[project].hours += hours;
+            projects[pid].hours += hours;
             totalHours += hours;
 
             const person = e['person-first-name'] + ' ' + e['person-last-name'];
-            if (!projects[project].people[person]) {
-                projects[project].people[person] = 0;
+            if (!projects[pid].people[person]) {
+                projects[pid].people[person] = 0;
             }
-            projects[project].people[person] += hours;
+            projects[pid].people[person] += hours;
         });
 
-        const projectList = Object.keys(projects).map(name => {
-            const id = name.replace(/[^a-z0-9]/gi, '');
-            const rate = savedRates[id] || savedRates[name] || GLOBAL_RATE;
+        const projectList = Object.keys(projects).map(pid => {
+            const name     = projects[pid].name;
+            const legacyId = name.replace(/[^a-z0-9]/gi, ''); // backward-compat key for existing rates.json entries
+            const rate     = savedRates[pid] || savedRates[legacyId] || savedRates[name] || GLOBAL_RATE;
             return {
-                id,
+                id: pid,
                 name,
-                hours: Math.round(projects[name].hours * 100) / 100,
+                hours: Math.round(projects[pid].hours * 100) / 100,
                 rate: parseInt(rate),
-                people: projects[name].people
+                people: projects[pid].people
             };
         }).sort((a, b) => b.hours - a.hours);
 

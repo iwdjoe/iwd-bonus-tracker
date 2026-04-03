@@ -280,8 +280,9 @@ async function fetchDashboardData() {
         if (e['isbillable'] !== '1') return;
 
         const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
-        const user = e['person-first-name'] + ' ' + e['person-last-name'];
-        const project = e['project-name'];
+        const user  = e['person-first-name'] + ' ' + e['person-last-name'];
+        const pid   = String(e['project-id']); // stable Teamwork project ID
+        const name  = e['project-name'];       // display name — may change over time
 
         if (e.date === todayStr) {
             todayBillableHours += hours;
@@ -291,15 +292,19 @@ async function fetchDashboardData() {
         users[user].hours += hours;
         if (CONTRACTORS.includes(user)) users[user].contractor = true;
 
-        if (!projects[project]) projects[project] = { hours: 0 };
-        projects[project].hours += hours;
+        // Group by project ID so renamed projects don't create duplicate entries.
+        // Always overwrite name so the latest Teamwork name is shown.
+        if (!projects[pid]) projects[pid] = { name, hours: 0 };
+        else projects[pid].name = name;
+        projects[pid].hours += hours;
     });
 
     const userList = Object.keys(users).map(name => ({ name, hours: users[name].hours, contractor: users[name].contractor }));
-    const projectList = Object.keys(projects).map(name => {
-        const id = name.replace(/[^a-z0-9]/gi, '');
-        const rate = savedRates[id] || savedRates[name] || GLOBAL_RATE;
-        return { id, name, hours: projects[name].hours, rate: parseInt(rate), def: GLOBAL_RATE };
+    const projectList = Object.keys(projects).map(pid => {
+        const name     = projects[pid].name;
+        const legacyId = name.replace(/[^a-z0-9]/gi, ''); // backward-compat key for existing rates.json entries
+        const rate     = savedRates[pid] || savedRates[legacyId] || savedRates[name] || GLOBAL_RATE;
+        return { id: pid, name, hours: projects[pid].hours, rate: parseInt(rate), def: GLOBAL_RATE };
     });
 
     return {
