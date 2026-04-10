@@ -185,12 +185,6 @@
       }
     },
     "2026-04": {
-      "SchoolFix - Migration to Adobe Live Search": {
-        "plan": "",
-        "rate": 160,
-        "minHours": 0,
-        "plannedHours": 0
-      },
       "Inyo Pools - Project Hammerhead MVP": {
         "plan": "Core",
         "rate": 155,
@@ -202,12 +196,6 @@
         "rate": 165,
         "minHours": 80,
         "plannedHours": 80
-      },
-      "Pryor - SEO Migration Recovery": {
-        "plan": "Growth",
-        "rate": 160,
-        "minHours": 89,
-        "plannedHours": 89
       },
       "PSU Extension - Maintenance": {
         "plan": "Growth",
@@ -270,8 +258,8 @@
         "plannedHours": 50
       },
       "Pryor - SEO Migration Recovery | Content": {
-        "plan": "",
-        "rate": 155,
+        "plan": "Growth",
+        "rate": 160,
         "minHours": 0,
         "plannedHours": 0
       },
@@ -279,7 +267,7 @@
         "plan": "",
         "rate": 160,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 4
       }
     }
   },
