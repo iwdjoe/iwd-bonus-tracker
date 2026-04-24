@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<!-- saved from url=(0091)file:///Users/gabby/Documents/Claud%20Projects/IWD%20Dashboard/top-100-target-accounts.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top 100 Target Accounts — Platform Intelligence Report</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
+:root{--black:#1c1c1c;--cyan:#00e5a0;--cyan2:#00c288;--cyan-glow:rgba(0,229,160,.25);--off:#f5f3ee;--white:#fff;--bdr:#e8e5de;--text:#1c1c1c;--muted:#6b6b6b;--muted2:#999;--red:#d42020;--ora:#d45f00;--ylw:#a87000;--ylw-lt:#fffbeb;--ylw-bd:#fde68a;--grn:#15803d;--grn-lt:#f0fdf4;--grn-bd:#bbf7d0;--blu:#1e40af;--blu-lt:#eff6ff;--blu-bd:#bfdbfe;--pur:#7c3aed;--pur-lt:#f5f3ff;--pur-bd:#ddd6fe;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:13px;}
+body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1200px;margin:0 auto;padding:32px 40px 60px;}
+.display{font-family:'Space Grotesk','Inter',sans-serif;letter-spacing:-.01em;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:0 0 16px;margin-bottom:8px;border-bottom:2px solid var(--black);}
+.topbar .tb-brand{font-weight:900;font-size:1rem;letter-spacing:.04em;}
+.topbar .tb-brand span{color:var(--cyan2);}
+.topbar .tb-meta{font-size:.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
+
+.cover{background:var(--black);border-radius:16px;padding:42px 48px;margin-bottom:24px;position:relative;overflow:hidden;}
+.cover::before{content:'';position:absolute;bottom:-60px;right:-60px;width:280px;height:280px;border-radius:50%;border:44px solid var(--cyan);opacity:.1;}
+.cover-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;position:relative;z-index:2;}
+.brand{font-weight:900;color:#fff;font-size:1.1rem;letter-spacing:.04em;}
+.brand span{color:var(--cyan);}
+.pill{background:var(--cyan);color:var(--black);font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;padding:6px 13px;border-radius:100px;}
+.cover h1{color:#fff;font-size:2.2rem;font-weight:900;line-height:1.08;letter-spacing:-.6px;margin-bottom:8px;position:relative;z-index:2;}
+.cover h1 em{color:var(--cyan);font-style:normal;}
+.cover-sub{color:rgba(255,255,255,.6);font-size:.92rem;max-width:760px;margin-bottom:26px;position:relative;z-index:2;line-height:1.55;}
+.cover-stats{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;position:relative;z-index:2;background:rgba(0,0,0,.2);}
+.cs-item{padding:16px 18px;border-right:1px solid rgba(255,255,255,.08);}
+.cs-item:last-child{border:none;}
+.cs-v{font-family:'Space Grotesk',sans-serif;font-size:1.65rem;font-weight:700;color:#fff;line-height:1;letter-spacing:-.02em;margin-bottom:5px;}
+.cs-v.c{color:var(--cyan);}
+.cs-l{font-size:.58rem;color:rgba(255,255,255,.44);text-transform:uppercase;letter-spacing:.09em;font-weight:700;}
+
+.tldr{background:var(--off);border:1.5px solid var(--bdr);border-radius:12px;padding:20px 24px;margin-bottom:24px;}
+.tldr h2{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:12px;}
+.tldr ul{list-style:none;padding:0;}
+.tldr li{padding:7px 0 7px 24px;position:relative;font-size:.92rem;line-height:1.65;}
+.tldr li::before{content:'▸';position:absolute;left:0;top:7px;color:var(--cyan2);font-weight:900;}
+.tldr b{color:var(--black);}
+.tldr .hi{background:rgba(0,229,160,.18);padding:1px 6px;border-radius:3px;font-weight:700;}
+
+.section{margin-bottom:24px;}
+.section-head{display:flex;align-items:center;gap:13px;padding:14px 20px;background:var(--black);border-radius:12px 12px 0 0;}
+.section-head .num-dot{width:30px;height:30px;border-radius:7px;background:var(--cyan);color:var(--black);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.88rem;font-family:'Space Grotesk',sans-serif;}
+.section-head h2{color:#fff;font-size:1.05rem;font-weight:800;letter-spacing:-.01em;}
+.section-head .sh-sub{color:rgba(255,255,255,.55);font-size:.76rem;margin-left:auto;font-weight:500;}
+.section-body{border:1.5px solid var(--bdr);border-top:none;border-radius:0 0 12px 12px;padding:22px 24px;background:#fff;}
+
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.chart-container{background:var(--off);border:1.5px solid var(--bdr);border-radius:10px;padding:18px 20px;margin-bottom:16px;}
+.chart-container.fullbleed{padding:22px 24px;}
+.chart-title{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px;}
+.donut-wrap{display:flex;align-items:center;gap:14px;}
+.donut-svg{flex-shrink:0;width:180px;height:180px;}
+.donut-legend{flex:1;font-size:.76rem;}
+.leg-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px dashed var(--bdr);}
+.leg-row:last-child{border-bottom:none;}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.leg-label{flex:1;color:var(--text);font-weight:600;}
+.leg-val{font-weight:800;font-family:'Space Grotesk',sans-serif;}
+.leg-pct{color:var(--muted);font-weight:500;}
+
+.strat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+.strat-card{background:#fff;border:1.5px solid var(--bdr);border-radius:10px;padding:14px 16px;}
+.strat-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:8px;}
+.strat-count{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;line-height:1;letter-spacing:-.03em;flex-shrink:0;}
+.strat-label{font-size:.88rem;font-weight:900;color:var(--black);margin-bottom:3px;letter-spacing:-.01em;}
+.strat-desc{font-size:.75rem;color:var(--muted);line-height:1.45;}
+.strat-desc b{color:var(--text);}
+.strat-action{padding-top:8px;border-top:1px dashed var(--bdr);font-size:.72rem;color:var(--text);}
+.strat-action b{color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.62rem;}
+
+.callout{padding:15px 20px;border-radius:10px;margin:14px 0;font-size:.9rem;line-height:1.65;}
+.callout b{font-weight:800;}
+.callout.good{background:var(--grn-lt);border:1.5px solid var(--grn-bd);color:var(--grn);}
+.callout.warn{background:var(--ylw-lt);border:1.5px solid var(--ylw-bd);color:var(--ylw);}
+.callout.info{background:var(--blu-lt);border:1.5px solid var(--blu-bd);color:var(--blu);}
+.callout.hero{background:linear-gradient(135deg,var(--grn-lt) 0%,var(--cyan-glow) 100%);border:1.5px solid var(--cyan);color:var(--black);}
+
+table.deals{width:100%;border-collapse:collapse;font-size:.78rem;}
+table.deals th{text-align:left;padding:9px 10px;background:var(--off);font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1.5px solid var(--bdr);position:sticky;top:0;z-index:1;}
+table.deals td{padding:10px;border-bottom:1px solid var(--bdr);vertical-align:top;}
+table.deals tr:last-child td{border-bottom:none;}
+table.deals tr:hover{background:var(--off);}
+table.deals .num{text-align:right;font-variant-numeric:tabular-nums;font-family:'Space Grotesk',sans-serif;}
+table.deals .small{font-size:.72rem;color:var(--muted);line-height:1.35;}
+.deal-link{font-weight:700;color:var(--black);text-decoration:none;border-bottom:1.5px dotted var(--cyan);}
+.deal-link:hover{color:var(--cyan2);}
+.co-sub{font-size:.66rem;margin-top:2px;}
+
+.rank{text-align:center;font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--muted);font-size:.85rem;width:36px;}
+.grade-cell{display:flex;align-items:center;gap:6px;}
+.grade-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;color:#fff;font-weight:900;font-size:.72rem;font-family:'Space Grotesk',sans-serif;flex-shrink:0;}
+.score-num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;color:var(--text);}
+.ind-chip{display:inline-block;background:var(--off);border:1px solid var(--bdr);color:var(--text);font-size:.66rem;font-weight:700;padding:3px 8px;border-radius:100px;white-space:nowrap;}
+.stage-sm{display:inline-block;background:var(--cyan);color:var(--black);font-size:.55rem;font-weight:900;text-transform:uppercase;padding:3px 6px;border-radius:3px;letter-spacing:.08em;}
+.open-deal-tag{display:inline-block;background:#fff3cd;color:var(--ora);font-size:.52rem;font-weight:900;text-transform:uppercase;padding:2px 5px;border-radius:3px;margin-right:4px;letter-spacing:.08em;border:1px solid #fde68a;vertical-align:middle;}
+.contact-pill{display:inline-block;background:var(--blu-lt);color:var(--blu);border:1px solid var(--blu-bd);font-size:.54rem;font-weight:800;padding:2px 5px;border-radius:100px;margin-left:5px;vertical-align:middle;}
+
+.platform-chip{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1.5px solid var(--bdr);font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap;}
+.pc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.size-detail{font-size:.62rem;color:var(--muted2);margin-top:1px;}
+
+.subhead-row{display:flex;justify-content:space-between;align-items:center;margin:18px 0 9px;padding-bottom:6px;border-bottom:1px solid var(--bdr);}
+.subhead-row h3{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
+.subhead-meta{font-size:.72rem;color:var(--muted);font-weight:600;}
+
+.method{background:var(--off);border:1.5px solid var(--bdr);border-radius:10px;padding:16px 22px;margin-top:24px;font-size:.78rem;color:var(--muted);line-height:1.6;}
+.method h3{font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px;}
+.method b{color:var(--text);}
+.method code{background:#fff;padding:1px 5px;border-radius:3px;border:1px solid var(--bdr);font-family:monospace;font-size:.72rem;}
+
+@media print{.wrap{padding:18px 24px;}.section{page-break-inside:avoid;}table.deals{font-size:.7rem;}}
+</style></head><body>
+
+<div class="wrap">
+
+<div class="topbar">
+  <div class="tb-brand">IWD <span>/</span> Agency</div>
+  <div class="tb-meta">Top 100 Target Accounts · Platform Intelligence · <b>Friday, April 24, 2026</b></div>
+</div>
+
+<div class="cover">
+  <div class="cover-top">
+    <div class="brand">IWD <span>/</span> Agency</div>
+    <div class="pill">🎯 Target Account Intelligence</div>
+  </div>
+  <h1 class="display">Top 100 Target Accounts<br><em>Platform, Size, and Revenue Intelligence</em></h1>
+  <div class="cover-sub">
+    The 100 highest-scoring USA/UK B2B prospects in HubSpot, enriched with <b>live platform detection</b> from their actual websites (Shopify Plus, Adobe Commerce, Magento, BigCommerce, WooCommerce) plus company size tier and revenue estimates. Scraped, parsed, and scored in real time. Tier 1 customers excluded.
+  </div>
+  <div class="cover-stats">
+    <div class="cs-item"><div class="cs-v c">55</div><div class="cs-l">Magento / AC</div></div>
+    <div class="cs-item"><div class="cs-v">17</div><div class="cs-l">Shopify / Plus</div></div>
+    <div class="cs-item"><div class="cs-v">4</div><div class="cs-l">BigC / WooC</div></div>
+    <div class="cs-item"><div class="cs-v">13</div><div class="cs-l">Custom / HL</div></div>
+    <div class="cs-item"><div class="cs-v c">85/15</div><div class="cs-l">US / UK Split</div></div>
+  </div>
+</div>
+
+<div class="tldr">
+  <h2>🎯 Headline Finding</h2>
+  <ul>
+    <li><span class="hi">55 of 100 prospects are already on Magento 2 or Adobe Commerce</span> — that's <b>61% of successfully-detected sites</b>. These are <b>direct-fit IWD customers</b> who just haven't bought from us yet. Our core competency matches their stack perfectly.</li>
+    <li><b>17 on Shopify / Shopify Plus</b> — ripe for either Dominate-hosted checkout upsell OR full Adobe Commerce migration pitch (especially the 2 Shopify Plus enterprise sites).</li>
+    <li><b>4 on BigCommerce + WooCommerce</b> — typical "outgrowing their platform" pattern, migration campaigns.</li>
+    <li><b>24 custom / unknown / fetch-blocked</b> — need manual review. Bot-blocking is itself a signal of a larger, more security-conscious site (e.g., Sugarfina).</li>
+    <li><b>Top industry concentration:</b> Retail/E-com (19), Apparel/Fashion (15), Sporting Goods (10) — aligns with IWD's winning clusters.</li>
+  </ul>
+</div>
+
+<div class="callout hero">
+  <b>💡 The big unlock:</b> Most of this list is already running the platforms IWD specializes in. <b>55%+ are on the Magento ecosystem</b> — we don't have to sell them on a re-platform, we just have to show we can serve them better than their current agency. The Shopify group is a different motion (migration or Dominate add-on), but no campaign here is a cold "convince them what Adobe Commerce is" — these prospects already know.
+</div>
+
+<!-- SECTION 1: PLATFORM INTELLIGENCE -->
+<div class="section">
+  <div class="section-head">
+    <div class="num-dot">01</div><h2>Platform Intelligence</h2>
+    <div class="sh-sub">What each prospect is actually running</div>
+  </div>
+  <div class="section-body">
+    <div class="chart-grid">
+      <div class="chart-container"><div class="chart-title">🛒 PLATFORM DISTRIBUTION</div><div class="donut-wrap"><svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" class="donut-svg"><path d="M 120.0,25.0 A 95,95 0 0,1 131.90665718860893,214.2508966248754 L 127.01866107960105,175.55842327361074 A 56,56 0 0,0 120.0,64.0 Z" fill="#ee672f"></path><path d="M 131.90665718860893,214.2508966248754 A 95,95 0 0,1 50.74798039496592,185.03197506322545 L 79.17775686440096,158.33463793200656 A 56,56 0 0,0 127.01866107960105,175.55842327361074 Z" fill="#96bf48"></path><path d="M 50.74798039496592,185.03197506322545 A 95,95 0 0,1 25.187460799314195,114.03490064471524 L 64.1105032080168,116.48373090635846 A 56,56 0 0,0 79.17775686440096,158.33463793200656 Z" fill="#6b6b6b"></path><path d="M 25.187460799314195,114.03490064471524 A 95,95 0 0,1 50.747980394965865,54.9680249367746 L 79.17775686440093,81.66536206799344 A 56,56 0 0,0 64.1105032080168,116.48373090635846 Z" fill="#d4d4d4"></path><path d="M 50.747980394965865,54.9680249367746 A 95,95 0 0,1 85.02816749495554,31.67123384061614 L 99.385025049658,67.93251679025794 A 56,56 0 0,0 79.17775686440093,81.66536206799344 Z" fill="#d4145a"></path><path d="M 85.02816749495554,31.67123384061614 A 95,95 0 0,1 96.37446071933874,27.98459969278005 L 106.07336631876811,65.75934297679666 A 56,56 0 0,0 99.385025049658,67.93251679025794 Z" fill="#5a31f4"></path><path d="M 96.37446071933874,27.98459969278005 A 95,95 0 0,1 108.09334281139098,25.74910337512462 L 112.9813389203989,64.44157672638926 A 56,56 0 0,0 106.07336631876811,65.75934297679666 Z" fill="#0d52ff"></path><path d="M 108.09334281139098,25.74910337512462 A 95,95 0 0,1 119.9999999999999,25.0 L 119.99999999999994,64.0 A 56,56 0 0,0 112.9813389203989,64.44157672638926 Z" fill="#7f54b3"></path><text x="120" y="116" text-anchor="middle" fill="#1c1c1c" font-size="30" font-weight="900" font-family="Space Grotesk,Inter">100</text><text x="120" y="136" text-anchor="middle" fill="#6b6b6b" font-size="10" font-weight="700" letter-spacing="1">PLATFORMS</text></svg><div class="donut-legend"><div class="leg-row"><span class="leg-dot" style="background:#ee672f"></span><span class="leg-label">Magento 2</span><span class="leg-val">48 <span class="leg-pct">(48%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#96bf48"></span><span class="leg-label">Shopify</span><span class="leg-val">15 <span class="leg-pct">(15%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#6b6b6b"></span><span class="leg-label">Other/Custom</span><span class="leg-val">13 <span class="leg-pct">(13%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#d4d4d4"></span><span class="leg-label">Could not fetch</span><span class="leg-val">11 <span class="leg-pct">(11%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#d4145a"></span><span class="leg-label">Adobe Commerce</span><span class="leg-val">7 <span class="leg-pct">(7%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#5a31f4"></span><span class="leg-label">Shopify Plus</span><span class="leg-val">2 <span class="leg-pct">(2%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#0d52ff"></span><span class="leg-label">BigCommerce</span><span class="leg-val">2 <span class="leg-pct">(2%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#7f54b3"></span><span class="leg-label">WooCommerce</span><span class="leg-val">2 <span class="leg-pct">(2%)</span></span></div></div></div></div>
+      <div class="chart-container"><div class="chart-title">🏢 COMPANY SIZE TIER</div><div class="donut-wrap"><svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" class="donut-svg"><path d="M 120.0,25.0 A 95,95 0 0,1 143.62553928066123,27.98459969278005 L 133.92663368123186,65.75934297679666 A 56,56 0 0,0 120.0,64.0 Z" fill="#1c1c1c"></path><path d="M 143.62553928066123,27.98459969278005 A 95,95 0 0,1 212.01540030721998,96.37446071933881 L 174.24065702320334,106.07336631876814 A 56,56 0 0,0 133.92663368123186,65.75934297679666 Z" fill="#00c288"></path><path d="M 212.01540030721998,96.37446071933881 A 95,95 0 0,1 125.96509935528474,214.81253920068582 L 123.51626909364153,175.88949679198322 A 56,56 0 0,0 174.24065702320334,106.07336631876814 Z" fill="#1e40af"></path><path d="M 125.96509935528474,214.81253920068582 A 95,95 0 0,1 114.03490064471525,25.187460799314195 L 116.48373090635846,64.1105032080168 A 56,56 0 0,0 123.51626909364153,175.88949679198322 Z" fill="#d45f00"></path><path d="M 114.03490064471525,25.187460799314195 A 95,95 0 0,1 120.00000000000007,25.0 L 120.00000000000004,64.0 A 56,56 0 0,0 116.48373090635846,64.1105032080168 Z" fill="#6b6b6b"></path><text x="120" y="116" text-anchor="middle" fill="#1c1c1c" font-size="30" font-weight="900" font-family="Space Grotesk,Inter">100</text><text x="120" y="136" text-anchor="middle" fill="#6b6b6b" font-size="10" font-weight="700" letter-spacing="1">SIZE TIER</text></svg><div class="donut-legend"><div class="leg-row"><span class="leg-dot" style="background:#1c1c1c"></span><span class="leg-label">Enterprise</span><span class="leg-val">4 <span class="leg-pct">(4%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#00c288"></span><span class="leg-label">Mid-Market</span><span class="leg-val">17 <span class="leg-pct">(17%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#1e40af"></span><span class="leg-label">SMB-Mid</span><span class="leg-val">28 <span class="leg-pct">(28%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#d45f00"></span><span class="leg-label">SMB</span><span class="leg-val">50 <span class="leg-pct">(50%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#6b6b6b"></span><span class="leg-label">Micro</span><span class="leg-val">1 <span class="leg-pct">(1%)</span></span></div></div></div></div>
+    </div>
+
+    <div class="chart-container fullbleed">
+      <div class="chart-title">📊 INDUSTRIES — TOP 12</div>
+      <svg viewBox="0 0 680 344" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;width:100%;max-width:680px;height:auto"><text x="0" y="14" font-size="10" font-weight="800" fill="#6b6b6b" letter-spacing="1.2">TOP INDUSTRIES IN TOP 100</text><text x="215" y="39.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Retail/E-com</text><rect x="220" y="24" width="360" height="20" fill="#00c288" rx="3"></rect><text x="586" y="39.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">19</text><text x="215" y="65.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Apparel/Fashion</text><rect x="220" y="50" width="284" height="20" fill="#00c288" rx="3"></rect><text x="510" y="65.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">15</text><text x="215" y="91.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Sporting Goods</text><rect x="220" y="76" width="189" height="20" fill="#00c288" rx="3"></rect><text x="415" y="91.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">10</text><text x="215" y="117.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Automotive</text><rect x="220" y="102" width="151" height="20" fill="#00c288" rx="3"></rect><text x="377" y="117.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">8</text><text x="215" y="143.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Food &amp; Beverage</text><rect x="220" y="128" width="151" height="20" fill="#00c288" rx="3"></rect><text x="377" y="143.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">8</text><text x="215" y="169.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Industrial Eng</text><rect x="220" y="154" width="94" height="20" fill="#00c288" rx="3"></rect><text x="320" y="169.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">5</text><text x="215" y="195.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Construction</text><rect x="220" y="180" width="75" height="20" fill="#00c288" rx="3"></rect><text x="301" y="195.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">4</text><text x="215" y="221.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Graphic Design</text><rect x="220" y="206" width="75" height="20" fill="#00c288" rx="3"></rect><text x="301" y="221.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">4</text><text x="215" y="247.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Cons. Electronics</text><rect x="220" y="232" width="56" height="20" fill="#00c288" rx="3"></rect><text x="282" y="247.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">3</text><text x="215" y="273.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Publishing</text><rect x="220" y="258" width="37" height="20" fill="#00c288" rx="3"></rect><text x="263" y="273.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">2</text><text x="215" y="299.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Building Materials</text><rect x="220" y="284" width="37" height="20" fill="#00c288" rx="3"></rect><text x="263" y="299.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">2</text><text x="215" y="325.0" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Education</text><rect x="220" y="310" width="37" height="20" fill="#00c288" rx="3"></rect><text x="263" y="325.0" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">2</text></svg>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: PLATFORM-BASED STRATEGY -->
+<div class="section">
+  <div class="section-head">
+    <div class="num-dot">02</div><h2>Platform-Based Strategy Groups</h2>
+    <div class="sh-sub">Six buckets · six different sales motions</div>
+  </div>
+  <div class="section-body">
+    <p style="font-size:.9rem;margin-bottom:14px;color:var(--muted);">Each prospect gets a different outreach angle based on their current stack. Same audience, different pitch per platform bucket.</p>
+    <div class="strat-grid">
+    <div class="strat-card" style="border-left:4px solid #ee672f;">
+      <div class="strat-head">
+        <div class="strat-count" style="color:#ee672f;">55</div>
+        <div>
+          <div class="strat-label">Magento / Adobe Commerce</div>
+          <div class="strat-desc">Already on our core platform. Dominate upsell, upgrades, support — <b>direct-to-close motion</b>.</div>
+        </div>
+      </div>
+      <div class="strat-action"><b>Action:</b> Campaign 3 (Cluster Nurture) + Dominate upsell</div>
+    </div>
+    <div class="strat-card" style="border-left:4px solid #5a31f4;">
+      <div class="strat-head">
+        <div class="strat-count" style="color:#5a31f4;">2</div>
+        <div>
+          <div class="strat-label">Shopify Plus</div>
+          <div class="strat-desc">Enterprise Shopify sites. Offer custom apps, checkout optimization, headless consulting.</div>
+        </div>
+      </div>
+      <div class="strat-action"><b>Action:</b> ABM + Custom Shopify Plus proposal</div>
+    </div>
+    <div class="strat-card" style="border-left:4px solid #96bf48;">
+      <div class="strat-head">
+        <div class="strat-count" style="color:#96bf48;">15</div>
+        <div>
+          <div class="strat-label">Shopify (standard)</div>
+          <div class="strat-desc">Growth-stage Shopify stores. Offer migration-to-Adobe OR Dominate hosted checkout.</div>
+        </div>
+      </div>
+      <div class="strat-action"><b>Action:</b> Migration campaign or Dominate add-on</div>
+    </div>
+    <div class="strat-card" style="border-left:4px solid #0d52ff;">
+      <div class="strat-head">
+        <div class="strat-count" style="color:#0d52ff;">2</div>
+        <div>
+          <div class="strat-label">BigCommerce</div>
+          <div class="strat-desc">Can serve as-is with expertise or migrate to Adobe Commerce at scale.</div>
+        </div>
+      </div>
+      <div class="strat-action"><b>Action:</b> Platform services / migration</div>
+    </div>
+    <div class="strat-card" style="border-left:4px solid #7f54b3;">
+      <div class="strat-head">
+        <div class="strat-count" style="color:#7f54b3;">2</div>
+        <div>
+          <div class="strat-label">WooCommerce</div>
+          <div class="strat-desc">Hitting WooCommerce limits — ripe for Adobe Commerce migration.</div>
+        </div>
+      </div>
+      <div class="strat-action"><b>Action:</b> WooCommerce → Adobe migration pitch</div>
+    </div>
+    <div class="strat-card" style="border-left:4px solid #6b6b6b;">
+      <div class="strat-head">
+        <div class="strat-count" style="color:#6b6b6b;">24</div>
+        <div>
+          <div class="strat-label">Custom / Unknown / WordPress</div>
+          <div class="strat-desc">Greenfield or manual-check accounts. Discovery call to learn their stack.</div>
+        </div>
+      </div>
+      <div class="strat-action"><b>Action:</b> Discovery-first outreach</div>
+    </div></div>
+  </div>
+</div>
+
+<!-- SECTION 3: FULL TOP 100 TABLE -->
+<div class="section">
+  <div class="section-head">
+    <div class="num-dot">03</div><h2>Top 100 Target Accounts — Full Detail</h2>
+    <div class="sh-sub">Ranked by lead score · click any row to open HubSpot</div>
+  </div>
+  <div class="section-body">
+    <table class="deals">
+      <thead><tr>
+        <th class="rank">#</th>
+        <th>Grade</th>
+        <th>Company</th>
+        <th>Current Platform</th>
+        <th>Size / Revenue</th>
+        <th>Industry</th>
+        <th>Country</th>
+        <th>Stage</th>
+      </tr></thead>
+      <tbody><tr>
+      <td class="rank">1</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">94</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/7691486995" target="_blank" class="deal-link">Replacement Kitchen Doors from Kitchen Door Workshop</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://kitchendoorworkshop.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">kitchendoorworkshop.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1774…)</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$10M · 50+</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">2</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">92</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/20677958185" target="_blank" class="deal-link">Combat Brands</a><span class="contact-pill">4c</span><div class="co-sub"><a href="https://combatbrands.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">combatbrands.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$10-20M · 50+</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">3</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">89</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16921587996" target="_blank" class="deal-link">Commsandsound.com</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://commsandsound.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">commsandsound.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4145a;color:#d4145a;"><span class="pc-dot" style="background:#d4145a;"></span>Magento 2 / Adobe Commerce</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$5-10M · 25+</div></td>
+      <td><span class="ind-chip">Cons. Electronics</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">4</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">88</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8881105704" target="_blank" class="deal-link">Tarmac Sportz</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://tarmacsportz.co.uk/" target="_blank" style="color:var(--muted);text-decoration:underline;">tarmacsportz.co.uk</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4145a;color:#d4145a;"><span class="pc-dot" style="background:#d4145a;"></span>Magento 2 / Adobe Commerce</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$5-10M · 25+</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="open-deal-tag">2 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">5</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">88</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/26924949932" target="_blank" class="deal-link">University Loft</a><span class="contact-pill">8c</span><div class="co-sub"><a href="https://uloft.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">uloft.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$50-75M · 200+</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">6</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">88</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/14855647320" target="_blank" class="deal-link">Naples UK</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://naplesuk.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">naplesuk.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4145a;color:#d4145a;"><span class="pc-dot" style="background:#d4145a;"></span>Magento 2 / Adobe Commerce</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$5M · 25+</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="open-deal-tag">2 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">7</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">88</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/13634129465" target="_blank" class="deal-link">Razny Jewelers</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://razny.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">razny.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$30M · 50+</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">2 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">8</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">88</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15413162241" target="_blank" class="deal-link">Treadmill Outlet</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://treadmilloutlet.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">treadmilloutlet.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$15M · 25+</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">2 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">9</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">87</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9309524887" target="_blank" class="deal-link">SafeFence Live</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://safefence.co.uk/" target="_blank" style="color:var(--muted);text-decoration:underline;">safefence.co.uk</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1769…)</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$5M · 25+</div></td>
+      <td><span class="ind-chip">Construction</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">10</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">86</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15366143073" target="_blank" class="deal-link">bigmen.com</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://bigmen.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">Bigmen.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1773…)</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">11</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">86</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/14770455350" target="_blank" class="deal-link">cleggengine.com</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://cleggengine.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">cleggengine.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">12</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16391848363" target="_blank" class="deal-link">PrestigeHairEx</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://prestigehairextensions.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">prestigehairextensions.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">13</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9412005239" target="_blank" class="deal-link">EZ Able LLC</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://ezable.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">ezable.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$3M · 10</div></td>
+      <td><span class="ind-chip">Construction</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">14</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/10441821031" target="_blank" class="deal-link">DMoose</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://dmoose.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">dmoose.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$30M · 50+</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">15</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15786245554" target="_blank" class="deal-link">Millard County</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://millardcounty.org/" target="_blank" style="color:var(--muted);text-decoration:underline;">millardcounty.org</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4d4d4;color:#d4d4d4;"><span class="pc-dot" style="background:#d4d4d4;"></span>Could not fetch</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Higher Education</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">16</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17024722966" target="_blank" class="deal-link">San Carlos Imports LLC</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://sancarlosimports.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">sancarlosimports.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4d4d4;color:#d4d4d4;"><span class="pc-dot" style="background:#d4d4d4;"></span>Could not fetch</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">17</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17712095368" target="_blank" class="deal-link">Ocean Millennium Trust Inc</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://oceansmall.net/" target="_blank" style="color:var(--muted);text-decoration:underline;">oceansmall.net</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">18</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/6080607070" target="_blank" class="deal-link">TreeSeeds.com</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://treeseeds.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">treeseeds.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown (Starfield Technologies; …</span></td>
+      <td class="small"><b>Micro</b><div class="size-detail">&lt;$1M · 5-10</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">19</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/7711981883" target="_blank" class="deal-link">Leez Inc</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://leez.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">leez.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1702…)</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">20</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/12149612698" target="_blank" class="deal-link">The Hat Pros</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://thehatpros.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">thehatpros.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">21</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">82</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203404852" target="_blank" class="deal-link">Sugarfina</a><span class="contact-pill">5c</span><div class="co-sub"><a href="https://sugarfina.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">sugarfina.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$50M · 200+</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">22</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">82</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9272593531" target="_blank" class="deal-link">AutoMaximizer</a><span class="contact-pill">3c</span><div class="co-sub"><a href="https://automaximizer.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">automaximizer.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">23</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">82</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/11823021425" target="_blank" class="deal-link">Stylla London</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://stylla.co.uk/" target="_blank" style="color:var(--muted);text-decoration:underline;">stylla.co.uk</a></div></td>
+      <td><span class="platform-chip" style="border-color:#5a31f4;color:#5a31f4;"><span class="pc-dot" style="background:#5a31f4;"></span>Shopify Plus</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$30-100M · 100-500</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">24</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">81</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/48206656318" target="_blank" class="deal-link">FriconUSA</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://friconusa.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">friconusa.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Electronics Mfg</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">25</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">81</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/7772396555" target="_blank" class="deal-link">Leapers Inc</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://leapers.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">leapers.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1776…)</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$30M+ · 75+</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">26</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">81</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/27519975236" target="_blank" class="deal-link">KeHE</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://kehe.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">kehe.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>Enterprise</b><div class="size-detail">$13B · 6,500+</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">27</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">80</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203406677" target="_blank" class="deal-link">BetterGrow Hydro</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://bghydro.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">bghydro.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$10M · 50+</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">28</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span><span class="score-num">80</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4164139588" target="_blank" class="deal-link">Slurp Wine Company Ltd</a><span class="contact-pill">5c</span><div class="co-sub"><a href="https://slurp.co.uk/" target="_blank" style="color:var(--muted);text-decoration:underline;">slurp.co.uk</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$10M · 25+</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">29</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">79</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203415434" target="_blank" class="deal-link">Divers Supply</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://divers-supply.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">divers-supply.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1775…)</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$10M · 25+</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">30</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">79</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17424884039" target="_blank" class="deal-link">russellsny</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://russellsny.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">russellsny.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">31</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">79</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/5961239133" target="_blank" class="deal-link">OneUp Innovations</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://oneupinnovations.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">oneupinnovations.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$10M · 25+</div></td>
+      <td><span class="ind-chip">Industrial Eng</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">32</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">78</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4202428715" target="_blank" class="deal-link">RK Audio Inc</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://rkaudio.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">rkaudio.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4145a;color:#d4145a;"><span class="pc-dot" style="background:#d4145a;"></span>Magento 2 / Adobe Commerce</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$30-100M · 100-500</div></td>
+      <td><span class="ind-chip">Cons. Electronics</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">33</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">78</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15991442540" target="_blank" class="deal-link">The Snowlands Company</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://thesnowlandscompany.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">thesnowlandscompany.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Publishing</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">34</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">78</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15358471186" target="_blank" class="deal-link">By Night Studios</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://bynightstudios.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">bynightstudios.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Publishing</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">35</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">76</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203292311" target="_blank" class="deal-link">Memorial Bracelets</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://memorialbracelets.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">memorialbracelets.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">36</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">76</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/19059209119" target="_blank" class="deal-link">BOA®</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://boafit.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">boafit.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$100M · 500+</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">37</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">76</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/19059183022" target="_blank" class="deal-link">Boa Technology</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://boatechnology.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">boatechnology.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$100M · 500+</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">38</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">76</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203262599" target="_blank" class="deal-link">Sprinkler Warehouse</a><span class="contact-pill">3c</span><div class="co-sub"><a href="https://sprinklerwarehouse.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">sprinklerwarehouse.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4d4d4;color:#d4d4d4;"><span class="pc-dot" style="background:#d4d4d4;"></span>Could not fetch</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$15M · 50+</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">39</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">76</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/21926516661" target="_blank" class="deal-link">Mingledorff's</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://mingledorffs.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">mingledorffs.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Building Materials</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">40</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">75</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203262823" target="_blank" class="deal-link">The Critical Thinking Co.</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://criticalthinking.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">criticalthinking.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4145a;color:#d4145a;"><span class="pc-dot" style="background:#d4145a;"></span>Magento 2 / Adobe Commerce</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$10M · 25+</div></td>
+      <td><span class="ind-chip">Education</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">41</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">75</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/22425792079" target="_blank" class="deal-link">Tacony</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://tacony.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">tacony.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$100M+ · 500+</div></td>
+      <td><span class="ind-chip">Wholesale</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">42</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">75</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/48626097687" target="_blank" class="deal-link">GS-JJ</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://gs-jj.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">gs-jj.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4d4d4;color:#d4d4d4;"><span class="pc-dot" style="background:#d4d4d4;"></span>Could not fetch</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">43</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">75</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17712555419" target="_blank" class="deal-link">Herba Invest Group</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://herbainvest.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">herbainvest.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Consumer Goods</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">44</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">75</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16358873500" target="_blank" class="deal-link">Laughing Lion</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://laughinglionherbs.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">laughinglionherbs.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#0d52ff;color:#0d52ff;"><span class="pc-dot" style="background:#0d52ff;"></span>BigCommerce</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Pharma</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">45</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203291275" target="_blank" class="deal-link">Google</a><span class="contact-pill">7c</span><div class="co-sub"><a href="https://google.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">google.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>Enterprise</b><div class="size-detail">$300B+ · 100k+</div></td>
+      <td><span class="ind-chip">Software</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">46</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9603342195" target="_blank" class="deal-link">Keypress Group</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://keypressgroup.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">keypressgroup.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">47</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/25240680076" target="_blank" class="deal-link">hossrods.com</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://hossrods.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">hossrods.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">48</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/20784803170" target="_blank" class="deal-link">Ringside Boxing</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://ringside.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">ringside.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1776…)</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$10M · 25+</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">49</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15751664803" target="_blank" class="deal-link">SafetyWearhouse</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://safetywearhouse.net/" target="_blank" style="color:var(--muted);text-decoration:underline;">safetywearhouse.net</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1763…)</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">50</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15149472592" target="_blank" class="deal-link">BeyondNice.com</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://beyondnice.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">beyondnice.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">51</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8632554574" target="_blank" class="deal-link">EnStyle Butik</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://enstyletheboutique.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">enstyletheboutique.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">52</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17632018325" target="_blank" class="deal-link">PMC Supplies LLC</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://pmcsupplies.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">pmcsupplies.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">53</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8113245960" target="_blank" class="deal-link">Fedoras.com</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://fedoras.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">fedoras.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">54</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/5840695719" target="_blank" class="deal-link">Englewood Wine Merchants</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://englewoodwinemerchants.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">englewoodwinemerchants.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">55</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16032091663" target="_blank" class="deal-link">Simpson Jewelers LLC</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://simpsonjewelers.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">simpsonjewelers.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">56</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9603134527" target="_blank" class="deal-link">Albany County Fasteners</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://albanycountyfasteners.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">albanycountyfasteners.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4d4d4;color:#d4d4d4;"><span class="pc-dot" style="background:#d4d4d4;"></span>Could not fetch</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">57</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16368894121" target="_blank" class="deal-link">Stair Solution</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://stairsolution.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">stairsolution.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Construction</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">58</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">73</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/45955539883" target="_blank" class="deal-link">MontyPay</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://montypay.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">montypay.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Financial</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">59</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">73</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16898259098" target="_blank" class="deal-link">Cleveland Equipment</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://clevelandequipment.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">clevelandequipment.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4145a;color:#d4145a;"><span class="pc-dot" style="background:#d4145a;"></span>Magento 2 / Adobe Commerce</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$30-100M · 100-500</div></td>
+      <td><span class="ind-chip">Industrial Eng</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">60</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">73</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15790074769" target="_blank" class="deal-link">PrintBox London</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://printbox.london/" target="_blank" style="color:var(--muted);text-decoration:underline;">printbox.london</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Printing</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">61</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">72</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16326210640" target="_blank" class="deal-link">Creativetheory</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://creativetheory.co.uk/" target="_blank" style="color:var(--muted);text-decoration:underline;">creativetheory.co.uk</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Graphic Design</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">62</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">72</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203394138" target="_blank" class="deal-link">Buzz Catering Supplies</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://buzzsupplies.co.uk/" target="_blank" style="color:var(--muted);text-decoration:underline;">buzzsupplies.co.uk</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">63</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">71</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15445442906" target="_blank" class="deal-link">Runners Sunglasses LLC</a><span class="contact-pill">6c</span><div class="co-sub"><a href="https://runnersathletics.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">runnersathletics.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">LEA</span></td>
+    </tr><tr>
+      <td class="rank">64</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">71</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15824481087" target="_blank" class="deal-link">O-I Glass, Inc.</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://o-i.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">o-i.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>Enterprise</b><div class="size-detail">$6.7B · 24,000</div></td>
+      <td><span class="ind-chip">Packaging</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">65</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">71</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203420876" target="_blank" class="deal-link">Premier Media</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://premiermediaav.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">premiermediaav.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1769…)</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Cons. Electronics</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">66</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">70</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17288812937" target="_blank" class="deal-link">Unheard</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://unheardpdx.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">unheardpdx.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">67</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">70</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9294175664" target="_blank" class="deal-link">Strand Book Store</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://strandbooks.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">strandbooks.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$30M · 200</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">68</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">70</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/30780939595" target="_blank" class="deal-link">DG Bullets</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://dgbullets.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">dgbullets.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Industrial Eng</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">69</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">70</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9677820562" target="_blank" class="deal-link">Inorganic Ventures</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://inorganicventures.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">inorganicventures.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1767…)</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$20M · 50+</div></td>
+      <td><span class="ind-chip">Chemicals</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">70</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">69</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/51637013125" target="_blank" class="deal-link">A Race Against Blindness</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://araceagainstblindness.org/" target="_blank" style="color:var(--muted);text-decoration:underline;">araceagainstblindness.org</a></div></td>
+      <td><span class="platform-chip" style="border-color:#5a31f4;color:#5a31f4;"><span class="pc-dot" style="background:#5a31f4;"></span>Shopify Plus</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$30-100M · 100-500</div></td>
+      <td><span class="ind-chip">Cosmetics</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">71</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">69</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17092292874" target="_blank" class="deal-link">Womple Studios</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://womplestudios.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">womplestudios.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Jewelry/Luxury</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">72</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">69</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/29356632691" target="_blank" class="deal-link">Snap Creative</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://snapcreative.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">snapcreative.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#7f54b3;color:#7f54b3;"><span class="pc-dot" style="background:#7f54b3;"></span>WordPress (not WooCommerce detected)</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$1-10M · 5-50</div></td>
+      <td><span class="ind-chip">Graphic Design</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">73</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">69</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17571807637" target="_blank" class="deal-link">TK422 Designs</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://tk422designs.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">tk422designs.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Graphic Design</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">74</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">69</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203472979" target="_blank" class="deal-link">Comsoft Business Solutions, Inc.</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://comsft.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">comsft.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4145a;color:#d4145a;"><span class="pc-dot" style="background:#d4145a;"></span>Magento 2 / Adobe Commerce</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$30-100M · 100-500</div></td>
+      <td><span class="ind-chip">Design</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">75</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203416696" target="_blank" class="deal-link">USA Safety Solutions LLC</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://usasafety.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">usasafety.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4d4d4;color:#d4d4d4;"><span class="pc-dot" style="background:#d4d4d4;"></span>Could not fetch</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Industrial Eng</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">76</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/30629386337" target="_blank" class="deal-link">Blankenship Dry Goods</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://blankenshipdrygoods.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">blankenshipdrygoods.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">77</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8825335362" target="_blank" class="deal-link">Minnetonka</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://minnetonkamoccasin.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">minnetonkamoccasin.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4d4d4;color:#d4d4d4;"><span class="pc-dot" style="background:#d4d4d4;"></span>Could not fetch</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$100M · 500+</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">78</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/25580305924" target="_blank" class="deal-link">Restomotive</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://restomotive.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">restomotive.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4d4d4;color:#d4d4d4;"><span class="pc-dot" style="background:#d4d4d4;"></span>Could not fetch</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">79</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/21815983275" target="_blank" class="deal-link">IQ Refinish Products Inc</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://iqrefinish.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">iqrefinish.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4d4d4;color:#d4d4d4;"><span class="pc-dot" style="background:#d4d4d4;"></span>Could not fetch</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">80</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/19826208604" target="_blank" class="deal-link">The Deliciouser</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://thedeliciouser.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">thedeliciouser.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">81</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203290673" target="_blank" class="deal-link">Big Island Candies</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://bigislandcandies.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">bigislandcandies.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$20M · 100+</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">82</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/26505298764" target="_blank" class="deal-link">Edstellar</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://edstellar.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">edstellar.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Education</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">83</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8088797089" target="_blank" class="deal-link">Byers' Choice</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://byerschoice.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">byerschoice.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$10-20M · 50+</div></td>
+      <td><span class="ind-chip">Industrial Eng</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">84</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/21270966430" target="_blank" class="deal-link">gelato pique</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://gelatopique.us/" target="_blank" style="color:var(--muted);text-decoration:underline;">gelatopique.us</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">85</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9731009615" target="_blank" class="deal-link">supersteerparts.com</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://supersteerparts.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">supersteerparts.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#0d52ff;color:#0d52ff;"><span class="pc-dot" style="background:#0d52ff;"></span>BigCommerce</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">86</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15318193230" target="_blank" class="deal-link">Popfusions</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://popfusions.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">popfusions.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4d4d4;color:#d4d4d4;"><span class="pc-dot" style="background:#d4d4d4;"></span>Could not fetch</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">87</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9055857770" target="_blank" class="deal-link">RuggedMade</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://ruggedmade.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">ruggedmade.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1775…)</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Construction</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">88</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203272086" target="_blank" class="deal-link">Salesone LLC</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://salesone.org/" target="_blank" style="color:var(--muted);text-decoration:underline;">salesone.org</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">89</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203414658" target="_blank" class="deal-link">SUE FISHER KING</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://suefisherking.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">suefisherking.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">90</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/20912258932" target="_blank" class="deal-link">Home Furniture and Patio</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://homefurnitureandpatio.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">homefurnitureandpatio.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">91</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/23775753645" target="_blank" class="deal-link">Iowa80.com</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://iowa80.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">iowa80.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$100M · 500+</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">92</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/18369436180" target="_blank" class="deal-link">The Amazing Chickpea</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://theamazingchickpea.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">theamazingchickpea.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#96bf48;color:#96bf48;"><span class="pc-dot" style="background:#96bf48;"></span>Shopify</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-20M · 10-100</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">93</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">67</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16664722609" target="_blank" class="deal-link">XUM Enterprise</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://drmem.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">drmem.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">COMPUTER_HARDWARE</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">94</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">67</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203272046" target="_blank" class="deal-link">Wilsonart LLC</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://wilsonart.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">wilsonart.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2 (static.v1776…)</span></td>
+      <td class="small"><b>Enterprise</b><div class="size-detail">$1.2B · 4,000+</div></td>
+      <td><span class="ind-chip">Building Materials</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">95</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">67</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8589249185" target="_blank" class="deal-link">global-ecommerce-services.com</a><span class="contact-pill">2c</span><div class="co-sub"><a href="https://global-ecommerce-services.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">global-ecommerce-services.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB-Mid</b><div class="size-detail">~$5-50M · 25-200</div></td>
+      <td><span class="ind-chip">Software</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">96</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">67</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/29212887952" target="_blank" class="deal-link">Parse Biosciences</a><span class="contact-pill">3c</span><div class="co-sub"><a href="https://parsebiosciences.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">parsebiosciences.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>Mid-Market</b><div class="size-detail">~$40M (funded) · 100+</div></td>
+      <td><span class="ind-chip">BIOTECHNOLOGY</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">97</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">67</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/5354252017" target="_blank" class="deal-link">Punch-Creative</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://punch-creative.co.uk/" target="_blank" style="color:var(--muted);text-decoration:underline;">punch-creative.co.uk</a></div></td>
+      <td><span class="platform-chip" style="border-color:#7f54b3;color:#7f54b3;"><span class="pc-dot" style="background:#7f54b3;"></span>WordPress (not WooCommerce detected)</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$1-10M · 5-50</div></td>
+      <td><span class="ind-chip">Graphic Design</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="open-deal-tag">1 OPEN</span><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">98</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">66</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203354326" target="_blank" class="deal-link">Spartan Armor Systems</a><span class="contact-pill">3c</span><div class="co-sub"><a href="https://spartanarmorsystems.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">spartanarmorsystems.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#ee672f;color:#ee672f;"><span class="pc-dot" style="background:#ee672f;"></span>Magento 2</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$10-20M · 25+</div></td>
+      <td><span class="ind-chip">Healthcare</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">99</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">66</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/25162282670" target="_blank" class="deal-link">Beautiful Foods</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://beautifulfoods.co.uk/" target="_blank" style="color:var(--muted);text-decoration:underline;">beautifulfoods.co.uk</a></div></td>
+      <td><span class="platform-chip" style="border-color:#d4d4d4;color:#d4d4d4;"><span class="pc-dot" style="background:#d4d4d4;"></span>Could not fetch</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇬🇧 United Kin</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr><tr>
+      <td class="rank">100</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span><span class="score-num">65</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16445434409" target="_blank" class="deal-link">Joto Imaging Supplies</a><span class="contact-pill">1c</span><div class="co-sub"><a href="https://jotoimagingsupplies.com/" target="_blank" style="color:var(--muted);text-decoration:underline;">jotoimagingsupplies.com</a></div></td>
+      <td><span class="platform-chip" style="border-color:#6b6b6b;color:#6b6b6b;"><span class="pc-dot" style="background:#6b6b6b;"></span>Custom/Unknown</span></td>
+      <td class="small"><b>SMB</b><div class="size-detail">~$2-15M · 10-75</div></td>
+      <td><span class="ind-chip">Paper/Forest</span></td>
+      <td class="small">🇺🇸 United Sta</td>
+      <td><span class="stage-sm">OPP</span></td>
+    </tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- METHODOLOGY -->
+<div class="method">
+  <h3>🔬 Methodology</h3>
+  <p><b>Lead scoring</b> — 6-factor model (Industry Fit 0-30, Engagement 0-25, Multi-Threading 0-15, Active Deals 0-20, Recency 0-10, Geo 0-10) with partner/reseller −10 penalty. Top 100 of 348 qualified USA/UK B2B companies in HubSpot, excluding Tier 1 customers.</p>
+  <p><b>Platform detection</b> — fetched live HTML + headers from each domain (89 of 100 successful; 11 fetch-blocked). Parsed signatures: <code>cdn.shopify.com</code>, <code>/static/frontend/</code>, <code>cdn11.bigcommerce.com</code>, <code>wp-content/plugins/woocommerce</code>, Magento version paths, meta generators. Adobe Commerce marked when Magento Cloud / Enterprise markers detected.</p>
+  <p><b>Size &amp; revenue estimates</b> — known brands use public data; unknowns estimated from platform tier (Adobe Commerce implies Mid-Market, Shopify implies SMB). Directional only; verify before pitching.</p>
+  <p><b>Limitations</b> — 11 domains refused our bot (marked "Could not fetch"). Platform detection is best-effort from public HTML; SaaS accounts with aggressive WAFs may be misclassified. Shopify Plus vs standard Shopify is hard to distinguish from homepage alone — ~2 confirmed Plus, others may be Plus too.</p>
+</div>
+
+</div></body></html>

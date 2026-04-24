@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<!-- saved from url=(0097)file:///Users/gabby/Documents/Claud%20Projects/IWD%20Dashboard/leadership-meeting-2026-04-24.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IWD Leadership Meeting — April 24, 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
+:root {--black:#1c1c1c;--cyan:#00e5a0;--cyan2:#00c288;--cyan-glow:rgba(0,229,160,.25);--off:#f5f3ee;--white:#fff;--bdr:#e8e5de;--text:#1c1c1c;--muted:#6b6b6b;--muted2:#999;--red:#d42020;--red-lt:#fff1f1;--red-bd:#fcc;--ora:#d45f00;--ora-lt:#fff6ee;--ora-bd:#fdd0a0;--ylw:#a87000;--ylw-lt:#fffbeb;--ylw-bd:#fde68a;--grn:#15803d;--grn-lt:#f0fdf4;--grn-bd:#bbf7d0;--blu:#1e40af;--blu-lt:#eff6ff;--blu-bd:#bfdbfe;--pur:#7c3aed;--pur-lt:#f5f3ff;--pur-bd:#ddd6fe;--jalap:#2d7a2d;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:13px;}
+body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1120px;margin:0 auto;padding:32px 44px 60px;}
+.display{font-family:'Space Grotesk','Inter',sans-serif;letter-spacing:-.01em;}
+
+/* Jalapeño decorative element */
+.jalap-corner{position:fixed;bottom:20px;right:22px;z-index:100;font-size:24px;background:#fff;border:2px solid var(--jalap);border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.12);cursor:pointer;transition:transform .2s;}
+.jalap-corner:hover{transform:scale(1.15) rotate(10deg);}
+.jalap-tip{position:fixed;bottom:74px;right:22px;background:var(--jalap);color:#fff;padding:8px 14px;border-radius:8px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;}
+.jalap-corner:hover + .jalap-tip{opacity:1;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:0 0 16px;margin-bottom:8px;border-bottom:2px solid var(--black);}
+.topbar .tb-brand{font-weight:900;font-size:1rem;letter-spacing:.04em;}
+.topbar .tb-brand span{color:var(--cyan2);}
+.topbar .tb-meta{font-size:.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
+.topbar .tb-meta b{color:var(--black);}
+
+.cover{background:var(--black);border-radius:16px;padding:42px 48px;margin-bottom:24px;position:relative;overflow:hidden;}
+.cover::before{content:'';position:absolute;bottom:-80px;right:-60px;width:300px;height:300px;border-radius:50%;border:44px solid var(--cyan);opacity:.1;}
+.cover::after{content:'';position:absolute;top:-40px;right:120px;width:140px;height:140px;border-radius:50%;border:22px solid var(--cyan);opacity:.07;}
+.cover-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;position:relative;z-index:2;}
+.brand{font-weight:900;color:#fff;font-size:1.1rem;letter-spacing:.04em;}
+.brand span{color:var(--cyan);}
+.pill{background:var(--cyan);color:var(--black);font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;padding:6px 13px;border-radius:100px;box-shadow:0 2px 8px var(--cyan-glow);}
+.cover h1{color:#fff;font-size:2.3rem;font-weight:900;line-height:1.08;letter-spacing:-.7px;margin-bottom:8px;position:relative;z-index:2;}
+.cover h1 em{color:var(--cyan);font-style:normal;}
+.cover-date{color:rgba(255,255,255,.6);font-size:.95rem;margin-bottom:26px;position:relative;z-index:2;}
+.cover-stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;position:relative;z-index:2;background:rgba(0,0,0,.2);}
+.cs-item{padding:16px 18px;border-right:1px solid rgba(255,255,255,.08);}
+.cs-item:last-child{border:none;}
+.cs-v{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:700;color:#fff;line-height:1;margin-bottom:5px;letter-spacing:-.02em;}
+.cs-v.c{color:var(--cyan);}
+.cs-l{font-size:.58rem;color:rgba(255,255,255,.44);text-transform:uppercase;letter-spacing:.09em;font-weight:700;}
+.cs-sub{font-size:.7rem;color:rgba(255,255,255,.6);margin-top:5px;}
+
+.toc{background:var(--off);border:1.5px solid var(--bdr);border-radius:10px;padding:16px 22px;margin-bottom:22px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.toc-item{text-decoration:none;color:var(--text);padding:10px 13px;background:#fff;border-radius:8px;border:1px solid var(--bdr);transition:all .15s;}
+.toc-item:hover{border-color:var(--cyan);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,229,160,.1);}
+.toc-num{font-size:.62rem;font-weight:800;color:var(--cyan2);letter-spacing:.1em;}
+.toc-title{font-size:.8rem;font-weight:700;margin-top:2px;}
+
+.spotlight{background:linear-gradient(135deg,var(--cyan) 0%,#00c288 100%);border-radius:12px;padding:18px 22px;margin-bottom:22px;display:flex;align-items:center;gap:18px;}
+.spotlight .spot-badge{background:var(--black);color:var(--cyan);padding:5px 12px;border-radius:100px;font-size:.6rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;flex-shrink:0;}
+.spotlight .spot-text{flex:1;font-size:.94rem;line-height:1.5;color:var(--black);font-weight:600;}
+.spotlight .spot-text b{font-weight:900;}
+.spotlight .spot-amt{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:var(--black);letter-spacing:-.02em;flex-shrink:0;}
+
+.tldr{background:var(--off);border:1.5px solid var(--bdr);border-radius:12px;padding:20px 24px;margin-bottom:26px;}
+.tldr h2{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:12px;}
+.tldr ul{list-style:none;padding:0;}
+.tldr li{padding:7px 0 7px 24px;position:relative;font-size:.92rem;line-height:1.65;}
+.tldr li::before{content:'▸';position:absolute;left:0;top:7px;color:var(--cyan2);font-weight:900;}
+.tldr b{color:var(--black);}
+.tldr .hi{background:rgba(0,229,160,.18);padding:1px 6px;border-radius:3px;font-weight:700;}
+
+.section{margin-bottom:26px;}
+.section-head{display:flex;align-items:center;gap:13px;padding:14px 20px;background:var(--black);border-radius:12px 12px 0 0;scroll-margin-top:20px;}
+.section-head .num-dot{width:30px;height:30px;border-radius:7px;background:var(--cyan);color:var(--black);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.88rem;font-family:'Space Grotesk',sans-serif;}
+.section-head h2{color:#fff;font-size:1.05rem;font-weight:800;letter-spacing:-.01em;}
+.section-head .sh-sub{color:rgba(255,255,255,.55);font-size:.76rem;margin-left:auto;font-weight:500;}
+.section-body{border:1.5px solid var(--bdr);border-top:none;border-radius:0 0 12px 12px;padding:22px 24px;background:#fff;}
+
+.metric-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.mb-item{padding:13px 16px;background:var(--off);border:1px solid var(--bdr);border-radius:9px;}
+.mb-v{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:5px;letter-spacing:-.02em;}
+.mb-v.hot{color:var(--cyan2);}
+.mb-v.warn{color:var(--ora);}
+.mb-v.good{color:var(--grn);}
+.mb-v.red{color:var(--red);}
+.mb-v.jalap{color:var(--jalap);}
+.mb-l{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;}
+
+.chart-container{background:var(--off);border:1.5px solid var(--bdr);border-radius:10px;padding:18px 20px;margin-bottom:16px;}
+.chart-container.fullbleed{padding:22px 24px;}
+.chart-title{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px;}
+.chart-full{width:100%;height:auto;display:block;}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.donut-wrap{display:flex;align-items:center;gap:14px;}
+.donut-svg{flex-shrink:0;width:180px;height:180px;}
+.donut-legend{flex:1;font-size:.78rem;}
+.leg-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px dashed var(--bdr);}
+.leg-row:last-child{border-bottom:none;}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.leg-label{flex:1;color:var(--text);font-weight:600;}
+.leg-val{font-weight:800;font-family:'Space Grotesk',sans-serif;}
+.leg-pct{color:var(--muted);font-weight:500;}
+
+table.deals{width:100%;border-collapse:collapse;font-size:.84rem;}
+table.deals th{text-align:left;padding:9px 11px;background:var(--off);font-size:.6rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--bdr);}
+table.deals td{padding:10px 11px;border-bottom:1px solid var(--bdr);vertical-align:top;}
+table.deals tr:last-child td{border-bottom:none;}
+table.deals .num{text-align:right;font-variant-numeric:tabular-nums;font-family:'Space Grotesk',sans-serif;}
+table.deals .money{font-weight:700;}
+table.deals .weighted{color:var(--cyan2);}
+table.deals .pct{font-weight:600;color:var(--muted);}
+table.deals .small{font-size:.72rem;color:var(--muted);}
+.deal-link{font-weight:700;color:var(--black);text-decoration:none;border-bottom:1.5px dotted var(--cyan);}
+.deal-link:hover{color:var(--cyan2);}
+.co-sub{font-size:.68rem;color:var(--muted);margin-top:2px;}
+.badge-new{display:inline-block;background:var(--cyan);color:var(--black);font-size:.54rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;padding:2px 6px;border-radius:3px;margin-right:5px;vertical-align:middle;}
+.badge-repeat{display:inline-block;background:var(--blu-lt);color:var(--blu);font-size:.54rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:2px 5px;border-radius:3px;margin-left:5px;vertical-align:middle;border:1px solid var(--blu-bd);}
+.badge-jalap{display:inline-block;background:var(--jalap);color:#fff;font-size:.54rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;padding:2px 6px;border-radius:3px;margin-right:5px;vertical-align:middle;}
+
+.stage{display:inline-block;font-size:.56rem;font-weight:900;text-transform:uppercase;padding:3px 8px;border-radius:4px;letter-spacing:.08em;white-space:nowrap;}
+.stage-hot{background:var(--cyan);color:var(--black);}
+.stage-warm{background:var(--grn-lt);color:var(--grn);border:1px solid var(--grn-bd);}
+.stage-early{background:var(--blu-lt);color:var(--blu);border:1px solid var(--blu-bd);}
+.stage-revival{background:var(--red-lt);color:var(--red);border:1px solid var(--red-bd);}
+.form-tag{display:inline-block;font-size:.56rem;font-weight:800;text-transform:uppercase;padding:3px 7px;border-radius:4px;letter-spacing:.06em;background:var(--off);color:var(--text);border:1px solid var(--bdr);}
+.overdue{color:var(--red);font-weight:700;font-size:.68rem;}
+.soon{color:var(--ora);font-weight:700;font-size:.68rem;}
+.future{color:var(--muted);font-size:.68rem;}
+.delta{margin-top:1px;}
+.subhead-row{display:flex;justify-content:space-between;align-items:center;margin:18px 0 9px;padding-bottom:6px;border-bottom:1px solid var(--bdr);}
+.subhead-row h3{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
+.subhead-meta{font-size:.72rem;color:var(--muted);font-weight:600;}
+
+.cluster-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.cluster-card{padding:15px 17px;background:var(--off);border:1.5px solid var(--bdr);border-radius:10px;transition:transform .15s;}
+.cluster-card:hover{transform:translateY(-2px);}
+.cc-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;}
+.cc-title{font-weight:900;font-size:.9rem;letter-spacing:-.01em;}
+.cc-rev{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--cyan2);font-size:.95rem;}
+.cc-stats{display:flex;flex-wrap:wrap;gap:11px;font-size:.72rem;color:var(--muted);}
+.cc-stats b{color:var(--black);font-weight:800;}
+.cc-stats .cc-hot b{color:var(--ora);}
+
+.callout{padding:15px 20px;border-radius:10px;margin:14px 0;font-size:.88rem;line-height:1.65;}
+.callout b{font-weight:800;}
+.callout.good{background:var(--grn-lt);border:1.5px solid var(--grn-bd);color:var(--grn);}
+.callout.warn{background:var(--ylw-lt);border:1.5px solid var(--ylw-bd);color:var(--ylw);}
+.callout.info{background:var(--blu-lt);border:1.5px solid var(--blu-bd);color:var(--blu);}
+.callout.revival{background:var(--red-lt);border:1.5px solid var(--red-bd);color:var(--red);}
+
+/* CAMPAIGN CARDS */
+.campaign-card{border:1.5px solid var(--bdr);border-radius:14px;padding:0;margin-bottom:16px;background:#fff;overflow:hidden;}
+.campaign-card.priority{border-color:var(--cyan);border-width:2px;box-shadow:0 3px 16px rgba(0,229,160,.08);}
+.cc-banner{padding:20px 24px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:16px;}
+.cc-banner.c1{background:linear-gradient(135deg,#d42020,#991b1b);}
+.cc-banner.c2{background:linear-gradient(135deg,#7c3aed,#5b21b6);}
+.cc-banner.c3{background:linear-gradient(135deg,#00e5a0,#00c288);color:#1c1c1c;}
+.cc-banner.c4{background:linear-gradient(135deg,#00c288,#15803d);}
+.cc-banner.c5{background:linear-gradient(135deg,#1e40af,#1e3a8a);}
+.cc-banner.c6{background:linear-gradient(135deg,#d45f00,#9a3412);}
+.cc-banner.c3 .cc-num{background:#1c1c1c;color:var(--cyan);}
+.cc-banner.c3 .cc-audience{color:rgba(28,28,28,.75);}
+.cc-num{width:46px;height:46px;border-radius:10px;background:rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.3rem;font-family:'Space Grotesk',sans-serif;flex-shrink:0;}
+.cc-banner-text{flex:1;}
+.cc-banner-text h3{font-size:1.25rem;font-weight:900;letter-spacing:-.3px;margin-bottom:3px;}
+.cc-audience{font-size:.8rem;color:rgba(255,255,255,.85);font-weight:500;}
+.cc-value{text-align:right;flex-shrink:0;}
+.cc-value-v{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:700;line-height:1;letter-spacing:-.02em;}
+.cc-value-l{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;opacity:0.8;margin-top:3px;}
+.cc-tag{display:inline-block;background:rgba(255,255,255,.22);color:#fff;font-size:.55rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;padding:4px 9px;border-radius:4px;margin-top:6px;}
+.cc-banner.c3 .cc-tag{background:#1c1c1c;color:var(--cyan);}
+.cc-body{padding:20px 24px;}
+.cc-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;}
+.cc-col h4{font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:7px;margin-top:14px;}
+.cc-col h4:first-child{margin-top:0;}
+.cc-col p{font-size:.84rem;line-height:1.6;margin-bottom:8px;}
+.cc-col code{background:var(--off);padding:1px 5px;border-radius:3px;font-family:monospace;font-size:.74rem;border:1px solid var(--bdr);}
+.cc-col ul{list-style:none;padding:0;margin-bottom:8px;}
+.cc-col li{padding:5px 0 5px 18px;position:relative;font-size:.8rem;line-height:1.45;border-bottom:1px dashed var(--bdr);}
+.cc-col li:last-child{border-bottom:none;}
+.cc-col li::before{content:'•';position:absolute;left:4px;color:var(--cyan2);font-weight:900;}
+.cc-col li b{font-weight:800;}
+.sequence{background:var(--off);border-radius:10px;padding:14px 16px;border:1px solid var(--bdr);}
+.seq-title{font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:9px;}
+.seq-step{display:flex;gap:9px;padding:6px 0;border-bottom:1px dashed var(--bdr);font-size:.8rem;}
+.seq-step:last-child{border-bottom:none;}
+.seq-num{background:var(--cyan);color:var(--black);width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.68rem;flex-shrink:0;font-family:'Space Grotesk',sans-serif;}
+.seq-content{flex:1;}
+.seq-label{font-weight:800;color:var(--black);font-size:.76rem;}
+.seq-body{color:var(--muted);font-size:.75rem;line-height:1.42;margin-top:2px;}
+.cc-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;padding-top:14px;border-top:1.5px solid var(--bdr);}
+.cc-met{background:var(--off);padding:10px 12px;border-radius:8px;text-align:center;}
+.cc-met-v{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;color:var(--cyan2);line-height:1;margin-bottom:3px;letter-spacing:-.01em;}
+.cc-met-l{font-size:.52rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;}
+.segment-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0;}
+.segment{padding:10px 12px;background:#fff;border:1px solid var(--bdr);border-radius:8px;}
+.seg-lbl{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px;}
+.seg-v{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--black);}
+.seg-sub{font-size:.68rem;color:var(--muted);margin-top:2px;}
+
+.rollout{background:var(--black);color:#fff;border-radius:14px;padding:26px 30px;margin-top:22px;position:relative;overflow:hidden;}
+.rollout::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;border:28px solid var(--cyan);opacity:.06;}
+.rollout h2{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--cyan);margin-bottom:14px;position:relative;z-index:2;}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;position:relative;z-index:2;}
+.tl-week{padding:16px 18px;background:rgba(255,255,255,.06);border-radius:10px;border-left:3px solid var(--cyan);}
+.tl-week h3{color:var(--cyan);font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+.tl-week ul{list-style:none;padding:0;}
+.tl-week li{font-size:.78rem;line-height:1.45;color:rgba(255,255,255,.88);padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.1);}
+.tl-week li:last-child{border-bottom:none;}
+.tl-week li b{color:#fff;}
+
+.next-steps{background:var(--black);color:#fff;border-radius:14px;padding:26px 30px;margin-top:22px;position:relative;overflow:hidden;}
+.next-steps::before{content:'';position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;border:24px solid var(--cyan);opacity:.06;}
+.next-steps h2{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--cyan);margin-bottom:14px;position:relative;z-index:2;}
+.next-steps-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;position:relative;z-index:2;}
+.ns-col h3{color:#fff;font-size:.9rem;font-weight:800;margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.15);letter-spacing:-.01em;}
+.ns-col ol{padding-left:21px;}
+.ns-col li{font-size:.82rem;line-height:1.6;color:rgba(255,255,255,.88);margin-bottom:7px;}
+.ns-col b{color:var(--cyan);}
+
+.footer-note{text-align:center;font-size:.72rem;color:var(--muted);margin-top:28px;padding-top:18px;border-top:1px solid var(--bdr);}
+.footer-note .jalap-note{display:inline-block;padding:4px 10px;background:var(--jalap);color:#fff;border-radius:100px;font-weight:700;letter-spacing:.08em;}
+
+@media print{.wrap{padding:18px 24px;}.section,.campaign-card{page-break-inside:avoid;}.jalap-corner,.jalap-tip{display:none;}}
+
+  /* Top 100 Target Accounts */
+  .top100-table{font-size:.82rem;}
+  .top100-table .rank-col{width:40px;text-align:center;}
+  .top100-table .rank{text-align:center;font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--muted);font-size:.85rem;}
+  .grade-cell{display:flex;align-items:center;gap:7px;}
+  .grade-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:5px;color:#fff;font-weight:900;font-size:.8rem;font-family:'Space Grotesk',sans-serif;}
+  .score-num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;color:var(--text);}
+  .ind-chip{display:inline-block;background:var(--off);border:1px solid var(--bdr);color:var(--text);font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:100px;}
+  .stage-sm{display:inline-block;background:var(--cyan);color:var(--black);font-size:.55rem;font-weight:900;text-transform:uppercase;padding:3px 7px;border-radius:3px;letter-spacing:.08em;}
+  .open-deal-tag{display:inline-block;background:#fff3cd;color:var(--ora);font-size:.54rem;font-weight:900;text-transform:uppercase;padding:2px 6px;border-radius:3px;margin-left:4px;letter-spacing:.08em;border:1px solid #fde68a;}
+  .contact-pill{display:inline-block;background:var(--blu-lt);color:var(--blu);border:1px solid var(--blu-bd);font-size:.54rem;font-weight:800;padding:2px 6px;border-radius:100px;margin-left:5px;letter-spacing:.04em;vertical-align:middle;}
+  .scoring-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+  .scoring-factor{background:#fff;border:1px solid var(--bdr);border-radius:8px;padding:11px 13px;}
+  .sf-label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text);margin-bottom:3px;}
+  .sf-max{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--cyan2);font-size:.95rem;margin-bottom:5px;}
+  .sf-desc{font-size:.72rem;color:var(--muted);line-height:1.4;}
+  .score-max{font-size:.75rem;color:var(--muted);margin-top:6px;}
+  .score-max b{color:var(--text);}
+
+</style></head><body>
+
+<div class="jalap-corner" title="Keep it spicy">🌶️</div>
+<div class="jalap-tip">Keep it spicy!</div>
+
+<div class="wrap">
+
+<div class="topbar">
+  <div class="tb-brand">IWD <span>/</span> Agency</div>
+  <div class="tb-meta">LEADERSHIP MEETING · <b>Friday, April 24, 2026</b></div>
+</div>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="brand">IWD <span>/</span> Agency</div>
+    <div class="pill">🌶️ Pipeline + Growth Strategy</div>
+  </div>
+  <h1 class="display">Pipeline Status.<br>Lead Strategy. <em>Campaign Plan.</em></h1>
+  <div class="cover-date">Friday, April 24, 2026 · All data live from HubSpot</div>
+  <div class="cover-stats">
+    <div class="cs-item"><div class="cs-v c">$875K</div><div class="cs-l">Total Open Pipeline</div><div class="cs-sub">$375K weighted</div></div>
+    <div class="cs-item"><div class="cs-v">$488K</div><div class="cs-l">Existing Biz Active</div><div class="cs-sub">$353K weighted</div></div>
+    <div class="cs-item"><div class="cs-v">$8.7M+</div><div class="cs-l">Reachable Lost $</div><div class="cs-sub">373 retargetable deals</div></div>
+    <div class="cs-item"><div class="cs-v c">47</div><div class="cs-l">New Form Leads (30d)</div><div class="cs-sub">filtered from bot spam</div></div>
+  </div>
+</div>
+
+<!-- Table of Contents -->
+<div class="toc">
+  <a href="file:///Users/gabby/Documents/Claud%20Projects/IWD%20Dashboard/leadership-meeting-2026-04-24.html#s1" class="toc-item"><div class="toc-num">SECTION 01</div><div class="toc-title">New Business Pipeline</div></a>
+  <a href="file:///Users/gabby/Documents/Claud%20Projects/IWD%20Dashboard/leadership-meeting-2026-04-24.html#s2" class="toc-item"><div class="toc-num">SECTION 02</div><div class="toc-title">Existing Client Business</div></a>
+  <a href="file:///Users/gabby/Documents/Claud%20Projects/IWD%20Dashboard/leadership-meeting-2026-04-24.html#s3" class="toc-item"><div class="toc-num">SECTION 03</div><div class="toc-title">New Leads (Form Subs)</div></a>
+  <a href="file:///Users/gabby/Documents/Claud%20Projects/IWD%20Dashboard/leadership-meeting-2026-04-24.html#s4" class="toc-item"><div class="toc-num">SECTION 04</div><div class="toc-title">Lookalike Clusters</div></a>
+  <a href="file:///Users/gabby/Documents/Claud%20Projects/IWD%20Dashboard/leadership-meeting-2026-04-24.html#s5" class="toc-item"><div class="toc-num">SECTION 05</div><div class="toc-title">Lost Deal Retargeting</div></a>
+  <a href="file:///Users/gabby/Documents/Claud%20Projects/IWD%20Dashboard/leadership-meeting-2026-04-24.html#s6" class="toc-item"><div class="toc-num">SECTION 06</div><div class="toc-title">🌶️ Six Campaigns</div></a>
+  <a href="file:///Users/gabby/Documents/Claud%20Projects/IWD%20Dashboard/leadership-meeting-2026-04-24.html#s-top100" class="toc-item"><div class="toc-num">TOP 100</div><div class="toc-title">💯 Target Accounts</div></a>
+  <a href="file:///Users/gabby/Documents/Claud%20Projects/IWD%20Dashboard/leadership-meeting-2026-04-24.html#s7" class="toc-item"><div class="toc-num">SECTION 07</div><div class="toc-title">4-Week Rollout</div></a>
+  <a href="file:///Users/gabby/Documents/Claud%20Projects/IWD%20Dashboard/leadership-meeting-2026-04-24.html#s8" class="toc-item"><div class="toc-num">SECTION 08</div><div class="toc-title">Decisions Needed</div></a>
+</div>
+
+<!-- EUROPA SPOTLIGHT -->
+<div class="spotlight">
+  <span class="spot-badge">🎉 Just Added</span>
+  <div class="spot-text"><b>Europa Eyewear B2B</b> — existing-client expansion at SOW Scoping (60% probability). Textbook <b>B2B expansion motion</b> that drives our existing-business revenue. Eyewear = Apparel cluster = our hottest segment.</div>
+  <div class="spot-amt">$70K</div>
+</div>
+
+<!-- PIPELINE BAR -->
+<div class="chart-container fullbleed">
+  <div class="chart-title">📊 TOTAL OPEN PIPELINE COMPOSITION — $875K</div>
+  <svg viewBox="0 0 680 100" xmlns="http://www.w3.org/2000/svg" class="chart-full">
+      <rect x="0" y="22" width="127" height="70" fill="#00e5a0" rx="7"></rect>
+      <rect x="127" y="22" width="173" height="70" fill="#d42020"></rect>
+      <rect x="300" y="22" width="380" height="70" fill="#1c1c1c" rx="7"></rect>
+      <text x="63" y="63" text-anchor="middle" fill="#1c1c1c" font-weight="900" font-size="17" font-family="Space Grotesk,Inter">$164K</text>
+      <text x="213" y="63" text-anchor="middle" fill="#fff" font-weight="900" font-size="17" font-family="Space Grotesk,Inter">$223K</text>
+      <text x="490" y="63" text-anchor="middle" fill="#00e5a0" font-weight="900" font-size="17" font-family="Space Grotesk,Inter">$488K</text>
+      <text x="63" y="16" text-anchor="middle" fill="#6b6b6b" font-size="10" font-weight="800" letter-spacing="1.5">ACTIVE NEW BIZ</text>
+      <text x="213" y="16" text-anchor="middle" fill="#6b6b6b" font-size="10" font-weight="800" letter-spacing="1.5">🌶️ REVIVAL TARGETS</text>
+      <text x="490" y="16" text-anchor="middle" fill="#6b6b6b" font-size="10" font-weight="800" letter-spacing="1.5">EXISTING BIZ</text>
+    </svg>
+</div>
+
+<!-- TL;DR -->
+<div class="tldr">
+  <h2>🎯 Leadership TL;DR</h2>
+  <ul>
+    <li><b>🔥 Quarter-defining wins:</b> <span class="hi">PSU SOWS $225K (90%)</span> + <b>DMC EU $128K (70%)</b> + <b>Europa Eyewear B2B $70K (60%)</b> = <span class="hi">$465K raw / $327K weighted</span> in existing-client expansions alone.</li>
+    <li><b>Active new business: $164K</b> across 7 deals led by Helio Brands ($100K). Three newly-scoped deals this week: TC Nutrition, Titan Industries, Golden Lighting.</li>
+    <li><b>🌶️ 5 revival targets worth $223K</b> just moved from "On Hold" back to "New Contact" — ready to be campaigned via automated reactivation sequence.</li>
+    <li><b>47 real form submissions in 30 days</b> (filtered 49 bots). Top sources: IWD Contact Us (22), Checkout Product Page (10), Dominate Sales (5).</li>
+    <li><b>🧠 Game-changer finding: 373 closed-lost deals worth $8.7M+ have never been retargeted.</b> Campaign 2 systematically re-engages them. <b>PSU, QC Supply, Circle Y, Urbanspace, Event Network all started as "closed-lost" before becoming our top customers.</b></li>
+    <li><b>Cluster finding:</b> <span class="hi">Apparel &amp; Fashion is our hottest under-recognized segment</span> — 7 customers ($124K) and <b>84 active leads with 30 open deals</b>. Europa Eyewear reinforces this pattern.</li>
+    <li><b>The play:</b> Close PSU + DMC EU + Europa. Launch 6 HubSpot email campaigns (zombie revival, lost deal retargeting, cluster nurture, new lead welcome, client expansion, ABM). All live within 4 weeks.</li>
+  </ul>
+</div>
+
+<!-- SECTION 1: NEW BUSINESS PIPELINE -->
+<div class="section" id="s1">
+  <div class="section-head">
+    <div class="num-dot">01</div><h2>New Business Pipeline</h2>
+    <div class="sh-sub">7 active · 5 revival targets · Owner: Gabrielle</div>
+  </div>
+  <div class="section-body">
+    <div class="metric-bar">
+      <div class="mb-item"><div class="mb-v">$387K</div><div class="mb-l">Total Pipeline</div></div>
+      <div class="mb-item"><div class="mb-v hot">$22K</div><div class="mb-l">Weighted</div></div>
+      <div class="mb-item"><div class="mb-v good">$164K</div><div class="mb-l">Active Deals</div></div>
+      <div class="mb-item"><div class="mb-v red">$223K</div><div class="mb-l">🌶️ Revival Targets</div></div>
+    </div>
+
+    <div class="chart-container fullbleed">
+      <div class="chart-title">📈 NEW BUSINESS · $ BY STAGE</div>
+<svg viewBox="0 0 640 149" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;width:100%;max-width:640px;height:auto"><g><text x="142" y="28.0" text-anchor="end" fill="#1c1c1c" font-size="13" font-weight="700">New Contact</text><rect x="150" y="10" width="360" height="28" fill="#d42020" rx="4"></rect><text x="516" y="28.0" fill="#1c1c1c" font-size="13" font-weight="800" font-family="Space Grotesk,Inter">$223K <tspan fill="#6b6b6b" font-weight="500">· 5</tspan></text></g><g><text x="142" y="63.0" text-anchor="end" fill="#1c1c1c" font-size="13" font-weight="700">Discovery</text><rect x="150" y="45" width="226" height="28" fill="#1e40af" rx="4"></rect><text x="382" y="63.0" fill="#1c1c1c" font-size="13" font-weight="800" font-family="Space Grotesk,Inter">$140K <tspan fill="#6b6b6b" font-weight="500">· 3</tspan></text></g><g><text x="142" y="98.0" text-anchor="end" fill="#1c1c1c" font-size="13" font-weight="700">ROM</text><rect x="150" y="80" width="29" height="28" fill="#15803d" rx="4"></rect><text x="185" y="98.0" fill="#1c1c1c" font-size="13" font-weight="800" font-family="Space Grotesk,Inter">$18K <tspan fill="#6b6b6b" font-weight="500">· 2</tspan></text></g><g><text x="142" y="133.0" text-anchor="end" fill="#1c1c1c" font-size="13" font-weight="700">MQL</text><rect x="150" y="115" width="9" height="28" fill="#1e40af" rx="4"></rect><text x="165" y="133.0" fill="#1c1c1c" font-size="13" font-weight="800" font-family="Space Grotesk,Inter">$6K <tspan fill="#6b6b6b" font-weight="500">· 2</tspan></text></g></svg>
+    </div>
+
+    <div class="subhead-row"><h3>Active Deals</h3><div class="subhead-meta">In motion · standard follow-up</div></div>
+    <table class="deals"><thead><tr><th>Deal</th><th>Stage</th><th class="num">Amount</th><th class="num">Prob</th><th class="num">Weighted</th><th>Close</th></tr></thead>
+    <tbody><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/57200667696?utm_source=iwd_report" target="_blank" class="deal-link">Helio Brands</a></td><td><span class="stage stage-early">Discovery</span></td><td class="num money">$100K</td><td class="num pct">10%</td><td class="num money weighted">$10K</td><td class="small">2026-05-28 <div class="delta"><span class="future">34d</span></div></td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/59151242125?utm_source=iwd_report" target="_blank" class="deal-link">TC Nutrition Deal</a></td><td><span class="stage stage-early">Discovery</span></td><td class="num money">$20K</td><td class="num pct">10%</td><td class="num money weighted">$2K</td><td class="small">2026-07-12 <div class="delta"><span class="future">79d</span></div></td></tr><tr><td><span class="badge-new">🌶️ NEW</span> <a href="https://app.hubspot.com/contacts/8048809/record/0-3/59374672904?utm_source=iwd_report" target="_blank" class="deal-link">Titan Industries Deal</a></td><td><span class="stage stage-early">Discovery</span></td><td class="num money">$20K</td><td class="num pct">10%</td><td class="num money weighted">$2K</td><td class="small">2026-07-20 <div class="delta"><span class="future">87d</span></div></td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/58370410931?utm_source=iwd_report" target="_blank" class="deal-link">Golden Lighting Deal</a></td><td><span class="stage stage-warm">ROM</span></td><td class="num money">$15K</td><td class="num pct">30%</td><td class="num money weighted">$4K</td><td class="small">2026-06-23 <div class="delta"><span class="future">60d</span></div></td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/56938233604?utm_source=iwd_report" target="_blank" class="deal-link">Baca Workwear &amp; Safety Deal</a></td><td><span class="stage stage-warm">ROM</span></td><td class="num money">$3K</td><td class="num pct">30%</td><td class="num money weighted">$900</td><td class="small">2026-05-25 <div class="delta"><span class="future">31d</span></div></td></tr><tr><td><span class="badge-new">🌶️ NEW</span> <a href="https://app.hubspot.com/contacts/8048809/record/0-3/59379334680?utm_source=iwd_report" target="_blank" class="deal-link">Honeybee Hippie Deal</a></td><td><span class="stage stage-early">MQL</span></td><td class="num money">$3K</td><td class="num pct">5%</td><td class="num money weighted">$150</td><td class="small">2026-07-20 <div class="delta"><span class="future">87d</span></div></td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/57054280841?utm_source=iwd_report" target="_blank" class="deal-link">Secure Recycling Solutions Deal</a></td><td><span class="stage stage-early">MQL</span></td><td class="num money">$3K</td><td class="num pct">5%</td><td class="num money weighted">$150</td><td class="small">2026-05-27 <div class="delta"><span class="future">33d</span></div></td></tr></tbody></table>
+
+    <div class="callout revival">
+      <b>🌶️ Revival play:</b> 5 deals totaling <b>$223K</b> just moved from "On Hold" to "New Contact" for active re-engagement. These are Campaign 1 audience (see Section 6).
+    </div>
+
+    <div class="subhead-row"><h3>🌶️ Revival Targets — Moved to New Contact</h3><div class="subhead-meta">Audience for Campaign 1</div></div>
+    <table class="deals"><thead><tr><th>Deal</th><th>Stage</th><th class="num">Amount</th><th class="num">Prob</th><th class="num">Weighted</th><th>Went Cold</th></tr></thead>
+    <tbody><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/32818666243?utm_source=iwd_report" target="_blank" class="deal-link">Snap Creative Deal</a></td><td><span class="stage stage-revival">New Contact</span></td><td class="num money">$90K</td><td class="num pct">1%</td><td class="num money weighted">$900</td><td class="small">2025-08-31 <div class="delta"><span class="overdue">⚠ 236d overdue</span></div></td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/32652840785?utm_source=iwd_report" target="_blank" class="deal-link">Parse Biosciences Deal</a></td><td><span class="stage stage-revival">New Contact</span></td><td class="num money">$60K</td><td class="num pct">1%</td><td class="num money weighted">$600</td><td class="small">2025-03-31 <div class="delta"><span class="overdue">⚠ 389d overdue</span></div></td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/36419577604?utm_source=iwd_report" target="_blank" class="deal-link">Sarco, inc. Deal</a></td><td><span class="stage stage-revival">New Contact</span></td><td class="num money">$50K</td><td class="num pct">1%</td><td class="num money weighted">$500</td><td class="small">2026-03-12 <div class="delta"><span class="overdue">⚠ 43d overdue</span></div></td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/39050636650?utm_source=iwd_report" target="_blank" class="deal-link">Textured Stickers Deal</a></td><td><span class="stage stage-revival">New Contact</span></td><td class="num money">$20K</td><td class="num pct">1%</td><td class="num money weighted">$200</td><td class="small">2025-07-31 <div class="delta"><span class="overdue">⚠ 267d overdue</span></div></td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/33451184151?utm_source=iwd_report" target="_blank" class="deal-link">TVD Capital Deal</a></td><td><span class="stage stage-revival">New Contact</span></td><td class="num money">$3K</td><td class="num pct">1%</td><td class="num money weighted">$30</td><td class="small">2025-06-27 <div class="delta"><span class="overdue">⚠ 301d overdue</span></div></td></tr></tbody></table>
+  </div>
+</div>
+
+<!-- SECTION 2: EXISTING CLIENT BUSINESS -->
+<div class="section" id="s2">
+  <div class="section-head">
+    <div class="num-dot">02</div><h2>Existing Client Business</h2>
+    <div class="sh-sub">6 active deals · Owner: Gabrielle</div>
+  </div>
+  <div class="section-body">
+    <div class="metric-bar">
+      <div class="mb-item"><div class="mb-v">$488K</div><div class="mb-l">Active Pipeline</div></div>
+      <div class="mb-item"><div class="mb-v hot">$353K</div><div class="mb-l">Weighted</div></div>
+      <div class="mb-item"><div class="mb-v good">4</div><div class="mb-l">Deals ≥ 60% Prob</div></div>
+      <div class="mb-item"><div class="mb-v">$225K</div><div class="mb-l">Biggest (PSU)</div></div>
+    </div>
+
+    <div class="chart-container fullbleed">
+      <div class="chart-title">📈 EXISTING CLIENT · $ BY STAGE</div>
+<svg viewBox="0 0 640 149" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;width:100%;max-width:640px;height:auto"><g><text x="142" y="28.0" text-anchor="end" fill="#1c1c1c" font-size="13" font-weight="700">Pending Signature</text><rect x="150" y="10" width="360" height="28" fill="#00c288" rx="4"></rect><text x="516" y="28.0" fill="#1c1c1c" font-size="13" font-weight="800" font-family="Space Grotesk,Inter">$225K <tspan fill="#6b6b6b" font-weight="500">· 1</tspan></text></g><g><text x="142" y="63.0" text-anchor="end" fill="#1c1c1c" font-size="13" font-weight="700">Client Review</text><rect x="150" y="45" width="204" height="28" fill="#00c288" rx="4"></rect><text x="360" y="63.0" fill="#1c1c1c" font-size="13" font-weight="800" font-family="Space Grotesk,Inter">$128K <tspan fill="#6b6b6b" font-weight="500">· 1</tspan></text></g><g><text x="142" y="98.0" text-anchor="end" fill="#1c1c1c" font-size="13" font-weight="700">SOW Scoping</text><rect x="150" y="80" width="136" height="28" fill="#15803d" rx="4"></rect><text x="292" y="98.0" fill="#1c1c1c" font-size="13" font-weight="800" font-family="Space Grotesk,Inter">$85K <tspan fill="#6b6b6b" font-weight="500">· 3</tspan></text></g><g><text x="142" y="133.0" text-anchor="end" fill="#1c1c1c" font-size="13" font-weight="700">Client Pitched</text><rect x="150" y="115" width="80" height="28" fill="#15803d" rx="4"></rect><text x="236" y="133.0" fill="#1c1c1c" font-size="13" font-weight="800" font-family="Space Grotesk,Inter">$50K <tspan fill="#6b6b6b" font-weight="500">· 1</tspan></text></g></svg>
+    </div>
+
+    <div class="callout good">
+      <b>🔥 In flight:</b> <b>PSU SOWS ($225K @ 90%)</b>, <b>DMC EU ($128K @ 70%)</b>, and just-added <b>Europa Eyewear B2B ($70K @ 60%)</b> = <b>$327K weighted</b>. Core revenue move for this quarter.
+    </div>
+
+    <div class="subhead-row"><h3>Active Existing-Client Deals</h3><div class="subhead-meta">Sorted by weighted value</div></div>
+    <table class="deals"><thead><tr><th>Deal</th><th>Stage</th><th class="num">Amount</th><th class="num">Prob</th><th class="num">Weighted</th><th>Close</th></tr></thead>
+    <tbody><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/12579081522?utm_source=iwd_report" target="_blank" class="deal-link">PSU SOWS</a></td><td><span class="stage stage-hot">Pending Signature</span></td><td class="num money">$225K</td><td class="num pct">90%</td><td class="num money weighted">$202K</td><td class="small">2026-03-31 <div class="delta"><span class="overdue">24d late</span></div></td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/57938924189?utm_source=iwd_report" target="_blank" class="deal-link">DMC EU</a></td><td><span class="stage stage-hot">Client Review</span></td><td class="num money">$128K</td><td class="num pct">70%</td><td class="num money weighted">$90K</td><td class="small">2026-08-31 <div class="delta"><span class="future">129d</span></div></td></tr><tr><td><span class="badge-new">🌶️ NEW</span> <a href="https://app.hubspot.com/contacts/8048809/record/0-3/59503435046?utm_source=iwd_report" target="_blank" class="deal-link">Europa Eyewear B2B</a></td><td><span class="stage stage-warm">SOW Scoping</span></td><td class="num money">$70K</td><td class="num pct">60%</td><td class="num money weighted">$42K</td><td class="small">2026-07-23 <div class="delta"><span class="future">90d</span></div></td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-3/57939168368?utm_source=iwd_report" target="_blank" class="deal-link">SchoolFix Canada</a></td><td><span class="stage stage-warm">Client Pitched</span></td><td class="num money">$50K</td><td class="num pct">20%</td><td class="num money weighted">$10K</td><td class="small">2026-06-10 <div class="delta"><span class="future">47d</span></div></td></tr><tr><td><span class="badge-new">🌶️ NEW</span> <a href="https://app.hubspot.com/contacts/8048809/record/0-3/59569919899?utm_source=iwd_report" target="_blank" class="deal-link">DMC Website Improvements</a></td><td><span class="stage stage-warm">SOW Scoping</span></td><td class="num money">$10K</td><td class="num pct">60%</td><td class="num money weighted">$6K</td><td class="small">2026-07-23 <div class="delta"><span class="future">90d</span></div></td></tr><tr><td><span class="badge-new">🌶️ NEW</span> <a href="https://app.hubspot.com/contacts/8048809/record/0-3/59569859767?utm_source=iwd_report" target="_blank" class="deal-link">DMC Checkout Optimization</a></td><td><span class="stage stage-warm">SOW Scoping</span></td><td class="num money">$5K</td><td class="num pct">60%</td><td class="num money weighted">$3K</td><td class="small">2026-07-23 <div class="delta"><span class="future">90d</span></div></td></tr></tbody></table>
+  </div>
+</div>
+
+<!-- SECTION 3: NEW LEADS -->
+<div class="section" id="s3">
+  <div class="section-head">
+    <div class="num-dot">03</div><h2>New Leads — Form Submissions (Last 30 Days)</h2>
+    <div class="sh-sub">47 real humans · 49 bots filtered</div>
+  </div>
+  <div class="section-body">
+    <div class="callout info">
+      <b>A "new lead" = someone who submitted a form on our site</b> (Contact Us, Checkout page, Dominate Sales, BTC Payments, Newsletter, Meeting Link, ROI Calculator). Aggressive filter removed ~49 bot submissions.
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-container"><div class="chart-title">📥 BY FORM SOURCE</div><div class="donut-wrap"><svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" class="donut-svg"><path d="M 120.0,25.0 A 95,95 0 0,1 138.92266858486445,213.09636197847573 L 131.15441516581484,174.87785548204886 A 56,56 0 0,0 120.0,64.0 Z" fill="#00e5a0"></path><path d="M 138.92266858486445,213.09636197847573 A 95,95 0 0,1 33.82636319523766,159.98880243069186 L 69.20290883087694,143.5723466959868 A 56,56 0 0,0 131.15441516581484,174.87785548204886 Z" fill="#1c1c1c"></path><path d="M 33.82636319523766,159.98880243069186 A 95,95 0 0,1 27.587926942321474,97.97708572458484 L 65.52551482915791,107.01807158501843 A 56,56 0 0,0 69.20290883087694,143.5723466959868 Z" fill="#1e40af"></path><path d="M 27.587926942321474,97.97708572458484 A 95,95 0 0,1 51.71175003159668,53.95671937090901 L 79.74587370283594,81.06922405022004 A 56,56 0 0,0 65.52551482915791,107.01807158501843 Z" fill="#999"></path><path d="M 51.71175003159668,53.95671937090901 A 95,95 0 0,1 94.90143682222772,28.375428369834253 L 105.20505749520792,65.98972619695493 A 56,56 0 0,0 79.74587370283594,81.06922405022004 Z" fill="#d45f00"></path><path d="M 94.90143682222772,28.375428369834253 A 95,95 0 0,1 107.3377392394909,25.847638625295914 L 112.53593049906833,64.49966066333232 A 56,56 0 0,0 105.20505749520792,65.98972619695493 Z" fill="#7c3aed"></path><path d="M 107.3377392394909,25.847638625295914 A 95,95 0 0,1 119.9999999999999,25.0 L 119.99999999999994,64.0 A 56,56 0 0,0 112.53593049906833,64.49966066333232 Z" fill="#a87000"></path><text x="120" y="116" text-anchor="middle" fill="#1c1c1c" font-size="30" font-weight="900" font-family="Space Grotesk,Inter">47</text><text x="120" y="136" text-anchor="middle" fill="#6b6b6b" font-size="10" font-weight="700" letter-spacing="1">FORMS (30D)</text></svg><div class="donut-legend"><div class="leg-row"><span class="leg-dot" style="background:#00e5a0"></span><span class="leg-label">IWD Agency Contact</span><span class="leg-val">22 <span class="leg-pct">(46%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#1c1c1c"></span><span class="leg-label">Checkout Product Page</span><span class="leg-val">10 <span class="leg-pct">(21%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#1e40af"></span><span class="leg-label">Contact Dominate</span><span class="leg-val">5 <span class="leg-pct">(10%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#999"></span><span class="leg-label">Other</span><span class="leg-val">4 <span class="leg-pct">(8%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#d45f00"></span><span class="leg-label">Meeting Link (Gabby)</span><span class="leg-val">4 <span class="leg-pct">(8%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#7c3aed"></span><span class="leg-label">BTC/Bitcoin Payments</span><span class="leg-val">1 <span class="leg-pct">(2%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#a87000"></span><span class="leg-label">Newsletter Signup</span><span class="leg-val">1 <span class="leg-pct">(2%)</span></span></div></div></div></div>
+      <div class="chart-container"><div class="chart-title">🎯 BY LIFECYCLE STAGE</div><div class="donut-wrap"><svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" class="donut-svg"><path d="M 120.0,25.0 A 95,95 0 1,1 66.23502603859347,198.32194823246724 L 88.30696271748668,166.16872737913857 A 56,56 0 1,0 120.0,64.0 Z" fill="#00e5a0"></path><path d="M 66.23502603859347,198.32194823246724 A 95,95 0 0,1 119.99999999999999,25.0 L 119.99999999999999,64.0 A 56,56 0 0,0 88.30696271748668,166.16872737913857 Z" fill="#1e40af"></path><text x="120" y="116" text-anchor="middle" fill="#1c1c1c" font-size="30" font-weight="900" font-family="Space Grotesk,Inter">47</text><text x="120" y="136" text-anchor="middle" fill="#6b6b6b" font-size="10" font-weight="700" letter-spacing="1">LIFECYCLE</text></svg><div class="donut-legend"><div class="leg-row"><span class="leg-dot" style="background:#00e5a0"></span><span class="leg-label">Opportunity</span><span class="leg-val">28 <span class="leg-pct">(59%)</span></span></div><div class="leg-row"><span class="leg-dot" style="background:#1e40af"></span><span class="leg-label">Lead</span><span class="leg-val">19 <span class="leg-pct">(40%)</span></span></div></div></div></div>
+    </div>
+
+    <div class="chart-container fullbleed">
+      <div class="chart-title">📅 DAILY FORM SUBMISSIONS · LAST 30 DAYS</div>
+      <svg viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg" class="chart-full"><line x1="40" y1="110.0" x2="670" y2="110.0" stroke="#e8e5de" stroke-width="1" stroke-dasharray="2,2"></line><text x="35" y="113.0" text-anchor="end" fill="#6b6b6b" font-size="9" font-weight="600">1</text><line x1="40" y1="80.0" x2="670" y2="80.0" stroke="#e8e5de" stroke-width="1" stroke-dasharray="2,2"></line><text x="35" y="83.0" text-anchor="end" fill="#6b6b6b" font-size="9" font-weight="600">2</text><line x1="40" y1="50.0" x2="670" y2="50.0" stroke="#e8e5de" stroke-width="1" stroke-dasharray="2,2"></line><text x="35" y="53.0" text-anchor="end" fill="#6b6b6b" font-size="9" font-weight="600">3</text><line x1="40" y1="20" x2="670" y2="20" stroke="#e8e5de" stroke-width="1" stroke-dasharray="2,2"></line><text x="35" y="23" text-anchor="end" fill="#6b6b6b" font-size="9" font-weight="600">5</text><rect x="41.0" y="140.0" width="18.666666666666668" height="2" fill="#e8e5de" rx="2"></rect><rect x="61.66666666666667" y="140.0" width="18.666666666666668" height="2" fill="#e8e5de" rx="2"></rect><rect x="82.33333333333334" y="140.0" width="18.666666666666668" height="2" fill="#e8e5de" rx="2"></rect><rect x="103.0" y="140.0" width="18.666666666666668" height="2" fill="#e8e5de" rx="2"></rect><rect x="123.66666666666667" y="140.0" width="18.666666666666668" height="2" fill="#e8e5de" rx="2"></rect><rect x="144.33333333333334" y="20.0" width="18.666666666666668" height="120.0" fill="#00e5a0" rx="2"></rect><text x="153.66666666666669" y="16.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">5</text><rect x="165.0" y="92.0" width="18.666666666666668" height="48.0" fill="#00e5a0" rx="2"></rect><text x="174.33333333333334" y="88.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">2</text><rect x="185.66666666666669" y="116.0" width="18.666666666666668" height="24.0" fill="#00e5a0" rx="2"></rect><text x="195.00000000000003" y="112.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">1</text><rect x="206.33333333333334" y="68.0" width="18.666666666666668" height="72.0" fill="#00e5a0" rx="2"></rect><text x="215.66666666666669" y="64.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">3</text><rect x="227.0" y="92.0" width="18.666666666666668" height="48.0" fill="#00e5a0" rx="2"></rect><text x="236.33333333333334" y="88.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">2</text><rect x="247.66666666666669" y="140.0" width="18.666666666666668" height="2" fill="#e8e5de" rx="2"></rect><rect x="268.33333333333337" y="116.0" width="18.666666666666668" height="24.0" fill="#00e5a0" rx="2"></rect><text x="277.6666666666667" y="112.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">1</text><rect x="289.0" y="92.0" width="18.666666666666668" height="48.0" fill="#00e5a0" rx="2"></rect><text x="298.3333333333333" y="88.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">2</text><rect x="309.6666666666667" y="116.0" width="18.666666666666668" height="24.0" fill="#00e5a0" rx="2"></rect><text x="319.0" y="112.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">1</text><rect x="330.33333333333337" y="116.0" width="18.666666666666668" height="24.0" fill="#00e5a0" rx="2"></rect><text x="339.6666666666667" y="112.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">1</text><rect x="351.0" y="68.0" width="18.666666666666668" height="72.0" fill="#00e5a0" rx="2"></rect><text x="360.3333333333333" y="64.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">3</text><rect x="371.6666666666667" y="140.0" width="18.666666666666668" height="2" fill="#e8e5de" rx="2"></rect><rect x="392.33333333333337" y="116.0" width="18.666666666666668" height="24.0" fill="#00e5a0" rx="2"></rect><text x="401.6666666666667" y="112.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">1</text><rect x="413.0" y="92.0" width="18.666666666666668" height="48.0" fill="#00e5a0" rx="2"></rect><text x="422.3333333333333" y="88.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">2</text><rect x="433.6666666666667" y="68.0" width="18.666666666666668" height="72.0" fill="#00e5a0" rx="2"></rect><text x="443.0" y="64.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">3</text><rect x="454.33333333333337" y="68.0" width="18.666666666666668" height="72.0" fill="#00e5a0" rx="2"></rect><text x="463.6666666666667" y="64.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">3</text><rect x="475.0" y="92.0" width="18.666666666666668" height="48.0" fill="#00e5a0" rx="2"></rect><text x="484.3333333333333" y="88.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">2</text><rect x="495.6666666666667" y="44.0" width="18.666666666666668" height="96.0" fill="#00e5a0" rx="2"></rect><text x="505.0" y="40.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">4</text><rect x="516.3333333333334" y="116.0" width="18.666666666666668" height="24.0" fill="#00e5a0" rx="2"></rect><text x="525.6666666666667" y="112.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">1</text><rect x="537.0" y="140.0" width="18.666666666666668" height="2" fill="#e8e5de" rx="2"></rect><rect x="557.6666666666667" y="92.0" width="18.666666666666668" height="48.0" fill="#00e5a0" rx="2"></rect><text x="567.0000000000001" y="88.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">2</text><rect x="578.3333333333334" y="92.0" width="18.666666666666668" height="48.0" fill="#00e5a0" rx="2"></rect><text x="587.6666666666667" y="88.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">2</text><rect x="599.0" y="20.0" width="18.666666666666668" height="120.0" fill="#00e5a0" rx="2"></rect><text x="608.3333333333334" y="16.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">5</text><rect x="619.6666666666667" y="116.0" width="18.666666666666668" height="24.0" fill="#00e5a0" rx="2"></rect><text x="629.0000000000001" y="112.0" text-anchor="middle" fill="#1c1c1c" font-size="9" font-weight="800" font-family="Space Grotesk,Inter">1</text><rect x="640.3333333333334" y="140.0" width="18.666666666666668" height="2" fill="#e8e5de" rx="2"></rect><text x="50.333333333333336" y="155" text-anchor="middle" fill="#6b6b6b" font-size="9" font-weight="600">03-26</text><text x="195.00000000000003" y="155" text-anchor="middle" fill="#6b6b6b" font-size="9" font-weight="600">04-02</text><text x="339.6666666666667" y="155" text-anchor="middle" fill="#6b6b6b" font-size="9" font-weight="600">04-09</text><text x="484.3333333333333" y="155" text-anchor="middle" fill="#6b6b6b" font-size="9" font-weight="600">04-16</text><text x="649.6666666666667" y="155" text-anchor="middle" fill="#6b6b6b" font-size="9" font-weight="600">04-24</text></svg>
+    </div>
+
+    <div class="subhead-row"><h3>All Form Submissions</h3><div class="subhead-meta">Opportunities first · newest first</div></div>
+    <table class="deals"><thead><tr><th>Contact / Company</th><th>Form</th><th>Stage</th><th>Date</th></tr></thead>
+    <tbody><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/215416773003" target="_blank" class="deal-link">Tony Tomas</a><div class="co-sub">TC Nutrition</div></td><td><span class="form-tag">Meeting Link (Gabby)</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-22</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/216954832970" target="_blank" class="deal-link">Jeff Aswad</a><div class="co-sub">Titan Industries</div></td><td><span class="form-tag">Meeting Link (Gabby)</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-22</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/164837400716" target="_blank" class="deal-link">Sharon Collins</a> <span class="badge-repeat">4× forms</span><div class="co-sub">webgrity</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-22</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/217090953831" target="_blank" class="deal-link">Benedict Mponzi</a><div class="co-sub">consultant</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-22</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/216953973172" target="_blank" class="deal-link">Chloe Morin</a><div class="co-sub">Honeybee Hippie</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-21</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/10536901" target="_blank" class="deal-link">Markus Ackermann</a> <span class="badge-repeat">132× forms</span><div class="co-sub">Meinduft Beauty</div></td><td><span class="form-tag">Checkout Product Page</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-21</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/6297501" target="_blank" class="deal-link">Adrian Southern</a> <span class="badge-repeat">10× forms</span><div class="co-sub">adrian@innovadiscgolf.com</div></td><td><span class="form-tag">Checkout Product Page</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-20</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/216611682075" target="_blank" class="deal-link">Bestian Rebel</a><div class="co-sub">Ranky Solution</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-20</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/216372786982" target="_blank" class="deal-link">Deep Bhatasana</a><div class="co-sub">jeenaminfotech.com</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-18</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/216137886802" target="_blank" class="deal-link">carlos lopez</a><div class="co-sub">228 marketing</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-17</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/215878296356" target="_blank" class="deal-link">Jennifer Smith</a><div class="co-sub">Seheiah</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-16</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/215840397476" target="_blank" class="deal-link">Iris Leigh</a><div class="co-sub">nexteriz.com</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-15</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/5211951" target="_blank" class="deal-link">Hannah Dixon</a><div class="co-sub">Southeastern Performance Apparel</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-14</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/215467387563" target="_blank" class="deal-link">Daniel Olszewski</a><div class="co-sub">Hype Space LLC</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-14</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/215413715638" target="_blank" class="deal-link">James Carroll</a><div class="co-sub">Before:Work</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-13</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/215217886533" target="_blank" class="deal-link">BEN Ben A</a><div class="co-sub">$10 Back Office Employees!</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-12</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/9737401" target="_blank" class="deal-link">Leo</a> <span class="badge-repeat">45× forms</span><div class="co-sub">info@holz-world.de</div></td><td><span class="form-tag">Other</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-10</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/214162140777" target="_blank" class="deal-link">Richard Thomas</a><div class="co-sub">Leadprospex</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-07</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/213667914681" target="_blank" class="deal-link">Adam Kinstely Adam Kinstely</a><div class="co-sub">The Tire Faster Ltd</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-04</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/213543868491" target="_blank" class="deal-link">Kabir Usman</a><div class="co-sub">https://blklabs.co/</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-03</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/213365536292" target="_blank" class="deal-link">Selviora Genossian</a><div class="co-sub">getyourslinks</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-03</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/66442236933" target="_blank" class="deal-link">Harshit Bhootra</a> <span class="badge-repeat">3× forms</span><div class="co-sub">Harshit Bhootra</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-02</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/193712437766" target="_blank" class="deal-link">Max Kichikov</a><div class="co-sub">Addax Lab</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-04-01</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/115151930018" target="_blank" class="deal-link">saxe roberts</a> <span class="badge-repeat">3× forms</span><div class="co-sub">liberty systems</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-03-31</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/212819246615" target="_blank" class="deal-link">Kennedy Price</a><div class="co-sub">GTU</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-03-31</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/212809887050" target="_blank" class="deal-link">Chris Walker</a><div class="co-sub">LeadProspex</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-03-31</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/10017351" target="_blank" class="deal-link">Brian Tugwell</a> <span class="badge-repeat">38× forms</span><div class="co-sub">sales@commsandsound.com</div></td><td><span class="form-tag">Checkout Product Page</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-03-31</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/212720899120" target="_blank" class="deal-link">Harikrishna Kundariya</a><div class="co-sub">eSparkBiz</div></td><td><span class="form-tag">IWD Agency Contact</span></td><td><span class="stage stage-hot">OPPORTUNITY</span></td><td class="small">2026-03-31</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/7913301" target="_blank" class="deal-link">Ollie</a> <span class="badge-repeat">229× forms</span><div class="co-sub">sales@hermeq.de</div></td><td><span class="form-tag">Checkout Product Page</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-23</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/217194666377" target="_blank" class="deal-link">Bohdan B</a> <span class="badge-repeat">4× forms</span><div class="co-sub">bohdan+test@test.com</div></td><td><span class="form-tag">Other</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-22</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/216222039700" target="_blank" class="deal-link">ajwaramzan86.0@gmail.com</a><div class="co-sub">ajwaramzan86.0@gmail.com</div></td><td><span class="form-tag">Other</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-17</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/54070938119" target="_blank" class="deal-link">Markus Ackermann</a> <span class="badge-repeat">111× forms</span><div class="co-sub">service@heikeackermann.de</div></td><td><span class="form-tag">Checkout Product Page</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-17</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/85845638020" target="_blank" class="deal-link">info@heikeackermann.de</a> <span class="badge-repeat">35× forms</span><div class="co-sub">info@heikeackermann.de</div></td><td><span class="form-tag">Checkout Product Page</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-17</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/83909062774" target="_blank" class="deal-link">Parth Patel</a> <span class="badge-repeat">5× forms</span><div class="co-sub">website@dortechdirect.co.uk</div></td><td><span class="form-tag">BTC/Bitcoin Payments</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-16</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/212481614849" target="_blank" class="deal-link">Marco Mauro</a> <span class="badge-repeat">3× forms</span><div class="co-sub">ufficio.web@behomecasa.it</div></td><td><span class="form-tag">Contact Dominate</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-15</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/188890541664" target="_blank" class="deal-link">Tom Taylor</a><div class="co-sub">ttaylor@pryor.com</div></td><td><span class="form-tag">Meeting Link (Gabby)</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-15</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/165153638764" target="_blank" class="deal-link">connector@dominate.co</a> <span class="badge-repeat">53× forms</span><div class="co-sub">connector@dominate.co</div></td><td><span class="form-tag">Checkout Product Page</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-14</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/215437056411" target="_blank" class="deal-link">sami.areh47@outlook.com</a><div class="co-sub">sami.areh47@outlook.com</div></td><td><span class="form-tag">Other</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-13</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/55601588092" target="_blank" class="deal-link">Lucas Senra</a> <span class="badge-repeat">7× forms</span><div class="co-sub">itteam@combatbrands.com</div></td><td><span class="form-tag">Checkout Product Page</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-10</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/214320021331" target="_blank" class="deal-link">info@farmaself.it</a><div class="co-sub">info@farmaself.it</div></td><td><span class="form-tag">Checkout Product Page</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-10</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/214546009769" target="_blank" class="deal-link">Joe Haston</a><div class="co-sub">joe_haston@msn.com</div></td><td><span class="form-tag">Contact Dominate</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-09</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/214461355180" target="_blank" class="deal-link">Nate Prince</a><div class="co-sub">nate@flowblend.com</div></td><td><span class="form-tag">Contact Dominate</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-08</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/205647544199" target="_blank" class="deal-link">Carolyn Zazra</a><div class="co-sub">czazra@europaeye.com</div></td><td><span class="form-tag">Meeting Link (Gabby)</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-07</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/213925091101" target="_blank" class="deal-link">Jack Belle Isle</a><div class="co-sub">jack.belleislesr@overtoneagles.org</div></td><td><span class="form-tag">Contact Dominate</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-06</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/179005707667" target="_blank" class="deal-link">osher.adini@gmail.com</a> <span class="badge-repeat">4× forms</span><div class="co-sub">osher.adini@gmail.com</div></td><td><span class="form-tag">Checkout Product Page</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-04</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/213445530421" target="_blank" class="deal-link">Randy DuBois</a><div class="co-sub">parts@gatehousesupplies.com</div></td><td><span class="form-tag">Contact Dominate</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-03</td></tr><tr><td><a href="https://app.hubspot.com/contacts/8048809/record/0-1/212968871774" target="_blank" class="deal-link">sophie@sendproud.com</a><div class="co-sub">sophie@sendproud.com</div></td><td><span class="form-tag">Newsletter Signup</span></td><td><span class="stage stage-early">LEAD</span></td><td class="small">2026-04-01</td></tr></tbody></table>
+
+    <div class="callout good" style="margin-top:14px;">
+      <b>🎯 Standouts:</b> Repeat submitters (2×+) indicate real intent. Meeting Link submissions (4) = highest-intent of all. <b>Jenn Martin from Golden Lighting</b> booked directly → now a $15K deal in ROM.
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: LOOKALIKE CLUSTERS -->
+<div class="section" id="s4">
+  <div class="section-head">
+    <div class="num-dot">04</div><h2>Lookalike Clusters — Where We Already Win</h2>
+    <div class="sh-sub">Foundation for industry-targeted campaigns</div>
+  </div>
+  <div class="section-body">
+    <p style="font-size:.92rem;margin-bottom:15px;color:var(--muted);">Built from HubSpot's native industry field on 118 existing customers. Each cluster shows where IWD already converts — and how many lookalike leads are in the pipeline ready to be worked.</p>
+
+    <div class="chart-container fullbleed">
+      <div class="chart-title">📊 ACTIVE LEADS PER CLUSTER</div>
+      <svg viewBox="0 0 680 188" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block"><text x="0" y="14" font-size="10" font-weight="800" fill="#6b6b6b" letter-spacing="1.2">ACTIVE LEADS PER CLUSTER</text><text x="215" y="39.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Food &amp; Beverages</text><rect x="220" y="25" width="95" height="18" fill="#00c288" rx="3"></rect><text x="320" y="39.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">9</text><text x="215" y="65.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Construction</text><rect x="220" y="51" width="148" height="18" fill="#00c288" rx="3"></rect><text x="373" y="65.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">14</text><text x="215" y="91.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Retail / E-commerce</text><rect x="220" y="77" width="169" height="18" fill="#00c288" rx="3"></rect><text x="394" y="91.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">16</text><text x="215" y="117.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Higher Education</text><rect x="220" y="103" width="84" height="18" fill="#00c288" rx="3"></rect><text x="309" y="117.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">8</text><text x="215" y="143.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Mechanical / Industrial Engineer</text><rect x="220" y="129" width="296" height="18" fill="#00c288" rx="3"></rect><text x="521" y="143.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">28</text><text x="215" y="169.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Automotive</text><rect x="220" y="155" width="360" height="18" fill="#00c288" rx="3"></rect><text x="585" y="169.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">34</text></svg>
+    </div>
+
+    <div class="cluster-grid"><div class="cluster-card"><div class="cc-head"><div class="cc-title">Food &amp; Beverages</div><div class="cc-rev">$1.19M</div></div><div class="cc-stats"><span><b>2</b> customers</span><span><b>9</b> leads</span><span><b>9</b> opps</span><span class="cc-hot"><b>10</b> open deals</span></div></div><div class="cluster-card"><div class="cc-head"><div class="cc-title">Construction</div><div class="cc-rev">$1.14M</div></div><div class="cc-stats"><span><b>2</b> customers</span><span><b>14</b> leads</span><span><b>6</b> opps</span><span class="cc-hot"><b>6</b> open deals</span></div></div><div class="cluster-card"><div class="cc-head"><div class="cc-title">Retail / E-commerce</div><div class="cc-rev">$589K</div></div><div class="cc-stats"><span><b>9</b> customers</span><span><b>16</b> leads</span><span><b>16</b> opps</span><span class="cc-hot"><b>19</b> open deals</span></div></div><div class="cluster-card"><div class="cc-head"><div class="cc-title">Higher Education</div><div class="cc-rev">$480K</div></div><div class="cc-stats"><span><b>4</b> customers</span><span><b>8</b> leads</span><span><b>3</b> opps</span><span class="cc-hot"><b>1</b> open deals</span></div></div><div class="cluster-card"><div class="cc-head"><div class="cc-title">Mechanical / Industrial Engineering</div><div class="cc-rev">$326K</div></div><div class="cc-stats"><span><b>4</b> customers</span><span><b>28</b> leads</span><span><b>14</b> opps</span><span class="cc-hot"><b>2</b> open deals</span></div></div><div class="cluster-card"><div class="cc-head"><div class="cc-title">Automotive</div><div class="cc-rev">$149K</div></div><div class="cc-stats"><span><b>8</b> customers</span><span><b>34</b> leads</span><span><b>21</b> opps</span><span class="cc-hot"><b>9</b> open deals</span></div></div></div>
+
+    <div class="callout good"><b>🔥 Apparel &amp; Fashion is the surprise:</b> 7 customers ($124K) AND <b>84 active leads with 48 opportunities and 30 open deals</b>. Today's Europa Eyewear B2B deal fits right in. Under-promoted internally.</div>
+    <div class="callout info"><b>Automotive has the deepest bench:</b> 8 customers (most of any industry), 34 active leads, 21 opportunities. Rough Country, Doosan, Mishimoto, Jack Williams — strong case-study material.</div>
+  </div>
+</div>
+
+<!-- SECTION 5: LOST DEAL RETARGETING -->
+<div class="section" id="s5">
+  <div class="section-head">
+    <div class="num-dot">05</div><h2>Lost Deal Retargeting — The $8.7M Opportunity</h2>
+    <div class="sh-sub">373 closed-lost deals ≥ $5K · never re-engaged</div>
+  </div>
+  <div class="section-body">
+    <div class="callout good" style="background:linear-gradient(135deg,var(--grn-lt) 0%,var(--cyan-glow) 100%);border-color:var(--cyan);">
+      <b>🧠 The insight:</b> PSU, QC Supply, Circle Y, Urbanspace, Event Network <b>all had "closed-lost" deals in this database before becoming our top customers</b>. Retargeting lost deals isn't wishful thinking — it's literally how our biggest accounts started.
+    </div>
+
+    <div class="metric-bar">
+      <div class="mb-item"><div class="mb-v">373</div><div class="mb-l">Lost Deals (≥$5K)</div></div>
+      <div class="mb-item"><div class="mb-v jalap">$8.7M+</div><div class="mb-l">Top 100 Value</div></div>
+      <div class="mb-item"><div class="mb-v hot">$10M+</div><div class="mb-l">Est. Total Value</div></div>
+      <div class="mb-item"><div class="mb-v good">6</div><div class="mb-l">Industry Segments</div></div>
+    </div>
+
+    <div class="chart-container fullbleed">
+      <div class="chart-title">📊 LOST DEAL $ BY INDUSTRY (TOP 100 · CAMPAIGN 2 SEGMENTATION)</div>
+      <svg viewBox="0 0 680 292" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block"><text x="0" y="14" font-size="10" font-weight="800" fill="#6b6b6b" letter-spacing="1.2">LOST DEAL $ BY INDUSTRY (TOP 100 · $8.7M)</text><text x="215" y="39.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Automotive</text><rect x="220" y="25" width="360" height="18" fill="#1c1c1c" rx="3"></rect><text x="585" y="39.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">$1.09M</text><text x="215" y="65.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Education</text><rect x="220" y="51" width="313" height="18" fill="#00c288" rx="3"></rect><text x="538" y="65.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">$950K</text><text x="215" y="91.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Wholesale/Distribution</text><rect x="220" y="77" width="302" height="18" fill="#1e40af" rx="3"></rect><text x="527" y="91.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">$916K</text><text x="215" y="117.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Retail/E-commerce</text><rect x="220" y="103" width="267" height="18" fill="#d45f00" rx="3"></rect><text x="492" y="117.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">$810K</text><text x="215" y="143.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Medical/Pharma</text><rect x="220" y="129" width="138" height="18" fill="#7c3aed" rx="3"></rect><text x="363" y="143.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">$420K</text><text x="215" y="169.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Food/Beverage</text><rect x="220" y="155" width="133" height="18" fill="#15803d" rx="3"></rect><text x="358" y="169.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">$405K</text><text x="215" y="195.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Apparel/Fashion</text><rect x="220" y="181" width="102" height="18" fill="#a87000" rx="3"></rect><text x="327" y="195.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">$310K</text><text x="215" y="221.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Entertainment</text><rect x="220" y="207" width="97" height="18" fill="#1c1c1c" rx="3"></rect><text x="322" y="221.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">$294K</text><text x="215" y="247.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Technology/SaaS</text><rect x="220" y="233" width="85" height="18" fill="#00c288" rx="3"></rect><text x="310" y="247.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">$260K</text><text x="215" y="273.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">Packaging</text><rect x="220" y="259" width="66" height="18" fill="#1e40af" rx="3"></rect><text x="291" y="273.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">$200K</text></svg>
+    </div>
+
+    <div class="segment-grid">
+      <div class="segment"><div class="seg-lbl">Automotive</div><div class="seg-v">$1.09M</div><div class="seg-sub">9 deals · Mishimoto, JWT, A&amp;I Parts</div></div>
+      <div class="segment"><div class="seg-lbl">Education</div><div class="seg-v">$950K</div><div class="seg-sub">3 deals · PSU, MacGill, Univ Loft</div></div>
+      <div class="segment"><div class="seg-lbl">Wholesale</div><div class="seg-v">$916K</div><div class="seg-sub">8 deals · QC Supply upgrades</div></div>
+      <div class="segment"><div class="seg-lbl">Retail/E-com</div><div class="seg-v">$810K</div><div class="seg-sub">7 deals · Urbanspace, Event Network</div></div>
+      <div class="segment"><div class="seg-lbl">Medical/Pharma</div><div class="seg-v">$420K</div><div class="seg-sub">6 deals · Gravity, Optisource</div></div>
+      <div class="segment"><div class="seg-lbl">Apparel/Fashion</div><div class="seg-v">$310K</div><div class="seg-sub">6 deals · Circle Y, Dallaswear</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6: SIX CAMPAIGNS -->
+<div class="section" id="s6">
+  <div class="section-head">
+    <div class="num-dot">06</div><h2>🌶️ The Six Campaigns — Revenue Engine</h2>
+    <div class="sh-sub">950+ companies · $13.6M reachable pipeline · 95% automated</div>
+  </div>
+  <div class="section-body">
+    <p style="font-size:.92rem;margin-bottom:15px;color:var(--muted);">Six HubSpot email campaigns leveraging native smart lists + workflows. Ordered by launch speed × ROI. Each has a named audience, segmentation logic, sequence, and automation trigger.</p>
+
+    <!-- EXCLUSION LIST -->
+    <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:18px 22px;margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:10px;">
+        <div>
+          <div style="font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:#a87000;margin-bottom:4px;">⚠️ Strategic Exclusion List</div>
+          <div style="font-size:.95rem;font-weight:800;color:#1c1c1c;letter-spacing:-.01em;">Tier 1 Customers — Excluded from Outbound Campaigns (1, 2, 3, 6)</div>
+        </div>
+        <div style="flex-shrink:0;font-family:&#39;Space Grotesk&#39;,sans-serif;font-size:1.4rem;font-weight:700;color:#a87000;">12</div>
+      </div>
+      <p style="font-size:.85rem;line-height:1.55;color:#6b6b6b;margin-bottom:12px;">These strategic accounts are handled exclusively by <b style="color:#1c1c1c;">Campaign 5 (Existing Client Expansion)</b> with 1:1 account management. They are <b style="color:#1c1c1c;">excluded from zombie revival, lost deal retargeting, cluster nurture, and ABM campaigns</b> to avoid conflicting messages.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">Penn State (PSU)</span>
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">SchoolFix</span>
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">Purdue</span>
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">Pryor Learning</span>
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">Warner Press</span>
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">US Camera Pro (USCP)</span>
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">Bobcat</span>
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">QC Supply</span>
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">DMC Tools</span>
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">BinMaster</span>
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">Intel</span>
+        <span style="background:#fff;border:1px solid #fde68a;color:#a87000;font-size:.74rem;font-weight:800;padding:4px 11px;border-radius:100px;">PayPal</span>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px dashed #fde68a;font-size:.78rem;color:#6b6b6b;line-height:1.55;">
+        <b style="color:#a87000;">Impact on Campaign 2:</b> ~<b style="color:#1c1c1c;">$1.6M in PSU + QC Supply historical "lost" deals</b> are removed from the Lost Deal Retargeting audience (they're already customers). Revised addressable lost-deal pool = <b style="color:#1c1c1c;">~$7.1M</b> still massive.
+      </div>
+    </div>
+
+    <div class="chart-container fullbleed">
+      <div class="chart-title">🎯 CAMPAIGN AUDIENCE SIZE COMPARISON</div>
+      <svg viewBox="0 0 680 188" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block"><text x="0" y="14" font-size="10" font-weight="800" fill="#6b6b6b" letter-spacing="1.2">CAMPAIGN AUDIENCE SIZE (COMPANIES / LEADS)</text><text x="215" y="39.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">1. 🌶️ Revival Targets</text><rect x="220" y="25" width="4" height="18" fill="#d42020" rx="3"></rect><text x="229" y="39.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">5</text><text x="215" y="65.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">2. Lost Deal Retargeting</text><rect x="220" y="51" width="360" height="18" fill="#7c3aed" rx="3"></rect><text x="585" y="65.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">373</text><text x="215" y="91.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">3. Cluster Industry Nurture</text><rect x="220" y="77" width="278" height="18" fill="#00c288" rx="3"></rect><text x="503" y="91.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">289</text><text x="215" y="117.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">4. New Lead Welcome</text><rect x="220" y="103" width="97" height="18" fill="#00e5a0" rx="3"></rect><text x="322" y="117.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">101</text><text x="215" y="143.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">5. Existing Client Expansion</text><rect x="220" y="129" width="113" height="18" fill="#1e40af" rx="3"></rect><text x="338" y="143.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">118</text><text x="215" y="169.0" text-anchor="end" fill="#1c1c1c" font-size="11" font-weight="700">6. ABM Contact Targeting</text><rect x="220" y="155" width="82" height="18" fill="#d45f00" rx="3"></rect><text x="307" y="169.0" fill="#1c1c1c" font-size="11" font-weight="800" font-family="Space Grotesk,Inter">85</text></svg>
+    </div>
+
+    <!-- CAMPAIGN 1 -->
+    <div class="campaign-card priority">
+      <div class="cc-banner c1">
+        <div class="cc-num">01</div>
+        <div class="cc-banner-text">
+          <h3>🌶️🧟 Revival Target Reactivation</h3>
+          <div class="cc-audience">5 deals Gabby just moved to "New Contact" · they went cold, now we bring them back</div>
+          <span class="cc-tag">Priority · Week 1 · Fully Automated</span>
+        </div>
+        <div class="cc-value"><div class="cc-value-v">$223K</div><div class="cc-value-l">To Revive</div></div>
+      </div>
+      <div class="cc-body"><div class="cc-grid">
+        <div class="cc-col">
+          <h4>🎯 Audience</h4>
+          <ul><li><b>Snap Creative</b> — $90K</li><li><b>Parse Biosciences</b> — $60K</li><li><b>Sarco, inc.</b> — $50K</li><li><b>Textured Stickers</b> — $20K</li><li><b>TVD Capital</b> — $3K</li></ul>
+          <h4>⚙️ Automation</h4>
+          <p>Smart list: <code>pipeline = New Business</code> AND <code>dealstage = New Contact</code>. Reply → advance to Discovery + Slack notify Gabby. No response after 4 emails → auto-close-lost with "Revival Attempted" reason.</p>
+        </div>
+        <div class="cc-col">
+          <div class="sequence">
+            <div class="seq-title">📬 4-Email Sequence · 7 days apart</div>
+            <div class="seq-step"><div class="seq-num">1</div><div class="seq-content"><div class="seq-label">"Still on your roadmap?"</div><div class="seq-body">200-word check-in, no pitch. Asks 1 yes/no question.</div></div></div>
+            <div class="seq-step"><div class="seq-num">2</div><div class="seq-content"><div class="seq-label">Industry case study</div><div class="seq-body">Dynamic content by company industry.</div></div></div>
+            <div class="seq-step"><div class="seq-num">3</div><div class="seq-content"><div class="seq-label">"New on our side"</div><div class="seq-body">Product update + Europa Eyewear win announcement.</div></div></div>
+            <div class="seq-step"><div class="seq-num">4</div><div class="seq-content"><div class="seq-label">Free audit + calendar</div><div class="seq-body">15-min call CTA. Auto-close-lost if no response.</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cc-metrics">
+        <div class="cc-met"><div class="cc-met-v">5</div><div class="cc-met-l">Deals</div></div>
+        <div class="cc-met"><div class="cc-met-v">$223K</div><div class="cc-met-l">Value</div></div>
+        <div class="cc-met"><div class="cc-met-v">10-15%</div><div class="cc-met-l">Revive Rate</div></div>
+        <div class="cc-met"><div class="cc-met-v">$22-33K</div><div class="cc-met-l">Expected Close</div></div>
+      </div>
+    </div></div>
+
+    <!-- CAMPAIGN 2 -->
+    <div class="campaign-card priority">
+      <div class="cc-banner c2">
+        <div class="cc-num">02</div>
+        <div class="cc-banner-text">
+          <h3>💔 Lost Deal Retargeting</h3>
+          <div class="cc-audience">373 closed-lost deals worth $10M+ · never revisited · segmented by industry</div>
+          <span class="cc-tag">High-Value · Week 2 · Segmented</span>
+        </div>
+        <div class="cc-value"><div class="cc-value-v">$8.7M+</div><div class="cc-value-l">Top 100 Value</div></div>
+      </div>
+      <div class="cc-body"><div class="cc-grid">
+        <div class="cc-col">
+          <h4>🎯 Audience — 373 companies, segmented by industry</h4>
+          <p>Each recipient gets an industry-matched case study. Segmentation lifts engagement from 1% (generic blast) to 5-8% (industry-relevant).</p>
+          <h4>⚙️ Automation</h4>
+          <p>Per-industry smart list: <code>dealstage = closedlost</code> AND <code>amount ≥ $5K</code> AND <code>closedate &gt; 1yr ago</code>. 3+ email opens or CTA click → auto-create deal + Slack notify. Meeting booked → Discovery.</p>
+        </div>
+        <div class="cc-col">
+          <div class="sequence">
+            <div class="seq-title">📬 3-Email Sequence · 14 days apart</div>
+            <div class="seq-step"><div class="seq-num">1</div><div class="seq-content"><div class="seq-label">"Your project is still on our mind"</div><div class="seq-body">Named-reason recap. Links won-back case study.</div></div></div>
+            <div class="seq-step"><div class="seq-num">2</div><div class="seq-content"><div class="seq-label">Industry whitepaper / ROI calc</div><div class="seq-body">Pure value. Uses Platform Comparison tool.</div></div></div>
+            <div class="seq-step"><div class="seq-num">3</div><div class="seq-content"><div class="seq-label">Free audit offer</div><div class="seq-body">Bold 30-min audit CTA. Dominate or IWD Agency.</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cc-metrics">
+        <div class="cc-met"><div class="cc-met-v">373</div><div class="cc-met-l">Deals</div></div>
+        <div class="cc-met"><div class="cc-met-v">$8.7M+</div><div class="cc-met-l">Value</div></div>
+        <div class="cc-met"><div class="cc-met-v">3-5%</div><div class="cc-met-l">Re-open Rate</div></div>
+        <div class="cc-met"><div class="cc-met-v">$260K+</div><div class="cc-met-l">Est. Pipeline</div></div>
+      </div>
+    </div></div>
+
+    <!-- CAMPAIGN 3 -->
+    <div class="campaign-card priority">
+      <div class="cc-banner c3">
+        <div class="cc-num">03</div>
+        <div class="cc-banner-text">
+          <h3>🎯 Cluster Industry Nurture</h3>
+          <div class="cc-audience">289+ active leads in industries where we already win · lookalike conversion targets</div>
+          <span class="cc-tag">Highest-Fit · Week 3 · Needs Content</span>
+        </div>
+        <div class="cc-value"><div class="cc-value-v">289+</div><div class="cc-value-l">Lookalike Leads</div></div>
+      </div>
+      <div class="cc-body"><div class="cc-grid">
+        <div class="cc-col">
+          <h4>🎯 6 industry-specific lists · start with biggest</h4>
+          <div class="segment-grid">
+            <div class="segment"><div class="seg-lbl">Apparel/Fashion</div><div class="seg-v">84 leads</div><div class="seg-sub">30 open deals</div></div>
+            <div class="segment"><div class="seg-lbl">Automotive</div><div class="seg-v">34 leads</div><div class="seg-sub">9 open deals</div></div>
+            <div class="segment"><div class="seg-lbl">Sporting Goods</div><div class="seg-v">32 leads</div><div class="seg-sub">11 open deals</div></div>
+            <div class="segment"><div class="seg-lbl">Mech/Industrial</div><div class="seg-v">28 leads</div><div class="seg-sub">2 open deals</div></div>
+            <div class="segment"><div class="seg-lbl">Construction</div><div class="seg-v">14 leads</div><div class="seg-sub">6 open deals</div></div>
+            <div class="segment"><div class="seg-lbl">Higher Ed</div><div class="seg-v">8 leads</div><div class="seg-sub">PSU+Purdue caliber</div></div>
+          </div>
+          <h4>⚙️ Automation</h4>
+          <p>Per-industry workflow on new lead where <code>industry</code> matches. Dynamic content per industry. CTA click → MQL. Meeting booked → Discovery.</p>
+        </div>
+        <div class="cc-col">
+          <div class="sequence">
+            <div class="seq-title">📬 3-Email · 10 days apart</div>
+            <div class="seq-step"><div class="seq-num">1</div><div class="seq-content"><div class="seq-label">Industry hook + customer spotlight</div><div class="seq-body">Europa Eyewear for Apparel; Rough Country for Auto.</div></div></div>
+            <div class="seq-step"><div class="seq-num">2</div><div class="seq-content"><div class="seq-label">Vertical whitepaper or audit</div><div class="seq-body">"B2B eCommerce checklist for [INDUSTRY]".</div></div></div>
+            <div class="seq-step"><div class="seq-num">3</div><div class="seq-content"><div class="seq-label">Social proof + soft CTA</div><div class="seq-body">"3 [INDUSTRY] brands we worked with this year".</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cc-metrics">
+        <div class="cc-met"><div class="cc-met-v">6</div><div class="cc-met-l">Industry Lists</div></div>
+        <div class="cc-met"><div class="cc-met-v">289+</div><div class="cc-met-l">Leads</div></div>
+        <div class="cc-met"><div class="cc-met-v">83</div><div class="cc-met-l">Open Deals</div></div>
+        <div class="cc-met"><div class="cc-met-v">15-20%</div><div class="cc-met-l">Engagement</div></div>
+      </div>
+    </div></div>
+
+    <!-- CAMPAIGN 4 -->
+    <div class="campaign-card">
+      <div class="cc-banner c4">
+        <div class="cc-num">04</div>
+        <div class="cc-banner-text">
+          <h3>👋 New Lead Welcome Sequence</h3>
+          <div class="cc-audience">Every inbound form submission · evergreen automation</div>
+          <span class="cc-tag">Set &amp; Forget · Week 2 · Fully Automated</span>
+        </div>
+        <div class="cc-value"><div class="cc-value-v">51</div><div class="cc-value-l">Current Leads</div></div>
+      </div>
+      <div class="cc-body"><div class="cc-grid">
+        <div class="cc-col">
+          <h4>🎯 Audience — form submissions, dynamic</h4>
+          <p>Auto-enrolls on <code>recent_conversion_date</code> change. Different sequence per form source:</p>
+          <ul><li><b>IWD Contact Us</b> → agency pitch</li><li><b>Checkout page</b> → Dominate ROI</li><li><b>Contact Dominate</b> → sales pitch</li><li><b>BTC Payments</b> → crypto integration</li><li><b>Meeting Link</b> → skip sequence, Gabby handles</li></ul>
+        </div>
+        <div class="cc-col">
+          <div class="sequence">
+            <div class="seq-title">📬 3-Email · Day 1 / 4 / 9</div>
+            <div class="seq-step"><div class="seq-num">1</div><div class="seq-content"><div class="seq-label">Welcome (by form source)</div><div class="seq-body">Thanks + what we do best + case study.</div></div></div>
+            <div class="seq-step"><div class="seq-num">2</div><div class="seq-content"><div class="seq-label">"Quick question"</div><div class="seq-body">Soft discovery ask, reply-friendly.</div></div></div>
+            <div class="seq-step"><div class="seq-num">3</div><div class="seq-content"><div class="seq-label">Calendar + case study</div><div class="seq-body">15-min call booking link.</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cc-metrics">
+        <div class="cc-met"><div class="cc-met-v">51</div><div class="cc-met-l">Leads Now</div></div>
+        <div class="cc-met"><div class="cc-met-v">~50/mo</div><div class="cc-met-l">Ongoing</div></div>
+        <div class="cc-met"><div class="cc-met-v">25-30%</div><div class="cc-met-l">Open Rate</div></div>
+        <div class="cc-met"><div class="cc-met-v">Set &amp; Forget</div><div class="cc-met-l">Maintenance</div></div>
+      </div>
+    </div></div>
+
+    <!-- CAMPAIGN 5 -->
+    <div class="campaign-card">
+      <div class="cc-banner c5">
+        <div class="cc-num">05</div>
+        <div class="cc-banner-text">
+          <h3>📈 Existing Client Expansion</h3>
+          <div class="cc-audience">118 customers · tiered 1/2/3 by revenue · warmest audience we have</div>
+          <span class="cc-tag">Highest Conversion · Week 3 · Account-Based</span>
+        </div>
+        <div class="cc-value"><div class="cc-value-v">118</div><div class="cc-value-l">Customers</div></div>
+      </div>
+      <div class="cc-body"><div class="cc-grid">
+        <div class="cc-col">
+          <h4>🎯 Tiered by revenue</h4>
+          <ul>
+            <li><b>Tier 1 — Strategic</b> (≥$100K LTV · 10 accounts): QC Supply, Bobcat, Schoolfix, DMC, PSU, ADTRAN, Splitit, Inyo Pools, US Camera Pro, Pryor — <b>Gabby 1:1</b></li>
+            <li><b>Tier 2 — Growth</b> ($10-100K · ~40 accounts): automated sequence + quarterly check-in call</li>
+            <li><b>Tier 3 — Reactivation</b> ($0-10K · ~70 accounts): automated nurture only</li>
+          </ul>
+          <h4>⚙️ Expansion Triggers</h4>
+          <ul>
+            <li><b>Platform upgrades</b> (Magento 2.4.8 = ~6 customers due)</li>
+            <li><b>B2B motion</b> (Europa just did this — pitch to Circle Y, Lee Michaels, Cariloha)</li>
+            <li><b>Dominate checkout</b> upsell to every M2 customer</li>
+            <li><b>SEO/Marketing cross-sell</b> to build-only clients</li>
+          </ul>
+        </div>
+        <div class="cc-col">
+          <div class="sequence">
+            <div class="seq-title">📬 Monthly cadence · Tier 2/3</div>
+            <div class="seq-step"><div class="seq-num">1</div><div class="seq-content"><div class="seq-label">"What's new at IWD" digest</div><div class="seq-body">Product updates + new case studies.</div></div></div>
+            <div class="seq-step"><div class="seq-num">2</div><div class="seq-content"><div class="seq-label">Quarterly health check offer</div><div class="seq-body">Free 30-min platform audit.</div></div></div>
+            <div class="seq-step"><div class="seq-num">3</div><div class="seq-content"><div class="seq-label">Semi-annual asks</div><div class="seq-body">Case study / referral requests.</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cc-metrics">
+        <div class="cc-met"><div class="cc-met-v">118</div><div class="cc-met-l">Customers</div></div>
+        <div class="cc-met"><div class="cc-met-v">10</div><div class="cc-met-l">Tier 1</div></div>
+        <div class="cc-met"><div class="cc-met-v">$1.5M</div><div class="cc-met-l">TAM</div></div>
+        <div class="cc-met"><div class="cc-met-v">Highest</div><div class="cc-met-l">Close Rate</div></div>
+      </div>
+    </div></div>
+
+    <!-- CAMPAIGN 6 -->
+    <div class="campaign-card">
+      <div class="cc-banner c6">
+        <div class="cc-num">06</div>
+        <div class="cc-banner-text">
+          <h3>🎯 ABM / Multi-Threaded Contact Targeting</h3>
+          <div class="cc-audience">85 accounts with 5+ contacts · expand beyond single point of contact</div>
+          <span class="cc-tag">High-Touch · Week 4 · Manual Curation</span>
+        </div>
+        <div class="cc-value"><div class="cc-value-v">85+</div><div class="cc-value-l">Target Accounts</div></div>
+      </div>
+      <div class="cc-body"><div class="cc-grid">
+        <div class="cc-col">
+          <h4>🎯 Top targets — multi-contact, NOT on exclusion list</h4>
+          <ul>
+            <li><b>ADTRAN</b> — 17 contacts · $141K customer (not on exclusion list)</li>
+            <li><b>Doosan</b> — 17 contacts · $62K customer (Automotive cluster)</li>
+            <li><b>Mishimoto</b> — 10 contacts · $12K customer (Automotive cluster)</li>
+            <li><b>Jack Williams Tire</b> — 8 contacts · Automotive cluster customer</li>
+            <li><b>SE Performance Apparel</b> — 2 contacts + brand ambassadors · $72K customer</li>
+            <li><b>Splitit Ltd</b> — 5 contacts · $105K customer (FinServ)</li>
+            <li><b>Rough Country LLC</b> — 3 contacts · $62K customer (Auto anchor)</li>
+            <li><b>Performance Food Group</b> — 7 contacts · $70K customer</li>
+          </ul>
+          <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:9px 12px;font-size:.76rem;color:#a87000;margin-top:8px;"><b>Excluded from ABM (Tier 1 strategic):</b> PayPal, Penn State, Intel — these 3 stay in Campaign 5 only, no ABM cold-touch.</div>
+          <h4>⚙️ Why manual</h4>
+          <p>ABM only works with real research. Gabby reviews weekly, approves 3-5 account-based sequences. Reference primary contact + named project in outreach.</p>
+        </div>
+        <div class="cc-col">
+          <div class="sequence">
+            <div class="seq-title">📬 Per-account personalized</div>
+            <div class="seq-step"><div class="seq-num">1</div><div class="seq-content"><div class="seq-label">Named introduction</div><div class="seq-body">"We work with [primary] on X — wanted to introduce myself."</div></div></div>
+            <div class="seq-step"><div class="seq-num">2</div><div class="seq-content"><div class="seq-label">Role-relevant asset</div><div class="seq-body">IT → tech case study. Marketing → growth case study.</div></div></div>
+            <div class="seq-step"><div class="seq-num">3</div><div class="seq-content"><div class="seq-label">Intro call ask</div><div class="seq-body">"Would love to hear what's on your roadmap."</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cc-metrics">
+        <div class="cc-met"><div class="cc-met-v">85+</div><div class="cc-met-l">Accounts</div></div>
+        <div class="cc-met"><div class="cc-met-v">3-5/wk</div><div class="cc-met-l">Touches</div></div>
+        <div class="cc-met"><div class="cc-met-v">$750K</div><div class="cc-met-l">Est. TAM</div></div>
+        <div class="cc-met"><div class="cc-met-v">Strategic</div><div class="cc-met-l">Quality</div></div>
+      </div>
+    </div></div>
+
+  </div>
+</div>
+
+
+<!-- SECTION 7: TOP 100 TARGET ACCOUNTS -->
+<div class="section" id="s-top100">
+  <div class="section-head">
+    <div class="num-dot">💯</div><h2>Top 100 Target Accounts for New Business</h2>
+    <div class="sh-sub">USA/UK · B2B · Has contact · Lead-scored</div>
+  </div>
+  <div class="section-body">
+    <p style="font-size:.93rem;line-height:1.6;margin-bottom:16px;color:var(--muted);">
+      Our sweet spot: <b style="color:var(--text);">B2B on Shopify Plus, Adobe Commerce, or legacy Magento/BigCommerce · USA or UK · has at least one known contact</b>. Scored across 6 dimensions. Companies on the Tier 1 exclusion list and platform partners are removed. <b>348</b> candidates scored, top <b>100</b> shown.
+    </p>
+
+    <div class="metric-bar">
+      <div class="mb-item"><div class="mb-v">85</div><div class="mb-l">🇺🇸 US Accounts</div></div>
+      <div class="mb-item"><div class="mb-v">15</div><div class="mb-l">🇬🇧 UK Accounts</div></div>
+      <div class="mb-item"><div class="mb-v hot">28</div><div class="mb-l">Grade A (Hot 80+)</div></div>
+      <div class="mb-item"><div class="mb-v good">37</div><div class="mb-l">Total Open Deals</div></div>
+    </div>
+
+    <div class="chart-container fullbleed">
+      <div class="chart-title">🎯 LEAD SCORE DISTRIBUTION · TOP 100</div>
+      <svg viewBox="0 0 640 70" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;width:100%;max-width:640px;height:auto">
+  <rect x="30" y="25" width="162" height="30" fill="#00c288" rx="4"></rect>
+  <rect x="192" y="25" width="417" height="30" fill="#00e5a0"></rect>
+  <rect x="609" y="25" width="0" height="30" fill="#1e40af"></rect>
+  <rect x="609" y="25" width="1" height="30" fill="#6b6b6b" rx="4"></rect>
+  <text x="111" y="45" text-anchor="middle" fill="#fff" font-size="14" font-weight="900" font-family="Space Grotesk,Inter">A · 28</text>
+  <text x="400" y="45" text-anchor="middle" fill="#1c1c1c" font-size="14" font-weight="900" font-family="Space Grotesk,Inter">B · 72</text>
+  <text x="609" y="45" text-anchor="middle" fill="#fff" font-size="14" font-weight="900" font-family="Space Grotesk,Inter">C · 0</text>
+  
+  <text x="111" y="18" text-anchor="middle" fill="#00c288" font-size="10" font-weight="800" letter-spacing="1.2">A · HOT (80+)</text>
+  <text x="400" y="18" text-anchor="middle" fill="#00c288" font-size="10" font-weight="800" letter-spacing="1.2">B · WARM (65-79)</text>
+  <text x="609" y="18" text-anchor="middle" fill="#1e40af" font-size="10" font-weight="800" letter-spacing="1.2">C · QUALIFIED (50-64)</text>
+</svg>
+    </div>
+
+    <div class="chart-container fullbleed">
+      <div class="chart-title">📊 INDUSTRY BREAKDOWN · TOP 100</div>
+      <svg viewBox="0 0 560 290" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;width:100%;max-width:560px;height:auto"><text x="142" y="36" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Retail/E-com</text><rect x="150" y="24" width="340" height="20" fill="#00c288" rx="3"></rect><text x="496" y="36" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">19</text><text x="142" y="62" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Apparel/Fashion</text><rect x="150" y="50" width="268" height="20" fill="#00c288" rx="3"></rect><text x="424" y="62" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">15</text><text x="142" y="88" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Sporting Goods</text><rect x="150" y="76" width="178" height="20" fill="#00c288" rx="3"></rect><text x="334" y="88" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">10</text><text x="142" y="114" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Automotive</text><rect x="150" y="102" width="143" height="20" fill="#00c288" rx="3"></rect><text x="299" y="114" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">8</text><text x="142" y="140" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Food &amp; Beverage</text><rect x="150" y="128" width="143" height="20" fill="#00c288" rx="3"></rect><text x="299" y="140" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">8</text><text x="142" y="166" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Industrial Eng</text><rect x="150" y="154" width="89" height="20" fill="#00c288" rx="3"></rect><text x="245" y="166" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">5</text><text x="142" y="192" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Construction</text><rect x="150" y="180" width="71" height="20" fill="#00c288" rx="3"></rect><text x="227" y="192" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">4</text><text x="142" y="218" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Graphic Design</text><rect x="150" y="206" width="71" height="20" fill="#00c288" rx="3"></rect><text x="227" y="218" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">4</text><text x="142" y="244" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Cons. Electronics</text><rect x="150" y="232" width="53" height="20" fill="#00c288" rx="3"></rect><text x="209" y="244" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">3</text><text x="142" y="270" text-anchor="end" fill="#1c1c1c" font-size="12" font-weight="700">Publishing</text><rect x="150" y="258" width="35" height="20" fill="#00c288" rx="3"></rect><text x="191" y="270" fill="#1c1c1c" font-size="12" font-weight="800" font-family="Space Grotesk,Inter">2</text></svg>
+    </div>
+
+    <div style="background:var(--off);border:1.5px solid var(--bdr);border-radius:12px;padding:18px 22px;margin-bottom:18px;">
+      <div style="font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px;">🔢 Lead Scoring Formula</div>
+      
+<div class="scoring-grid">
+  <div class="scoring-factor"><div class="sf-label">Industry Fit</div><div class="sf-max">0-30</div><div class="sf-desc">Winning B2B clusters weighted by customer density (Apparel, Auto, Retail, Wholesale = full 30; Software/Consulting = 6)</div></div>
+  <div class="scoring-factor"><div class="sf-label">Engagement</div><div class="sf-max">0-25</div><div class="sf-desc">Opportunity = 25 · SQL = 20 · MQL = 15 · Lead = 6</div></div>
+  <div class="scoring-factor"><div class="sf-label">Multi-Threading</div><div class="sf-max">0-15</div><div class="sf-desc">5+ contacts = 15 · 3-4 = 11 · 2 = 8 · 1 = 3 (decision-maker access)</div></div>
+  <div class="scoring-factor"><div class="sf-label">Active Deals</div><div class="sf-max">0-20</div><div class="sf-desc">2+ open deals = 20 · 1 open = 16 · past deal = 6 (real buying signal)</div></div>
+  <div class="scoring-factor"><div class="sf-label">Recency</div><div class="sf-max">0-10</div><div class="sf-desc">Active in 30d = 10 · 90d = 7 · 180d = 4 · 365d = 2</div></div>
+  <div class="scoring-factor"><div class="sf-label">Geo Fit</div><div class="sf-max">0-10</div><div class="sf-desc">USA = 10 · UK = 8 (our sweet spot)</div></div>
+</div>
+<div class="score-max">Max possible: <b>110 points</b> · Partner/reseller type incurs -10 penalty</div>
+
+    </div>
+
+    <div class="subhead-row"><h3>Top 100 Target Accounts — Ranked by Lead Score</h3><div class="subhead-meta">Click company → opens HubSpot record</div></div>
+    <table class="deals top100-table">
+      <thead><tr>
+        <th class="rank-col">#</th>
+        <th>Grade</th>
+        <th>Company</th>
+        <th>Industry</th>
+        <th>Country</th>
+        <th>Stage</th>
+      </tr></thead>
+      <tbody><tr>
+      <td class="rank">1</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">94</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/7691486995" target="_blank" class="deal-link">Replacement Kitchen Doors from Kitchen Door Workshop</a><span class="contact-pill">2c</span><div class="co-sub">kitchendoorworkshop.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">2</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">92</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/20677958185" target="_blank" class="deal-link">Combat Brands</a><span class="contact-pill">4c</span><div class="co-sub">combatbrands.com</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">3</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">89</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16921587996" target="_blank" class="deal-link">Commsandsound.com</a><span class="contact-pill">1c</span><div class="co-sub">commsandsound.com</div></td>
+      <td><span class="ind-chip">Cons. Electronics</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">4</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">88</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8881105704" target="_blank" class="deal-link">Tarmac Sportz</a><span class="contact-pill">2c</span><div class="co-sub">tarmacsportz.co.uk</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">2 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">5</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">88</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/26924949932" target="_blank" class="deal-link">University Loft</a><span class="contact-pill">8c</span><div class="co-sub">uloft.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">6</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">88</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/14855647320" target="_blank" class="deal-link">Naples UK</a><span class="contact-pill">1c</span><div class="co-sub">naplesuk.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">2 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">7</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">88</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/13634129465" target="_blank" class="deal-link">Razny Jewelers</a><span class="contact-pill">1c</span><div class="co-sub">razny.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">2 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">8</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">88</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15413162241" target="_blank" class="deal-link">Treadmill Outlet</a><span class="contact-pill">1c</span><div class="co-sub">treadmilloutlet.com</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">2 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">9</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">87</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9309524887" target="_blank" class="deal-link">SafeFence Live</a><span class="contact-pill">2c</span><div class="co-sub">safefence.co.uk</div></td>
+      <td><span class="ind-chip">Construction</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">10</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">86</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15366143073" target="_blank" class="deal-link">bigmen.com</a><span class="contact-pill">2c</span><div class="co-sub">Bigmen.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">11</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">86</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/14770455350" target="_blank" class="deal-link">cleggengine.com</a><span class="contact-pill">1c</span><div class="co-sub">cleggengine.com</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">12</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16391848363" target="_blank" class="deal-link">PrestigeHairEx</a><span class="contact-pill">1c</span><div class="co-sub">prestigehairextensions.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">13</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9412005239" target="_blank" class="deal-link">EZ Able LLC</a><span class="contact-pill">1c</span><div class="co-sub">ezable.com</div></td>
+      <td><span class="ind-chip">Construction</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">14</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/10441821031" target="_blank" class="deal-link">DMoose</a><span class="contact-pill">1c</span><div class="co-sub">dmoose.com</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">15</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15786245554" target="_blank" class="deal-link">Millard County</a><span class="contact-pill">1c</span><div class="co-sub">millardcounty.org</div></td>
+      <td><span class="ind-chip">Higher Education</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">16</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17024722966" target="_blank" class="deal-link">San Carlos Imports LLC</a><span class="contact-pill">1c</span><div class="co-sub">sancarlosimports.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">17</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17712095368" target="_blank" class="deal-link">Ocean Millennium Trust Inc</a><span class="contact-pill">1c</span><div class="co-sub">oceansmall.net</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">18</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/6080607070" target="_blank" class="deal-link">TreeSeeds.com</a><span class="contact-pill">1c</span><div class="co-sub">treeseeds.com</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">19</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/7711981883" target="_blank" class="deal-link">Leez Inc</a><span class="contact-pill">1c</span><div class="co-sub">leez.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">20</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">84</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/12149612698" target="_blank" class="deal-link">The Hat Pros</a><span class="contact-pill">1c</span><div class="co-sub">thehatpros.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">21</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">82</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203404852" target="_blank" class="deal-link">Sugarfina</a><span class="contact-pill">5c</span><div class="co-sub">sugarfina.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">22</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">82</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9272593531" target="_blank" class="deal-link">AutoMaximizer</a><span class="contact-pill">3c</span><div class="co-sub">automaximizer.com</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">23</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">82</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/11823021425" target="_blank" class="deal-link">Stylla London</a><span class="contact-pill">1c</span><div class="co-sub">stylla.co.uk</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">24</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">81</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/48206656318" target="_blank" class="deal-link">FriconUSA</a><span class="contact-pill">1c</span><div class="co-sub">friconusa.com</div></td>
+      <td><span class="ind-chip">Electronics Mfg</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">25</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">81</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/7772396555" target="_blank" class="deal-link">Leapers Inc</a><span class="contact-pill">2c</span><div class="co-sub">leapers.com</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">26</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">81</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/27519975236" target="_blank" class="deal-link">KeHE</a><span class="contact-pill">2c</span><div class="co-sub">kehe.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">27</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">80</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203406677" target="_blank" class="deal-link">BetterGrow Hydro</a><span class="contact-pill">2c</span><div class="co-sub">bghydro.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">28</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00c288;">A</span> <span class="score-num">80</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4164139588" target="_blank" class="deal-link">Slurp Wine Company Ltd</a><span class="contact-pill">5c</span><div class="co-sub">slurp.co.uk</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">29</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">79</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203415434" target="_blank" class="deal-link">Divers Supply</a><span class="contact-pill">2c</span><div class="co-sub">divers-supply.com</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">30</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">79</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17424884039" target="_blank" class="deal-link">russellsny</a><span class="contact-pill">2c</span><div class="co-sub">russellsny.com</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">31</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">79</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/5961239133" target="_blank" class="deal-link">OneUp Innovations</a><span class="contact-pill">2c</span><div class="co-sub">oneupinnovations.com</div></td>
+      <td><span class="ind-chip">Industrial Eng</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">32</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">78</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4202428715" target="_blank" class="deal-link">RK Audio Inc</a><span class="contact-pill">2c</span><div class="co-sub">rkaudio.com</div></td>
+      <td><span class="ind-chip">Cons. Electronics</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">33</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">78</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15991442540" target="_blank" class="deal-link">The Snowlands Company</a><span class="contact-pill">1c</span><div class="co-sub">thesnowlandscompany.com</div></td>
+      <td><span class="ind-chip">Publishing</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">34</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">78</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15358471186" target="_blank" class="deal-link">By Night Studios</a><span class="contact-pill">1c</span><div class="co-sub">bynightstudios.com</div></td>
+      <td><span class="ind-chip">Publishing</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">35</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">76</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203292311" target="_blank" class="deal-link">Memorial Bracelets</a><span class="contact-pill">1c</span><div class="co-sub">memorialbracelets.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">36</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">76</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/19059209119" target="_blank" class="deal-link">BOA®</a><span class="contact-pill">1c</span><div class="co-sub">boafit.com</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">37</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">76</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/19059183022" target="_blank" class="deal-link">Boa Technology</a><span class="contact-pill">1c</span><div class="co-sub">boatechnology.com</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">38</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">76</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203262599" target="_blank" class="deal-link">Sprinkler Warehouse</a><span class="contact-pill">3c</span><div class="co-sub">sprinklerwarehouse.com</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">39</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">76</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/21926516661" target="_blank" class="deal-link">Mingledorff's</a><span class="contact-pill">2c</span><div class="co-sub">mingledorffs.com</div></td>
+      <td><span class="ind-chip">Building Materials</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">40</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">75</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203262823" target="_blank" class="deal-link">The Critical Thinking Co.</a><span class="contact-pill">1c</span><div class="co-sub">criticalthinking.com</div></td>
+      <td><span class="ind-chip">Education</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">41</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">75</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/22425792079" target="_blank" class="deal-link">Tacony</a><span class="contact-pill">1c</span><div class="co-sub">tacony.com</div></td>
+      <td><span class="ind-chip">Wholesale</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">42</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">75</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/48626097687" target="_blank" class="deal-link">GS-JJ</a><span class="contact-pill">1c</span><div class="co-sub">gs-jj.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">43</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">75</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17712555419" target="_blank" class="deal-link">Herba Invest Group</a><span class="contact-pill">1c</span><div class="co-sub">herbainvest.com</div></td>
+      <td><span class="ind-chip">Consumer Goods</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">44</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">75</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16358873500" target="_blank" class="deal-link">Laughing Lion</a><span class="contact-pill">1c</span><div class="co-sub">laughinglionherbs.com</div></td>
+      <td><span class="ind-chip">Pharma</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">45</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203291275" target="_blank" class="deal-link">Google</a><span class="contact-pill">7c</span><div class="co-sub">google.com</div></td>
+      <td><span class="ind-chip">Software</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">46</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9603342195" target="_blank" class="deal-link">Keypress Group</a><span class="contact-pill">1c</span><div class="co-sub">keypressgroup.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">47</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/25240680076" target="_blank" class="deal-link">hossrods.com</a><span class="contact-pill">1c</span><div class="co-sub">hossrods.com</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">48</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/20784803170" target="_blank" class="deal-link">Ringside Boxing</a><span class="contact-pill">1c</span><div class="co-sub">ringside.com</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">49</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15751664803" target="_blank" class="deal-link">SafetyWearhouse</a><span class="contact-pill">1c</span><div class="co-sub">safetywearhouse.net</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">50</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15149472592" target="_blank" class="deal-link">BeyondNice.com</a><span class="contact-pill">1c</span><div class="co-sub">beyondnice.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">51</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8632554574" target="_blank" class="deal-link">EnStyle Butik</a><span class="contact-pill">1c</span><div class="co-sub">enstyletheboutique.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">52</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17632018325" target="_blank" class="deal-link">PMC Supplies LLC</a><span class="contact-pill">1c</span><div class="co-sub">pmcsupplies.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">53</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8113245960" target="_blank" class="deal-link">Fedoras.com</a><span class="contact-pill">1c</span><div class="co-sub">fedoras.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">54</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/5840695719" target="_blank" class="deal-link">Englewood Wine Merchants</a><span class="contact-pill">1c</span><div class="co-sub">englewoodwinemerchants.com</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">55</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16032091663" target="_blank" class="deal-link">Simpson Jewelers LLC</a><span class="contact-pill">1c</span><div class="co-sub">simpsonjewelers.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">56</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9603134527" target="_blank" class="deal-link">Albany County Fasteners</a><span class="contact-pill">1c</span><div class="co-sub">albanycountyfasteners.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">57</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">74</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16368894121" target="_blank" class="deal-link">Stair Solution</a><span class="contact-pill">1c</span><div class="co-sub">stairsolution.com</div></td>
+      <td><span class="ind-chip">Construction</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">58</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">73</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/45955539883" target="_blank" class="deal-link">MontyPay</a><span class="contact-pill">1c</span><div class="co-sub">montypay.com</div></td>
+      <td><span class="ind-chip">Financial</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">59</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">73</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16898259098" target="_blank" class="deal-link">Cleveland Equipment</a><span class="contact-pill">2c</span><div class="co-sub">clevelandequipment.com</div></td>
+      <td><span class="ind-chip">Industrial Eng</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">60</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">73</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15790074769" target="_blank" class="deal-link">PrintBox London</a><span class="contact-pill">1c</span><div class="co-sub">printbox.london</div></td>
+      <td><span class="ind-chip">Printing</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">61</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">72</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16326210640" target="_blank" class="deal-link">Creativetheory</a><span class="contact-pill">2c</span><div class="co-sub">creativetheory.co.uk</div></td>
+      <td><span class="ind-chip">Graphic Design</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">62</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">72</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203394138" target="_blank" class="deal-link">Buzz Catering Supplies</a><span class="contact-pill">1c</span><div class="co-sub">buzzsupplies.co.uk</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">63</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">71</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15445442906" target="_blank" class="deal-link">Runners Sunglasses LLC</a><span class="contact-pill">6c</span><div class="co-sub">runnersathletics.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">LEAD</span></td>
+    </tr><tr>
+      <td class="rank">64</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">71</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15824481087" target="_blank" class="deal-link">O-I Glass, Inc.</a><span class="contact-pill">2c</span><div class="co-sub">o-i.com</div></td>
+      <td><span class="ind-chip">Packaging</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">65</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">71</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203420876" target="_blank" class="deal-link">Premier Media</a><span class="contact-pill">1c</span><div class="co-sub">premiermediaav.com</div></td>
+      <td><span class="ind-chip">Cons. Electronics</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">66</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">70</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17288812937" target="_blank" class="deal-link">Unheard</a><span class="contact-pill">1c</span><div class="co-sub">unheardpdx.com</div></td>
+      <td><span class="ind-chip">Sporting Goods</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">67</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">70</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9294175664" target="_blank" class="deal-link">Strand Book Store</a><span class="contact-pill">1c</span><div class="co-sub">strandbooks.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">68</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">70</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/30780939595" target="_blank" class="deal-link">DG Bullets</a><span class="contact-pill">1c</span><div class="co-sub">dgbullets.com</div></td>
+      <td><span class="ind-chip">Industrial Eng</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">69</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">70</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9677820562" target="_blank" class="deal-link">Inorganic Ventures</a><span class="contact-pill">2c</span><div class="co-sub">inorganicventures.com</div></td>
+      <td><span class="ind-chip">Chemicals</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">70</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">69</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/51637013125" target="_blank" class="deal-link">A Race Against Blindness</a><span class="contact-pill">1c</span><div class="co-sub">araceagainstblindness.org</div></td>
+      <td><span class="ind-chip">Cosmetics</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">71</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">69</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17092292874" target="_blank" class="deal-link">Womple Studios</a><span class="contact-pill">1c</span><div class="co-sub">womplestudios.com</div></td>
+      <td><span class="ind-chip">Jewelry/Luxury</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">72</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">69</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/29356632691" target="_blank" class="deal-link">Snap Creative</a><span class="contact-pill">1c</span><div class="co-sub">snapcreative.com</div></td>
+      <td><span class="ind-chip">Graphic Design</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">73</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">69</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/17571807637" target="_blank" class="deal-link">TK422 Designs</a><span class="contact-pill">1c</span><div class="co-sub">tk422designs.com</div></td>
+      <td><span class="ind-chip">Graphic Design</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">74</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">69</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203472979" target="_blank" class="deal-link">Comsoft Business Solutions, Inc.</a><span class="contact-pill">1c</span><div class="co-sub">comsft.com</div></td>
+      <td><span class="ind-chip">Design</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">75</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203416696" target="_blank" class="deal-link">USA Safety Solutions LLC</a><span class="contact-pill">1c</span><div class="co-sub">usasafety.com</div></td>
+      <td><span class="ind-chip">Industrial Eng</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">76</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/30629386337" target="_blank" class="deal-link">Blankenship Dry Goods</a><span class="contact-pill">1c</span><div class="co-sub">blankenshipdrygoods.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">77</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8825335362" target="_blank" class="deal-link">Minnetonka</a><span class="contact-pill">1c</span><div class="co-sub">minnetonkamoccasin.com</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">78</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/25580305924" target="_blank" class="deal-link">Restomotive</a><span class="contact-pill">1c</span><div class="co-sub">restomotive.com</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">79</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/21815983275" target="_blank" class="deal-link">IQ Refinish Products Inc</a><span class="contact-pill">1c</span><div class="co-sub">iqrefinish.com</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">80</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/19826208604" target="_blank" class="deal-link">The Deliciouser</a><span class="contact-pill">1c</span><div class="co-sub">thedeliciouser.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">81</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203290673" target="_blank" class="deal-link">Big Island Candies</a><span class="contact-pill">1c</span><div class="co-sub">bigislandcandies.com</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">82</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/26505298764" target="_blank" class="deal-link">Edstellar</a><span class="contact-pill">1c</span><div class="co-sub">edstellar.com</div></td>
+      <td><span class="ind-chip">Education</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">83</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8088797089" target="_blank" class="deal-link">Byers' Choice</a><span class="contact-pill">1c</span><div class="co-sub">byerschoice.com</div></td>
+      <td><span class="ind-chip">Industrial Eng</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">84</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/21270966430" target="_blank" class="deal-link">gelato pique</a><span class="contact-pill">1c</span><div class="co-sub">gelatopique.us</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">85</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9731009615" target="_blank" class="deal-link">supersteerparts.com</a><span class="contact-pill">1c</span><div class="co-sub">supersteerparts.com</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">86</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/15318193230" target="_blank" class="deal-link">Popfusions</a><span class="contact-pill">1c</span><div class="co-sub">popfusions.com</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">87</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/9055857770" target="_blank" class="deal-link">RuggedMade</a><span class="contact-pill">1c</span><div class="co-sub">ruggedmade.com</div></td>
+      <td><span class="ind-chip">Construction</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">88</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203272086" target="_blank" class="deal-link">Salesone LLC</a><span class="contact-pill">1c</span><div class="co-sub">salesone.org</div></td>
+      <td><span class="ind-chip">Apparel/Fashion</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">89</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203414658" target="_blank" class="deal-link">SUE FISHER KING</a><span class="contact-pill">1c</span><div class="co-sub">suefisherking.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">90</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/20912258932" target="_blank" class="deal-link">Home Furniture and Patio</a><span class="contact-pill">1c</span><div class="co-sub">homefurnitureandpatio.com</div></td>
+      <td><span class="ind-chip">Retail/E-com</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">91</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/23775753645" target="_blank" class="deal-link">Iowa80.com</a><span class="contact-pill">1c</span><div class="co-sub">iowa80.com</div></td>
+      <td><span class="ind-chip">Automotive</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">92</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">68</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/18369436180" target="_blank" class="deal-link">The Amazing Chickpea</a><span class="contact-pill">1c</span><div class="co-sub">theamazingchickpea.com</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">93</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">67</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16664722609" target="_blank" class="deal-link">XUM Enterprise</a><span class="contact-pill">2c</span><div class="co-sub">drmem.com</div></td>
+      <td><span class="ind-chip">COMPUTER_HARDWARE</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">94</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">67</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203272046" target="_blank" class="deal-link">Wilsonart LLC</a><span class="contact-pill">1c</span><div class="co-sub">wilsonart.com</div></td>
+      <td><span class="ind-chip">Building Materials</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">95</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">67</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/8589249185" target="_blank" class="deal-link">global-ecommerce-services.com</a><span class="contact-pill">2c</span><div class="co-sub">global-ecommerce-services.com</div></td>
+      <td><span class="ind-chip">Software</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">96</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">67</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/29212887952" target="_blank" class="deal-link">Parse Biosciences</a><span class="contact-pill">3c</span><div class="co-sub">parsebiosciences.com</div></td>
+      <td><span class="ind-chip">BIOTECHNOLOGY</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">97</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">67</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/5354252017" target="_blank" class="deal-link">Punch-Creative</a><span class="contact-pill">1c</span><div class="co-sub">punch-creative.co.uk</div></td>
+      <td><span class="ind-chip">Graphic Design</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span><span class="open-deal-tag">1 OPEN</span></td>
+    </tr><tr>
+      <td class="rank">98</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">66</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/4203354326" target="_blank" class="deal-link">Spartan Armor Systems</a><span class="contact-pill">3c</span><div class="co-sub">spartanarmorsystems.com</div></td>
+      <td><span class="ind-chip">Healthcare</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">99</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">66</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/25162282670" target="_blank" class="deal-link">Beautiful Foods</a><span class="contact-pill">1c</span><div class="co-sub">beautifulfoods.co.uk</div></td>
+      <td><span class="ind-chip">Food &amp; Beverage</span></td>
+      <td class="small">🇬🇧 United Kingdom</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr><tr>
+      <td class="rank">100</td>
+      <td><div class="grade-cell"><span class="grade-badge" style="background:#00e5a0;">B</span> <span class="score-num">65</span></div></td>
+      <td><a href="https://app.hubspot.com/contacts/8048809/record/0-2/16445434409" target="_blank" class="deal-link">Joto Imaging Supplies</a><span class="contact-pill">1c</span><div class="co-sub">jotoimagingsupplies.com</div></td>
+      <td><span class="ind-chip">Paper/Forest</span></td>
+      <td class="small">🇺🇸 United States</td>
+      <td><span class="stage-sm">OPPORTUNITY</span></td>
+    </tr></tbody>
+    </table>
+
+    <div class="callout good" style="margin-top:18px;">
+      <b>🎯 How to use this list:</b> The 28 Grade-A accounts (80+ score) are the priority for <b>personal outreach by Gabby</b> this quarter. Grade-B (72 accounts) get <b>Campaign 3 (Cluster Nurture)</b>. Grade-C/D fill the Campaign 2 and 4 audiences. Each row links directly to HubSpot — update stages/notes as you work them.
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 7: ROLLOUT -->
+<div class="section" id="s7">
+  <div class="rollout">
+    <h2>📅 4-Week Launch Timeline</h2>
+    <div class="timeline">
+      <div class="tl-week">
+        <h3>Week 1</h3>
+        <ul>
+          <li><b>🌶️ Revival (C1)</b> goes live — reactivates $223K</li>
+          <li><b>Build content for C2</b> — won-back case studies</li>
+          <li><b>Draft industry templates</b> for C3 (Apparel first)</li>
+        </ul>
+      </div>
+      <div class="tl-week">
+        <h3>Week 2</h3>
+        <ul>
+          <li><b>Lost Deal Retargeting (C2)</b> — 3 top segments</li>
+          <li><b>New Lead Welcome (C4)</b> evergreen</li>
+          <li><b>Tag customers</b> into Tier 1/2/3</li>
+        </ul>
+      </div>
+      <div class="tl-week">
+        <h3>Week 3</h3>
+        <ul>
+          <li><b>Cluster Nurture (C3)</b> — Apparel + Auto</li>
+          <li><b>Client Expansion (C5)</b> Tier 2/3 automation</li>
+          <li><b>C2 expands</b> to Retail, Medical, Apparel</li>
+        </ul>
+      </div>
+      <div class="tl-week">
+        <h3>Week 4</h3>
+        <ul>
+          <li><b>ABM Targeting (C6)</b> manual curation</li>
+          <li><b>C3 expands</b> to remaining clusters</li>
+          <li><b>Measure first results</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="callout good" style="margin-top:18px;">
+    <b>🎯 90-day expected outcome:</b> 50-80 meetings booked, 15-25 re-opened deals, $300-500K new pipeline. Ongoing: 5-8 new meetings/week from automation alone.
+  </div>
+</div>
+
+<!-- SECTION 8: DECISIONS -->
+<div class="section" id="s8">
+  <div class="next-steps">
+    <h2>📋 Decisions Needed Today</h2>
+    <div class="next-steps-grid">
+      <div class="ns-col"><h3>Close what's in flight</h3><ol>
+        <li><b>PSU SOWS ($225K):</b> Signature timing this week?</li>
+        <li><b>DMC EU ($128K):</b> Client Review — blocker?</li>
+        <li><b>Europa Eyewear B2B ($70K):</b> SOW → Contract</li>
+        <li><b>Helio Brands ($100K):</b> Discovery → ROM</li>
+      </ol></div>
+      <div class="ns-col"><h3>Campaign launch approval</h3><ol>
+        <li>Approve all 6 campaigns or subset?</li>
+        <li>Content ownership — who writes case studies?</li>
+        <li>Tier existing customers — Gabby tags this week?</li>
+        <li>ABM target list — full 85 or top 20?</li>
+      </ol></div>
+      <div class="ns-col"><h3>Content needed</h3><ol>
+        <li><b>Europa Eyewear</b> — fresh B2B case study</li>
+        <li><b>Apparel bundle</b> (SE Performance, Eiseman, Europa)</li>
+        <li><b>Automotive</b> (Rough Country, Doosan)</li>
+        <li><b>Won-back stories</b> (PSU, Circle Y, Urbanspace)</li>
+      </ol></div>
+      <div class="ns-col"><h3>Operations</h3><ol>
+        <li><b>Dominate vs IWD brand split</b> — separate sequences?</li>
+        <li><b>Reporting cadence</b> — weekly or monthly?</li>
+        <li><b>Should Apparel/B2B become a dedicated vertical?</b></li>
+        <li><b>Weekly pipeline review</b> time + attendees?</li>
+      </ol></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  <span class="jalap-note">🌶️ Keep it spicy</span> &nbsp;·&nbsp; Built live from HubSpot &nbsp;·&nbsp; IWD Agency · April 24, 2026
+</div>
+
+</div></body></html>
