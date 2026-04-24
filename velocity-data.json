@@ -264,7 +264,7 @@
         "plannedHours": 0
       },
       "PSU Creamery - Maintenance": {
-        "plan": "",
+        "plan": "Light Touch",
         "rate": 160,
         "minHours": 0,
         "plannedHours": 4
