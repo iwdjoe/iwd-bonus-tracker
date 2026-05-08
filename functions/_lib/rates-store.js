@@ -12,6 +12,14 @@ const STORE = 'rates';
 const KEY = 'current';
 
 function store() {
+    // Prefer auto-context (works in modern Netlify function runtime). Fall
+    // back to explicit siteID + token if NETLIFY_BLOBS_TOKEN is provided
+    // (used as escape hatch when auto-context isn't injected).
+    const siteID = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
+    const token = process.env.NETLIFY_BLOBS_TOKEN;
+    if (siteID && token) {
+        return getStore({ name: STORE, siteID, token });
+    }
     return getStore(STORE);
 }
 
