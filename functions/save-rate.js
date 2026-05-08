@@ -74,42 +74,64 @@ exports.handler = async function(event, context) {
             return { statusCode: 400, body: JSON.stringify({ error: "Rate must be a number between 1 and 9999" }) };
         }
 
-        // 1. Get Current File (Need SHA to update)
         const getUrl = `https://api.github.com/repos/${REPO}/contents/${PATH}`;
-        const currentFile = await fetch(getUrl, {
-            headers: { 
-                "Authorization": `token ${GH_TOKEN}`,
-                "Accept": "application/vnd.github.v3+json"
-            }
-        }).then(res => res.json());
 
-        // 2. Decode Content
-        let currentRates = {};
-        if (currentFile.content) {
-            const buff = Buffer.from(currentFile.content, 'base64');
-            currentRates = JSON.parse(buff.toString('utf-8'));
+        async function readCurrent() {
+            const res = await fetch(getUrl, {
+                headers: {
+                    "Authorization": `token ${GH_TOKEN}`,
+                    "Accept": "application/vnd.github.v3+json"
+                }
+            });
+            if (res.status === 404) return { rates: {}, sha: null };
+            if (!res.ok) {
+                const errBody = await res.text();
+                throw new Error('GitHub GET failed: ' + res.status + ' ' + errBody);
+            }
+            const data = await res.json();
+            const rates = data.content
+                ? JSON.parse(Buffer.from(data.content, 'base64').toString('utf-8'))
+                : {};
+            return { rates, sha: data.sha || null };
         }
 
-        // 3. Update Rate
+        async function commit(rates, sha) {
+            const newContent = Buffer.from(JSON.stringify(rates, null, 2)).toString('base64');
+            const putBody = {
+                message: `Update rate for ${projectId} to $${parsedRate}`,
+                content: newContent
+            };
+            if (sha) putBody.sha = sha;
+            return fetch(getUrl, {
+                method: 'PUT',
+                headers: {
+                    "Authorization": `token ${GH_TOKEN}`,
+                    "Accept": "application/vnd.github.v3+json"
+                },
+                body: JSON.stringify(putBody)
+            });
+        }
+
+        // 1. Read current rates + SHA
+        let { rates: currentRates, sha } = await readCurrent();
+
+        // 2. Apply update
         currentRates[projectId] = parsedRate;
 
-        // 4. Commit Back
-        const newContent = Buffer.from(JSON.stringify(currentRates, null, 2)).toString('base64');
-        
-        const updateRes = await fetch(getUrl, {
-            method: 'PUT',
-            headers: { 
-                "Authorization": `token ${GH_TOKEN}`,
-                "Accept": "application/vnd.github.v3+json"
-            },
-            body: JSON.stringify({
-                message: `Update rate for ${projectId} to $${rate}`,
-                content: newContent,
-                sha: currentFile.sha
-            })
-        });
+        // 3. Commit (retry once on 409 Conflict — stale SHA)
+        let updateRes = await commit(currentRates, sha);
+        if (updateRes.status === 409) {
+            const retry = await readCurrent();
+            retry.rates[projectId] = parsedRate;
+            currentRates = retry.rates;
+            updateRes = await commit(retry.rates, retry.sha);
+        }
 
-        if (!updateRes.ok) throw new Error("GitHub Update Failed");
+        if (!updateRes.ok) {
+            const errBody = await updateRes.text();
+            console.error('save-rate GitHub error:', updateRes.status, errBody);
+            throw new Error('GitHub update failed: ' + updateRes.status + ' ' + errBody);
+        }
 
         return {
             statusCode: 200,
@@ -117,6 +139,7 @@ exports.handler = async function(event, context) {
         };
 
     } catch (error) {
+        console.error('save-rate error:', error);
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
 };
