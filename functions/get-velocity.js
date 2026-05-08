@@ -66,12 +66,37 @@ exports.handler = async function(event, context) {
     const cacheKey = `velocity-${year}-${month}`;
     const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
     const cacheTTL = isCurrentMonth ? 60000 : 300000;
-
-    if (cache[cacheKey] && (Date.now() - cache[cacheKey].time < cacheTTL)) {
-        return { statusCode: 200, body: JSON.stringify(cache[cacheKey].data) };
-    }
+    const cacheHit = cache[cacheKey] && (Date.now() - cache[cacheKey].time < cacheTTL);
 
     try {
+        const { readRates } = require('./_lib/rates-store');
+
+        // Always read rates fresh; reuse cached Teamwork aggregation if hot.
+        const savedRates = await readRates().catch(() => ({}));
+        const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
+
+        // If cache hit: rebuild response from cached raw data + fresh rates
+        if (cacheHit) {
+            const cached = cache[cacheKey].data;
+            const projectList = Object.keys(cached.rawProjects).map(pid => {
+                const name = cached.rawProjects[pid].name;
+                const legacyId = name.replace(/[^a-z0-9]/gi, '');
+                const rate = savedRates[pid] || savedRates[legacyId] || savedRates[name] || GLOBAL_RATE;
+                return {
+                    id: pid,
+                    name,
+                    hours: Math.round(cached.rawProjects[pid].hours * 100) / 100,
+                    rate: parseInt(rate),
+                    people: cached.rawProjects[pid].people
+                };
+            }).sort((a, b) => b.hours - a.hours);
+
+            return { statusCode: 200, body: JSON.stringify({
+                projects: projectList,
+                meta: { ...cached.meta, globalRate: GLOBAL_RATE, serverTime: new Date().toISOString() }
+            }) };
+        }
+
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
         const startDate = new Date(year, month, 1).toISOString().split('T')[0].replace(/-/g, '');
 
@@ -82,16 +107,9 @@ exports.handler = async function(event, context) {
             endDate = new Date(year, month + 1, 0).toISOString().split('T')[0].replace(/-/g, '');
         }
 
-        // Fetch page 1 + rates in parallel (rates from Netlify Blobs)
-        const { readRates } = require('./_lib/rates-store');
-        const [twRes1, savedRates] = await Promise.all([
-            fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } }),
-            readRates().catch(() => ({}))
-        ]);
-
+        const twRes1 = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } });
         if (!twRes1.ok) throw new Error("Teamwork API " + twRes1.status);
         const twData1 = await twRes1.json();
-        const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
         let entries = twData1['time-entries'] || [];
 
@@ -149,6 +167,8 @@ exports.handler = async function(event, context) {
             };
         }).sort((a, b) => b.hours - a.hours);
 
+        const rawProjects = projects;
+
         // Calculate business days
         const monthStart = new Date(year, month, 1);
         const monthEnd = isCurrentMonth ? now : new Date(year, month + 1, 0);
@@ -188,7 +208,11 @@ exports.handler = async function(event, context) {
             }
         };
 
-        cache[cacheKey] = { data: responseData, time: Date.now() };
+        // Cache raw aggregation only; rates are re-applied on every read.
+        cache[cacheKey] = {
+            data: { rawProjects, meta: responseData.meta },
+            time: Date.now()
+        };
         return { statusCode: 200, body: JSON.stringify(responseData) };
 
     } catch (error) {

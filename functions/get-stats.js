@@ -83,89 +83,102 @@ exports.handler = async function(event, context) {
     const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
 
     // CACHE: 60s for current month, 5 min for past months
+    // Cache holds the expensive Teamwork-derived data only (userList, rawProjects).
+    // Rates are always re-read from Blobs so live rate edits surface immediately.
     const cacheTTL = isCurrentMonth ? 60000 : 300000;
-    if (cache[cacheKey] && (Date.now() - cache[cacheKey].time < cacheTTL)) {
-        return { statusCode: 200, body: JSON.stringify(cache[cacheKey].data) };
-    }
+    const cacheHit = cache[cacheKey] && (Date.now() - cache[cacheKey].time < cacheTTL);
 
     try {
-        const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
-        const startDate = new Date(year, month, 1).toISOString().split('T')[0].replace(/-/g, '');
-
-        // For current month use today; for past months use last day of that month
-        let endDate;
-        if (isCurrentMonth) {
-            endDate = now.toISOString().split('T')[0].replace(/-/g, '');
-        } else {
-            endDate = new Date(year, month + 1, 0).toISOString().split('T')[0].replace(/-/g, '');
-        }
-
-        // Fetch page 1 + rates in parallel (rates from Netlify Blobs)
         const { readRates } = require('./_lib/rates-store');
-        const [twRes1, savedRates] = await Promise.all([
-            fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } }),
-            readRates().catch(() => ({}))
-        ]);
 
-        if(!twRes1.ok) throw new Error("Teamwork API " + twRes1.status);
-        const twData1 = await twRes1.json();
-        const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
+        let userList, rawProjects, todayBillableHours;
 
-        let entries = twData1['time-entries'] || [];
+        if (cacheHit) {
+            // Reuse the expensive Teamwork aggregation; rates re-applied below.
+            ({ userList, rawProjects, todayBillableHours } = cache[cacheKey].data);
+        } else {
+            const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
+            const startDate = new Date(year, month, 1).toISOString().split('T')[0].replace(/-/g, '');
 
-        // Fetch all remaining pages until we get a partial page (max 5 pages = 2,500 entries)
-        const MAX_PAGES = 5;
-        let page = 2;
-        while (entries.length === (page - 1) * 500 && page <= MAX_PAGES) {
-            const res = await fetch(`https://${DOMAIN}/time_entries.json?page=${page}&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } });
-            if (!res.ok) break;
-            const data = await res.json();
-            const pageEntries = data['time-entries'] || [];
-            if (pageEntries.length === 0) break;
-            entries = entries.concat(pageEntries);
-            page++;
-        }
-
-        // Contractors: included in billable hours/revenue but excluded from bonus payouts
-        const CONTRACTORS = ['Julian Stoddart'];
-
-        let users = Object.create(null);
-        let projects = Object.create(null);
-
-        // Track today's billable hours separately for timezone-neutral projections
-        const todayStr = isCurrentMonth ? now.toISOString().split('T')[0].replace(/-/g, '') : '';
-        let todayBillableHours = 0;
-
-        entries.forEach(e => {
-            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
-            if (e['isbillable'] !== '1') return;
-
-            const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
-            const user = e['person-first-name'] + ' ' + e['person-last-name'];
-            const pid  = String(e['project-id']);    // stable Teamwork project ID
-            const name = e['project-name'];          // display name — may change over time
-
-            if (isCurrentMonth && e.date === todayStr) {
-                todayBillableHours += hours;
+            // For current month use today; for past months use last day of that month
+            let endDate;
+            if (isCurrentMonth) {
+                endDate = now.toISOString().split('T')[0].replace(/-/g, '');
+            } else {
+                endDate = new Date(year, month + 1, 0).toISOString().split('T')[0].replace(/-/g, '');
             }
 
-            if (!users[user]) users[user] = { hours: 0, contractor: false };
-            users[user].hours += hours;
-            if (CONTRACTORS.includes(user)) users[user].contractor = true;
+            const twRes1 = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } });
+            if(!twRes1.ok) throw new Error("Teamwork API " + twRes1.status);
+            const twData1 = await twRes1.json();
 
-            // Group by project ID so renamed projects don't create duplicate entries.
-            // Always overwrite name so the latest Teamwork name is shown.
-            if (!projects[pid]) projects[pid] = { name, hours: 0 };
-            else projects[pid].name = name;
-            projects[pid].hours += hours;
-        });
+            let entries = twData1['time-entries'] || [];
 
-        const userList = Object.keys(users).map(name => ({ name, hours: users[name].hours, contractor: users[name].contractor }));
-        const projectList = Object.keys(projects).map(pid => {
-            const name     = projects[pid].name;
+            // Fetch all remaining pages until we get a partial page (max 5 pages = 2,500 entries)
+            const MAX_PAGES = 5;
+            let page = 2;
+            while (entries.length === (page - 1) * 500 && page <= MAX_PAGES) {
+                const res = await fetch(`https://${DOMAIN}/time_entries.json?page=${page}&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } });
+                if (!res.ok) break;
+                const data = await res.json();
+                const pageEntries = data['time-entries'] || [];
+                if (pageEntries.length === 0) break;
+                entries = entries.concat(pageEntries);
+                page++;
+            }
+
+            // Contractors: included in billable hours/revenue but excluded from bonus payouts
+            const CONTRACTORS = ['Julian Stoddart'];
+
+            let users = Object.create(null);
+            let projects = Object.create(null);
+
+            // Track today's billable hours separately for timezone-neutral projections
+            const todayStr = isCurrentMonth ? now.toISOString().split('T')[0].replace(/-/g, '') : '';
+            todayBillableHours = 0;
+
+            entries.forEach(e => {
+                if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
+                if (e['isbillable'] !== '1') return;
+
+                const hours = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
+                const user = e['person-first-name'] + ' ' + e['person-last-name'];
+                const pid  = String(e['project-id']);    // stable Teamwork project ID
+                const name = e['project-name'];          // display name — may change over time
+
+                if (isCurrentMonth && e.date === todayStr) {
+                    todayBillableHours += hours;
+                }
+
+                if (!users[user]) users[user] = { hours: 0, contractor: false };
+                users[user].hours += hours;
+                if (CONTRACTORS.includes(user)) users[user].contractor = true;
+
+                // Group by project ID so renamed projects don't create duplicate entries.
+                // Always overwrite name so the latest Teamwork name is shown.
+                if (!projects[pid]) projects[pid] = { name, hours: 0 };
+                else projects[pid].name = name;
+                projects[pid].hours += hours;
+            });
+
+            userList = Object.keys(users).map(name => ({ name, hours: users[name].hours, contractor: users[name].contractor }));
+            rawProjects = projects;
+
+            cache[cacheKey] = {
+                data: { userList, rawProjects, todayBillableHours },
+                time: Date.now()
+            };
+        }
+
+        // Always read rates fresh so live rate edits take effect immediately.
+        const savedRates = await readRates().catch(() => ({}));
+        const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
+
+        const projectList = Object.keys(rawProjects).map(pid => {
+            const name     = rawProjects[pid].name;
             const legacyId = name.replace(/[^a-z0-9]/gi, ''); // backward-compat key for existing rates.json entries
             const rate     = savedRates[pid] || savedRates[legacyId] || savedRates[name] || GLOBAL_RATE;
-            return { id: pid, name, hours: projects[pid].hours, rate: parseInt(rate), def: GLOBAL_RATE };
+            return { id: pid, name, hours: rawProjects[pid].hours, rate: parseInt(rate), def: GLOBAL_RATE };
         });
 
         const responseData = {
@@ -174,14 +187,12 @@ exports.handler = async function(event, context) {
             meta: {
                 serverTime: new Date().toISOString(),
                 globalRate: GLOBAL_RATE,
-                cached: false,
+                cached: cacheHit,
                 month: `${year}-${String(month + 1).padStart(2, '0')}`,
                 isCurrentMonth,
                 todayBillableHours: isCurrentMonth ? todayBillableHours : 0
             }
         };
-
-        cache[cacheKey] = { data: responseData, time: Date.now() };
 
         return { statusCode: 200, body: JSON.stringify(responseData) };
 
