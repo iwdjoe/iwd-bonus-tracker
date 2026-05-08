@@ -82,15 +82,15 @@ exports.handler = async function(event, context) {
             endDate = new Date(year, month + 1, 0).toISOString().split('T')[0].replace(/-/g, '');
         }
 
-        // Fetch page 1 + rates in parallel
-        const [twRes1, ratesRes] = await Promise.all([
+        // Fetch page 1 + rates in parallel (rates from Netlify Blobs)
+        const { readRates } = require('./_lib/rates-store');
+        const [twRes1, savedRates] = await Promise.all([
             fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } }),
-            fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } })
+            readRates().catch(() => ({}))
         ]);
 
         if (!twRes1.ok) throw new Error("Teamwork API " + twRes1.status);
         const twData1 = await twRes1.json();
-        const savedRates = ratesRes.ok ? await ratesRes.json() : {};
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
         let entries = twData1['time-entries'] || [];

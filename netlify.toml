@@ -2,6 +2,12 @@
   publish = "public"
   functions = "functions"
 
+# Bundle the seed JSON used by functions/_lib/rates-store.js as a one-time
+# fallback when the Netlify Blob is empty. After first read the Blob becomes
+# the source of truth; this file only matters for cold-start recovery.
+[functions]
+  included_files = ["rates.json"]
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"

@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const { readRates, writeRates } = require('./_lib/rates-store');
 
 // ── Rate Limiter (10 requests/min per IP) ─────────────────────────────────────
 const rateLimitMap = {};
@@ -52,10 +52,6 @@ exports.handler = async function(event, context) {
         return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests. Please wait a moment.' }) };
     }
 
-    const GH_TOKEN = process.env.GITHUB_PAT;
-    const REPO = "iwdjoe/iwd-bonus-tracker";
-    const PATH = "rates.json";
-    
     try {
         const body = JSON.parse(event.body);
         const { projectId, rate } = body;
@@ -63,8 +59,11 @@ exports.handler = async function(event, context) {
         if (!projectId || rate === undefined) return { statusCode: 400, body: JSON.stringify({ error: "Missing projectId or rate" }) };
 
         // Validate projectId: alphanumeric + hyphens/underscores only, block prototype pollution keys
-        const BLOCKED_KEYS = ['__proto__', 'constructor', 'prototype', '__GLOBAL_RATE__'];
-        if (!/^[a-zA-Z0-9_-]+$/.test(projectId) || BLOCKED_KEYS.includes(projectId)) {
+        const BLOCKED_KEYS = ['__proto__', 'constructor', 'prototype'];
+        if (!/^[a-zA-Z0-9_-]+$/.test(projectId) && projectId !== '__GLOBAL_RATE__') {
+            return { statusCode: 400, body: JSON.stringify({ error: "Invalid projectId" }) };
+        }
+        if (BLOCKED_KEYS.includes(projectId)) {
             return { statusCode: 400, body: JSON.stringify({ error: "Invalid projectId" }) };
         }
 
@@ -74,64 +73,9 @@ exports.handler = async function(event, context) {
             return { statusCode: 400, body: JSON.stringify({ error: "Rate must be a number between 1 and 9999" }) };
         }
 
-        const getUrl = `https://api.github.com/repos/${REPO}/contents/${PATH}`;
-
-        async function readCurrent() {
-            const res = await fetch(getUrl, {
-                headers: {
-                    "Authorization": `token ${GH_TOKEN}`,
-                    "Accept": "application/vnd.github.v3+json"
-                }
-            });
-            if (res.status === 404) return { rates: {}, sha: null };
-            if (!res.ok) {
-                const errBody = await res.text();
-                throw new Error('GitHub GET failed: ' + res.status + ' ' + errBody);
-            }
-            const data = await res.json();
-            const rates = data.content
-                ? JSON.parse(Buffer.from(data.content, 'base64').toString('utf-8'))
-                : {};
-            return { rates, sha: data.sha || null };
-        }
-
-        async function commit(rates, sha) {
-            const newContent = Buffer.from(JSON.stringify(rates, null, 2)).toString('base64');
-            const putBody = {
-                message: `Update rate for ${projectId} to $${parsedRate}`,
-                content: newContent
-            };
-            if (sha) putBody.sha = sha;
-            return fetch(getUrl, {
-                method: 'PUT',
-                headers: {
-                    "Authorization": `token ${GH_TOKEN}`,
-                    "Accept": "application/vnd.github.v3+json"
-                },
-                body: JSON.stringify(putBody)
-            });
-        }
-
-        // 1. Read current rates + SHA
-        let { rates: currentRates, sha } = await readCurrent();
-
-        // 2. Apply update
+        const currentRates = await readRates();
         currentRates[projectId] = parsedRate;
-
-        // 3. Commit (retry once on 409 Conflict — stale SHA)
-        let updateRes = await commit(currentRates, sha);
-        if (updateRes.status === 409) {
-            const retry = await readCurrent();
-            retry.rates[projectId] = parsedRate;
-            currentRates = retry.rates;
-            updateRes = await commit(retry.rates, retry.sha);
-        }
-
-        if (!updateRes.ok) {
-            const errBody = await updateRes.text();
-            console.error('save-rate GitHub error:', updateRes.status, errBody);
-            throw new Error('GitHub update failed: ' + updateRes.status + ' ' + errBody);
-        }
+        await writeRates(currentRates);
 
         return {
             statusCode: 200,

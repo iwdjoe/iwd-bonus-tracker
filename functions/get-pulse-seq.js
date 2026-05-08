@@ -68,9 +68,9 @@ exports.handler = async function(event, context) {
         const p2 = await fetch(url2, { headers: { 'Authorization': AUTH } });
         const d2 = p2.ok ? await p2.json() : {}; // If Page 2 fails (e.g. empty), just ignore? Or throw? Better to ignore if it's 404/empty, but 429 is bad.
 
-        // 4. FETCH RATES (GitHub)
-        const ratesRes = await fetch(`https://api.github.com/repos/${REPO}/contents/rates.json`, { headers: { "Authorization": `token ${GH_TOKEN}`, "Accept": "application/vnd.github.v3.raw" } });
-        const savedRates = ratesRes.ok ? await ratesRes.json() : {};
+        // 4. FETCH RATES (Netlify Blobs)
+        const { readRates } = require('./_lib/rates-store');
+        const savedRates = await readRates().catch(() => ({}));
         const GLOBAL_RATE = savedRates['__GLOBAL_RATE__'] || 155;
 
         // 5. MERGE
