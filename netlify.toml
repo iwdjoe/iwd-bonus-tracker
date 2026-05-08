@@ -6,6 +6,7 @@
 # fallback when the Netlify Blob is empty. After first read the Blob becomes
 # the source of truth; this file only matters for cold-start recovery.
 [functions]
+  node_bundler = "esbuild"
   included_files = ["rates.json"]
 
 [[redirects]]
