@@ -275,7 +275,7 @@
         "plan": "Core",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 467
       },
       "School Fix - Maintenance": {
         "plan": "Core",
@@ -311,7 +311,7 @@
         "plan": "Light Touch",
         "rate": 150,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 5
       },
       "Europa Eyewear - General": {
         "plan": "Support",
@@ -322,8 +322,8 @@
       "US Camera Pro - Maintenance": {
         "plan": "Support",
         "rate": 160,
-        "minHours": 20,
-        "plannedHours": 20
+        "minHours": 10,
+        "plannedHours": 10
       },
       "Europa Eyewear - EyeBobs to Bloomingdale’s Integration": {
         "plan": "Support",
@@ -341,13 +341,13 @@
         "plan": "Support",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 50
       },
       "Pryor - SEO Migration Recovery | Content": {
         "plan": "Growth",
         "rate": 160,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 65
       },
       "PSU Creamery - Maintenance": {
         "plan": "Light Touch",
@@ -359,7 +359,7 @@
         "plan": "Core",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 120
       }
     }
   },
