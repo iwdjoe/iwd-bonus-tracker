@@ -158,11 +158,12 @@
                 <div id="bar-actual" class="absolute h-full bg-blue-600 z-20 rounded-l-full transition-all duration-500 w-0"></div>
                 <div id="bar-proj" class="absolute h-full bg-green-400 dark:bg-green-600 opacity-40 z-10 rounded-l-full transition-all duration-500 w-0"></div>
                 
-                <div class="marker-line" style="left: 53%"></div><div class="marker-label" style="left: 53%">$85k</div><div class="marker-bonus" style="left: 53%">$1k</div>
-                <div class="marker-line" style="left: 62%"></div><div class="marker-label" style="left: 62%">$100k</div><div class="marker-bonus" style="left: 62%">$2k</div>
-                <div class="marker-line" style="left: 72%"></div><div class="marker-label" style="left: 72%">$115k</div><div class="marker-bonus" style="left: 72%">$3k</div>
-                <div class="marker-line" style="left: 81%"></div><div class="marker-label" style="left: 81%">$130k</div><div class="marker-bonus" style="left: 81%">$4k</div>
-                <div class="marker-line" style="left: 90%"></div><div class="marker-label" style="left: 90%">$145k</div><div class="marker-bonus" style="left: 90%">$5k</div>
+                <div class="marker-line" style="left: 49%"></div><div class="marker-label" style="left: 49%">$85k</div><div class="marker-bonus" style="left: 49%">$1k</div>
+                <div class="marker-line" style="left: 57%"></div><div class="marker-label" style="left: 57%">$100k</div><div class="marker-bonus" style="left: 57%">$2k</div>
+                <div class="marker-line" style="left: 66%"></div><div class="marker-label" style="left: 66%">$115k</div><div class="marker-bonus" style="left: 66%">$3k</div>
+                <div class="marker-line" style="left: 74%"></div><div class="marker-label" style="left: 74%">$130k</div><div class="marker-bonus" style="left: 74%">$4k</div>
+                <div class="marker-line" style="left: 83%"></div><div class="marker-label" style="left: 83%">$145k</div><div class="marker-bonus" style="left: 83%">$5k</div>
+                <div class="marker-line" style="left: 91%"></div><div class="marker-label" style="left: 91%">$160k</div><div class="marker-bonus" style="left: 91%">$6k</div>
             </div>
         </div>
 
@@ -665,7 +666,7 @@
                 if (payoutLabel) payoutLabel.innerText = 'Actual Payout';
             }
 
-            const max = 160000;
+            const max = 175000;
             const actPct = Math.min((state.totalRev / max)*100, 100);
             const simPct = Math.min((state.simProjRev / max)*100, 100);
             document.getElementById('bar-actual').style.width = actPct + '%';
