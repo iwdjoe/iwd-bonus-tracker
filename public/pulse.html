@@ -538,7 +538,8 @@
                 mutation.addedNodes.forEach(node => {
                     if (node.nodeType === 1 && node.tagName === 'DIV' &&
                         node.parentElement === document.body &&
-                        !KNOWN_IDS.includes(node.id) && !node.querySelector('iframe')) {
+                        !KNOWN_IDS.includes(node.id) && !node.querySelector('iframe') &&
+                        !node.classList.contains('pulse-tip-bubble')) {
                         node.remove();
                     }
                 });
