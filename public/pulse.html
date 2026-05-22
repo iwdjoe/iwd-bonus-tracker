@@ -77,11 +77,8 @@
           visibility: hidden;
           opacity: 0;
           pointer-events: none;
-          position: absolute;
+          position: fixed;
           z-index: 9999;
-          bottom: calc(100% + 10px);
-          left: 50%;
-          transform: translateX(-50%);
           width: 260px;
           background: #1a1f2b;
           border: 1px solid rgba(255,255,255,0.13);
@@ -129,22 +126,9 @@
           position: relative;
           display: inline-block;
         }
-        .pulse-tip-wrap:hover .pulse-tip-bubble {
-          visibility: visible;
-          opacity: 1;
-          pointer-events: auto;
-        }
         @media (max-width: 520px) {
           .pulse-tip-bubble {
             width: 220px;
-            left: auto;
-            right: -8px;
-            transform: none;
-          }
-          .pulse-tip-bubble::after {
-            left: auto;
-            right: 14px;
-            transform: none;
           }
         }
     </style>
@@ -610,12 +594,36 @@
       icon.setAttribute('aria-label', 'How this is calculated');
       icon.textContent = 'i';
 
+      // Append bubble to body so it escapes any overflow:hidden card containers
       const bubble = document.createElement('div');
       bubble.className = 'pulse-tip-bubble';
       bubble.innerHTML = `<div class="pulse-tip-bubble-title">${tip.title}</div><div class="pulse-tip-bubble-body">${tip.html}</div>`;
+      document.body.appendChild(bubble);
+
+      function showBubble() {
+        const rect = icon.getBoundingClientRect();
+        const bubbleW = window.innerWidth <= 520 ? 220 : 260;
+        bubble.style.width = bubbleW + 'px';
+        let left = rect.left + rect.width / 2 - bubbleW / 2;
+        left = Math.max(8, Math.min(left, window.innerWidth - bubbleW - 8));
+        bubble.style.left = left + 'px';
+        bubble.style.top = (rect.top - 10) + 'px';
+        bubble.style.transform = 'translateY(-100%)';
+        bubble.style.visibility = 'visible';
+        bubble.style.opacity = '1';
+        bubble.style.pointerEvents = 'auto';
+      }
+
+      function hideBubble() {
+        bubble.style.visibility = 'hidden';
+        bubble.style.opacity = '0';
+        bubble.style.pointerEvents = 'none';
+      }
+
+      wrap.addEventListener('mouseenter', showBubble);
+      wrap.addEventListener('mouseleave', hideBubble);
 
       wrap.appendChild(icon);
-      wrap.appendChild(bubble);
       heading.appendChild(wrap);
     });
   }
