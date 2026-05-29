@@ -90,11 +90,13 @@
         .pulse-tip-bubble::after {
           content: '';
           position: absolute;
-          top: 100%;
+          bottom: 100%;
+          top: auto;
           left: 50%;
           transform: translateX(-50%);
           border: 6px solid transparent;
-          border-top-color: #1a1f2b;
+          border-top-color: transparent;
+          border-bottom-color: #1a1f2b;
         }
         .pulse-tip-bubble-title {
           font-size: 11px;
@@ -608,8 +610,8 @@
         let left = rect.left + rect.width / 2 - bubbleW / 2;
         left = Math.max(8, Math.min(left, window.innerWidth - bubbleW - 8));
         bubble.style.left = left + 'px';
-        bubble.style.top = (rect.top - 10) + 'px';
-        bubble.style.transform = 'translateY(-100%)';
+        bubble.style.top = (rect.bottom + 8) + 'px';
+        bubble.style.transform = '';
         bubble.style.visibility = 'visible';
         bubble.style.opacity = '1';
         bubble.style.pointerEvents = 'auto';
