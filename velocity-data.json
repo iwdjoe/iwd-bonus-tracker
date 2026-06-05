@@ -387,12 +387,6 @@
         "minHours": 20,
         "plannedHours": 20
       },
-      "BinMaster - Maintenance": {
-        "plan": "Support",
-        "rate": 180,
-        "minHours": 20,
-        "plannedHours": 20
-      },
       "Purdue - Maintenance": {
         "plan": "Support",
         "rate": 150,
