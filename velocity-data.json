@@ -531,7 +531,7 @@
         "plan": "Core",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 120
       },
       "DMCE - Adobe Commerce": {
         "plan": "Core",
