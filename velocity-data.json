@@ -459,7 +459,7 @@
         "plan": "Core",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 7
       },
       "School Fix - Maintenance": {
         "plan": "Core",
@@ -500,8 +500,8 @@
       "US Camera Pro - Maintenance": {
         "plan": "Support",
         "rate": 160,
-        "minHours": 10,
-        "plannedHours": 10
+        "minHours": 20,
+        "plannedHours": 20
       },
       "Europa Eyewear - EyeBobs to Bloomingdale’s Integration": {
         "plan": "Support",
@@ -521,12 +521,6 @@
         "minHours": 0,
         "plannedHours": 0
       },
-      "Pryor - SEO Migration Recovery | Content": {
-        "plan": "Growth",
-        "rate": 160,
-        "minHours": 0,
-        "plannedHours": 0
-      },
       "PSU Creamery - Maintenance": {
         "plan": "Light Touch",
         "rate": 160,
@@ -543,13 +537,19 @@
         "plan": "Core",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 160
       },
       "Inyo Pools - Maintenance": {
-        "plan": "",
+        "plan": "Support",
         "rate": 155,
+        "minHours": 20,
+        "plannedHours": 20
+      },
+      "Inyo Pools Phase 2": {
+        "plan": "Growth",
+        "rate": 160,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 120
       }
     }
   },
