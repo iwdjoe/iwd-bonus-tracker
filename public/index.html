@@ -392,6 +392,16 @@
             // return Central-Time-correct values regardless of the browser's own zone.
             return new Date(parseInt(p.year, 10), parseInt(p.month, 10) - 1, parseInt(p.day, 10), hour, parseInt(p.minute, 10), parseInt(p.second, 10));
         }
+
+        // Returns 'CST' or 'CDT' depending on whether Central Time is currently
+        // observing daylight saving, so the displayed label always matches reality.
+        function getCentralTimeZoneAbbr() {
+            const parts = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'America/Chicago', timeZoneName: 'short'
+            }).formatToParts(new Date());
+            const tz = parts.find(part => part.type === 'timeZoneName');
+            return tz ? tz.value : 'CT';
+        }
         // ─────────────────────────────────────────────────────────────────────────
 
         // Populate month dropdown with last 12 months
@@ -438,7 +448,7 @@
                 indicator.className = "text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase";
                 
                 const t = getCentralNow();
-                updated.innerText = "Last Updated: " + t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " CST";
+                updated.innerText = "Last Updated: " + t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " " + getCentralTimeZoneAbbr();
                 
                 return data;
             } catch (e) {
