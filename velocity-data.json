@@ -550,6 +550,12 @@
         "rate": 160,
         "minHours": 0,
         "plannedHours": 120
+      },
+      "Inyo Pools - Project Hammerhead Phase 2": {
+        "plan": "",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
       }
     }
   },
