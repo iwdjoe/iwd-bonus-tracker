@@ -284,6 +284,33 @@
         const API_PULSE = '/.netlify/functions/get-pulse-seq?v=' + Date.now();
         const API_STATS = '/.netlify/functions/get-stats?v=' + Date.now();
 
+        // ── Standardize "now" to US Central Time (CST/CDT) ──────────────────────
+        // Same fix as the main dashboard (index.html): pin "today"/week/month
+        // boundaries to America/Chicago so every viewer sees the same numbers,
+        // regardless of their own browser's timezone.
+        function getCentralNow() {
+            const parts = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'America/Chicago',
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: false
+            }).formatToParts(new Date());
+            const p = {};
+            parts.forEach(part => { if (part.type !== 'literal') p[part.type] = part.value; });
+            let hour = parseInt(p.hour, 10);
+            if (hour === 24) hour = 0;
+            return new Date(parseInt(p.year, 10), parseInt(p.month, 10) - 1, parseInt(p.day, 10), hour, parseInt(p.minute, 10), parseInt(p.second, 10));
+        }
+
+        function getCentralTimeZoneAbbr() {
+            const parts = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'America/Chicago', timeZoneName: 'short'
+            }).formatToParts(new Date());
+            const tz = parts.find(part => part.type === 'timeZoneName');
+            return tz ? tz.value : 'CT';
+        }
+        // ─────────────────────────────────────────────────────────────────────────
+
         // AUTH LOGIC (matches bonus tracker)
         function checkAuth() {
             const user = netlifyIdentity.currentUser();
@@ -339,8 +366,8 @@
                 indicator.innerText = 'LIVE API';
                 indicator.className = "text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase";
 
-                const date = new Date();
-                document.getElementById('time-updated').innerText = "Last Updated: " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const date = getCentralNow();
+                document.getElementById('time-updated').innerText = "Last Updated: " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " " + getCentralTimeZoneAbbr();
 
                 processData(dataPulse, dataStats);
             } catch (e) {
@@ -354,7 +381,7 @@
             const entries = pulseData.entries || [];
 
             // Date Ranges
-            const now = new Date();
+            const now = getCentralNow();
             const toStr = (d) => {
                 const y = d.getFullYear();
                 const m = String(d.getMonth() + 1).padStart(2, '0');

@@ -43,8 +43,23 @@ exports.handler = async function(event, context) {
 
     try {
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
-        const now = new Date();
-        
+
+        // Pin "today" to US Central Time (America/Chicago) so the 15-day fetch
+        // window is anchored to the same "today" as the rest of the dashboards,
+        // regardless of the server's own (UTC) clock.
+        function getCentralParts() {
+            const parts = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'America/Chicago',
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour12: false
+            }).formatToParts(new Date());
+            const p = {};
+            parts.forEach(part => { if (part.type !== 'literal') p[part.type] = part.value; });
+            return { year: parseInt(p.year, 10), month: parseInt(p.month, 10) - 1, day: parseInt(p.day, 10) };
+        }
+        const cp = getCentralParts();
+        const now = new Date(cp.year, cp.month, cp.day);
+
         // 1. DATES (14 Days)
         const startDate = new Date(now);
         startDate.setDate(now.getDate() - 15);

@@ -45,7 +45,30 @@ exports.handler = async function(event, context) {
     const GH_TOKEN = process.env.GITHUB_PAT;
     const REPO = "iwdjoe/iwd-bonus-tracker";
 
-    const now = new Date();
+    // ── Standardize "now" to US Central Time (CST/CDT) ──────────────────────────
+    // Same fix as get-stats.js: pin month/day boundaries to America/Chicago
+    // regardless of the server's own (UTC) clock.
+    function getCentralParts() {
+        const parts = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/Chicago',
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false
+        }).formatToParts(new Date());
+        const p = {};
+        parts.forEach(part => { if (part.type !== 'literal') p[part.type] = part.value; });
+        let hour = parseInt(p.hour, 10);
+        if (hour === 24) hour = 0;
+        return {
+            year: parseInt(p.year, 10),
+            month: parseInt(p.month, 10) - 1,
+            day: parseInt(p.day, 10),
+            hour, minute: parseInt(p.minute, 10), second: parseInt(p.second, 10)
+        };
+    }
+    const centralNow = getCentralParts();
+    // ─────────────────────────────────────────────────────────────────────────────
+
     const qMonth = (event.queryStringParameters && event.queryStringParameters.month) || null;
     let year, month;
 
@@ -59,12 +82,12 @@ exports.handler = async function(event, context) {
         year = parsedYear;
         month = parsedMonth - 1;
     } else {
-        year = now.getFullYear();
-        month = now.getMonth();
+        year = centralNow.year;
+        month = centralNow.month;
     }
 
     const cacheKey = `velocity-${year}-${month}`;
-    const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
+    const isCurrentMonth = (year === centralNow.year && month === centralNow.month);
     const cacheTTL = isCurrentMonth ? 60000 : 300000;
     const cacheHit = cache[cacheKey] && (Date.now() - cache[cacheKey].time < cacheTTL);
 
@@ -98,13 +121,14 @@ exports.handler = async function(event, context) {
         }
 
         const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
-        const startDate = new Date(year, month, 1).toISOString().split('T')[0].replace(/-/g, '');
+        const startDate = `${year}${String(month + 1).padStart(2, '0')}01`;
 
         let endDate;
         if (isCurrentMonth) {
-            endDate = now.toISOString().split('T')[0].replace(/-/g, '');
+            endDate = `${centralNow.year}${String(centralNow.month + 1).padStart(2, '0')}${String(centralNow.day).padStart(2, '0')}`;
         } else {
-            endDate = new Date(year, month + 1, 0).toISOString().split('T')[0].replace(/-/g, '');
+            const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+            endDate = `${year}${String(month + 1).padStart(2, '0')}${String(lastDay).padStart(2, '0')}`;
         }
 
         const twRes1 = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } });
@@ -171,7 +195,8 @@ exports.handler = async function(event, context) {
 
         // Calculate business days
         const monthStart = new Date(year, month, 1);
-        const monthEnd = isCurrentMonth ? now : new Date(year, month + 1, 0);
+        const centralToday = new Date(centralNow.year, centralNow.month, centralNow.day);
+        const monthEnd = isCurrentMonth ? centralToday : new Date(year, month + 1, 0);
         const totalMonthEnd = new Date(year, month + 1, 0);
 
         function countBusinessDays(start, end) {

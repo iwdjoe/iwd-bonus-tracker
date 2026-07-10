@@ -232,13 +232,16 @@ async function fetchDashboardData() {
 
     if (!TOKEN) throw new Error("TEAMWORK_API_TOKEN is not configured");
 
-    const now = new Date();
+    // Pin "today" to US Central Time so this matches calculateStats() below —
+    // previously this used the raw server (UTC) clock while calculateStats used
+    // Madrid time, so the two halves of this file could disagree on "today".
+    const now = getTimezoneNow('America/Chicago');
     const year = now.getFullYear();
     const month = now.getMonth();
 
     const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
-    const startDate = new Date(year, month, 1).toISOString().split('T')[0].replace(/-/g, '');
-    const endDate = now.toISOString().split('T')[0].replace(/-/g, '');
+    const startDate = `${year}${String(month + 1).padStart(2, '0')}01`;
+    const endDate = `${year}${String(month + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
 
     const { readRates } = require('./_lib/rates-store');
     const [twRes1, savedRates] = await Promise.all([
@@ -366,7 +369,7 @@ exports.handler = async function(event, context) {
         const body = JSON.parse(event.body || '{}');
         const modeFlag = body.mode || 'auto';
         const isPreview = body.preview === true;
-        const timezone = 'Europe/Madrid';
+        const timezone = 'America/Chicago'; // matches the dashboard's Central Time standardization
         const dashboardUrl = process.env.DASHBOARD_URL || 'https://iwd-bonus-tracker.netlify.app';
 
         // Validate mode
