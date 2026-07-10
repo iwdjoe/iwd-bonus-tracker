@@ -369,10 +369,35 @@
         let state = { projects: [], users: [], totalRev: 0, projRev: 0, simProjRev: 0, pool: 0, simPool: 0, isCurrentMonth: true };
         let sortState = { key: 'hours', asc: false };
 
+        // ── Standardize "now" to US Central Time (CST/CDT) ──────────────────────
+        // Our operations run on US Central Time. Using new Date() directly reads
+        // the VIEWER's browser clock/timezone, so two people looking at this page
+        // at the same moment (one in NY, one in LA) could see different "today",
+        // different weekday, and different day-of-month — which cascades into
+        // different projected revenue/pool numbers. This pins "now" to Central
+        // Time for every viewer, everywhere, so the numbers always match.
+        function getCentralNow() {
+            const parts = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'America/Chicago',
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: false
+            }).formatToParts(new Date());
+            const p = {};
+            parts.forEach(part => { if (part.type !== 'literal') p[part.type] = part.value; });
+            let hour = parseInt(p.hour, 10);
+            if (hour === 24) hour = 0; // midnight edge case from hour12:false
+            // Construct via the local Date constructor using Central component
+            // values, so all get*() calls (getFullYear, getDate, getDay, getHours...)
+            // return Central-Time-correct values regardless of the browser's own zone.
+            return new Date(parseInt(p.year, 10), parseInt(p.month, 10) - 1, parseInt(p.day, 10), hour, parseInt(p.minute, 10), parseInt(p.second, 10));
+        }
+        // ─────────────────────────────────────────────────────────────────────────
+
         // Populate month dropdown with last 12 months
         function populateMonthSelector() {
             const sel = document.getElementById('month-select');
-            const now = new Date();
+            const now = getCentralNow();
             for (let i = 0; i < 12; i++) {
                 const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
                 const val = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
@@ -412,8 +437,8 @@
                 indicator.innerText = 'LIVE API';
                 indicator.className = "text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase";
                 
-                const t = new Date();
-                updated.innerText = "Last Updated: " + t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const t = getCentralNow();
+                updated.innerText = "Last Updated: " + t.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " CST";
                 
                 return data;
             } catch (e) {
@@ -518,8 +543,7 @@
             const parts = selectedMonth.split('-');
             const year = parseInt(parts[0]);
             const month = parseInt(parts[1]) - 1;
-            const now = new Date();
-
+            const now = getCentralNow();
             const start = new Date(year, month, 1);
             const end = new Date(year, month + 1, 0);
 

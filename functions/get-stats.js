@@ -60,8 +60,35 @@ exports.handler = async function(event, context) {
     const GH_TOKEN = process.env.GITHUB_PAT;
     const REPO = "iwdjoe/iwd-bonus-tracker";
 
-    // Parse optional month param (YYYY-MM) or default to current month
-    const now = new Date();
+    // ── Standardize "now" to US Central Time (CST/CDT) ──────────────────────────
+    // Netlify Functions execute on servers running UTC. Reading new Date() directly
+    // means "today" and "this month" flip over at UTC midnight — 6/7PM Central —
+    // hours before the actual Central business day ends. That mismatch is what was
+    // producing inconsistent-looking numbers. This pins the month/day boundaries
+    // used everywhere below to America/Chicago, regardless of server TZ.
+    function getCentralParts() {
+        const parts = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/Chicago',
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false
+        }).formatToParts(new Date());
+        const p = {};
+        parts.forEach(part => { if (part.type !== 'literal') p[part.type] = part.value; });
+        let hour = parseInt(p.hour, 10);
+        if (hour === 24) hour = 0; // midnight edge case from hour12:false
+        return {
+            year: parseInt(p.year, 10),
+            month: parseInt(p.month, 10) - 1, // 0-indexed, matches JS Date convention
+            day: parseInt(p.day, 10),
+            hour, minute: parseInt(p.minute, 10), second: parseInt(p.second, 10)
+        };
+    }
+    const centralNow = getCentralParts();
+    const todayCentralStr = `${centralNow.year}${String(centralNow.month + 1).padStart(2, '0')}${String(centralNow.day).padStart(2, '0')}`;
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    // Parse optional month param (YYYY-MM) or default to current month (Central Time)
     const qMonth = (event.queryStringParameters && event.queryStringParameters.month) || null;
     let year, month;
 
@@ -75,12 +102,12 @@ exports.handler = async function(event, context) {
         year = parsedYear;
         month = parsedMonth - 1; // JS months are 0-indexed
     } else {
-        year = now.getFullYear();
-        month = now.getMonth();
+        year = centralNow.year;
+        month = centralNow.month;
     }
 
     const cacheKey = `${year}-${month}`;
-    const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
+    const isCurrentMonth = (year === centralNow.year && month === centralNow.month);
 
     // CACHE: 60s for current month, 5 min for past months
     // Cache holds the expensive Teamwork-derived data only (userList, rawProjects).
@@ -98,14 +125,15 @@ exports.handler = async function(event, context) {
             ({ userList, rawProjects, todayBillableHours } = cache[cacheKey].data);
         } else {
             const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
-            const startDate = new Date(year, month, 1).toISOString().split('T')[0].replace(/-/g, '');
+            const startDate = `${year}${String(month + 1).padStart(2, '0')}01`;
 
-            // For current month use today; for past months use last day of that month
+            // For current month use today (Central); for past months use last day of that month
             let endDate;
             if (isCurrentMonth) {
-                endDate = now.toISOString().split('T')[0].replace(/-/g, '');
+                endDate = todayCentralStr;
             } else {
-                endDate = new Date(year, month + 1, 0).toISOString().split('T')[0].replace(/-/g, '');
+                const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+                endDate = `${year}${String(month + 1).padStart(2, '0')}${String(lastDay).padStart(2, '0')}`;
             }
 
             const twRes1 = await fetch(`https://${DOMAIN}/time_entries.json?page=1&pageSize=500&fromDate=${startDate}&toDate=${endDate}`, { headers: { 'Authorization': AUTH } });
@@ -134,7 +162,7 @@ exports.handler = async function(event, context) {
             let projects = Object.create(null);
 
             // Track today's billable hours separately for timezone-neutral projections
-            const todayStr = isCurrentMonth ? now.toISOString().split('T')[0].replace(/-/g, '') : '';
+            const todayStr = isCurrentMonth ? todayCentralStr : '';
             todayBillableHours = 0;
 
             entries.forEach(e => {
