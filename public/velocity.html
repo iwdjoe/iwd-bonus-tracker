@@ -314,13 +314,14 @@
     let _saveTimer = null;
     let _saving = false;
 
-    // ── Standardize "now" to US Central Time (CST/CDT) ──────────────────────
+    // ── Standardize "now" to the team's timezone (Poland — CET/CEST) ────────
     // Same fix as the main dashboard (index.html): pin "current month" to
-    // America/Chicago so every viewer's browser agrees on which month is
+    // TEAM_TIMEZONE so every viewer's browser agrees on which month is
     // "current", regardless of their own local timezone.
-    function getCentralNow() {
+    const TEAM_TIMEZONE = 'Europe/Warsaw';
+    function getTeamNow() {
         const parts = new Intl.DateTimeFormat('en-US', {
-            timeZone: 'America/Chicago',
+            timeZone: TEAM_TIMEZONE,
             year: 'numeric', month: '2-digit', day: '2-digit',
             hour: '2-digit', minute: '2-digit', second: '2-digit',
             hour12: false
@@ -406,7 +407,7 @@
     // ── Month Selector (UNCHANGED) ───────────────────────────────────────────
     function populateMonthSelector() {
         const sel = document.getElementById('month-select');
-        const now = getCentralNow();
+        const now = getTeamNow();
         sel.innerHTML = '';
         let y = now.getFullYear(), m = now.getMonth();
         while (y > 2026 || (y === 2026 && m >= 0)) {
@@ -424,7 +425,7 @@
     function migrateIfNeeded(obj) {
         const keys = Object.keys(obj);
         if (keys.length > 0 && !/^\d{4}-\d{2}$/.test(keys[0])) {
-            const now = getCentralNow();
+            const now = getTeamNow();
             const month = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
             return { [month]: obj };
         }

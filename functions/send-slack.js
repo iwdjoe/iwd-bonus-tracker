@@ -5,6 +5,9 @@
 // Env vars needed: SLACK_WEBHOOK_URL
 // (Plus existing TEAMWORK_API_TOKEN, GITHUB_PAT for data fetch)
 
+// The team's workday (incl. the 9AM meeting) runs on Poland time.
+const TEAM_TIMEZONE = 'Europe/Warsaw';
+
 // ── Rate Limiter (1 Slack post per 5 min per IP) ──────────────────────────────
 const slackRateMap = {};
 function isSlackRateLimited(ip, windowMs = 300000) {
@@ -232,10 +235,10 @@ async function fetchDashboardData() {
 
     if (!TOKEN) throw new Error("TEAMWORK_API_TOKEN is not configured");
 
-    // Pin "today" to US Central Time so this matches calculateStats() below —
+    // Pin "today" to the team's timezone so this matches calculateStats() below —
     // previously this used the raw server (UTC) clock while calculateStats used
-    // Madrid time, so the two halves of this file could disagree on "today".
-    const now = getTimezoneNow('America/Chicago');
+    // a different timezone, so the two halves of this file could disagree on "today".
+    const now = getTimezoneNow(TEAM_TIMEZONE);
     const year = now.getFullYear();
     const month = now.getMonth();
 
@@ -369,7 +372,7 @@ exports.handler = async function(event, context) {
         const body = JSON.parse(event.body || '{}');
         const modeFlag = body.mode || 'auto';
         const isPreview = body.preview === true;
-        const timezone = 'America/Chicago'; // matches the dashboard's Central Time standardization
+        const timezone = TEAM_TIMEZONE; // matches the dashboards' timezone standardization
         const dashboardUrl = process.env.DASHBOARD_URL || 'https://iwd-bonus-tracker.netlify.app';
 
         // Validate mode

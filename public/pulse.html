@@ -284,13 +284,14 @@
         const API_PULSE = '/.netlify/functions/get-pulse-seq?v=' + Date.now();
         const API_STATS = '/.netlify/functions/get-stats?v=' + Date.now();
 
-        // ── Standardize "now" to US Central Time (CST/CDT) ──────────────────────
+        // ── Standardize "now" to the team's timezone (Poland — CET/CEST) ────────
         // Same fix as the main dashboard (index.html): pin "today"/week/month
-        // boundaries to America/Chicago so every viewer sees the same numbers,
+        // boundaries to TEAM_TIMEZONE so every viewer sees the same numbers,
         // regardless of their own browser's timezone.
-        function getCentralNow() {
+        const TEAM_TIMEZONE = 'Europe/Warsaw';
+        function getTeamNow() {
             const parts = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'America/Chicago',
+                timeZone: TEAM_TIMEZONE,
                 year: 'numeric', month: '2-digit', day: '2-digit',
                 hour: '2-digit', minute: '2-digit', second: '2-digit',
                 hour12: false
@@ -302,12 +303,15 @@
             return new Date(parseInt(p.year, 10), parseInt(p.month, 10) - 1, parseInt(p.day, 10), hour, parseInt(p.minute, 10), parseInt(p.second, 10));
         }
 
-        function getCentralTimeZoneAbbr() {
+        // Returns the short zone label the browser gives Poland's time (e.g.
+        // 'GMT+1' in winter, 'GMT+2' in summer during CEST), so the displayed
+        // label always matches reality regardless of daylight saving.
+        function getTeamTimeZoneAbbr() {
             const parts = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'America/Chicago', timeZoneName: 'short'
+                timeZone: TEAM_TIMEZONE, timeZoneName: 'short'
             }).formatToParts(new Date());
             const tz = parts.find(part => part.type === 'timeZoneName');
-            return tz ? tz.value : 'CT';
+            return tz ? tz.value : '';
         }
         // ─────────────────────────────────────────────────────────────────────────
 
@@ -366,8 +370,8 @@
                 indicator.innerText = 'LIVE API';
                 indicator.className = "text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase";
 
-                const date = getCentralNow();
-                document.getElementById('time-updated').innerText = "Last Updated: " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " " + getCentralTimeZoneAbbr();
+                const date = getTeamNow();
+                document.getElementById('time-updated').innerText = "Last Updated: " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " " + getTeamTimeZoneAbbr();
 
                 processData(dataPulse, dataStats);
             } catch (e) {
@@ -381,7 +385,7 @@
             const entries = pulseData.entries || [];
 
             // Date Ranges
-            const now = getCentralNow();
+            const now = getTeamNow();
             const toStr = (d) => {
                 const y = d.getFullYear();
                 const m = String(d.getMonth() + 1).padStart(2, '0');

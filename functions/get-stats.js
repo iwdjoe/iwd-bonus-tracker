@@ -60,15 +60,17 @@ exports.handler = async function(event, context) {
     const GH_TOKEN = process.env.GITHUB_PAT;
     const REPO = "iwdjoe/iwd-bonus-tracker";
 
-    // ── Standardize "now" to US Central Time (CST/CDT) ──────────────────────────
-    // Netlify Functions execute on servers running UTC. Reading new Date() directly
-    // means "today" and "this month" flip over at UTC midnight — 6/7PM Central —
-    // hours before the actual Central business day ends. That mismatch is what was
-    // producing inconsistent-looking numbers. This pins the month/day boundaries
-    // used everywhere below to America/Chicago, regardless of server TZ.
-    function getCentralParts() {
+    // ── Standardize "now" to the team's timezone (Poland — CET/CEST) ────────────
+    // The team's workday (incl. the 9AM meeting) runs on Poland time. Netlify
+    // Functions execute on servers running UTC, and reading new Date() directly
+    // meant "today"/"this month" flipped over at UTC midnight — hours before or
+    // after the actual Poland business day boundary — producing inconsistent
+    // numbers. This pins the month/day boundaries used everywhere below to
+    // TEAM_TIMEZONE, regardless of server TZ.
+    const TEAM_TIMEZONE = 'Europe/Warsaw';
+    function getTeamParts() {
         const parts = new Intl.DateTimeFormat('en-US', {
-            timeZone: 'America/Chicago',
+            timeZone: TEAM_TIMEZONE,
             year: 'numeric', month: '2-digit', day: '2-digit',
             hour: '2-digit', minute: '2-digit', second: '2-digit',
             hour12: false
@@ -84,11 +86,11 @@ exports.handler = async function(event, context) {
             hour, minute: parseInt(p.minute, 10), second: parseInt(p.second, 10)
         };
     }
-    const centralNow = getCentralParts();
-    const todayCentralStr = `${centralNow.year}${String(centralNow.month + 1).padStart(2, '0')}${String(centralNow.day).padStart(2, '0')}`;
+    const teamNow = getTeamParts();
+    const todayTeamStr = `${teamNow.year}${String(teamNow.month + 1).padStart(2, '0')}${String(teamNow.day).padStart(2, '0')}`;
     // ─────────────────────────────────────────────────────────────────────────────
 
-    // Parse optional month param (YYYY-MM) or default to current month (Central Time)
+    // Parse optional month param (YYYY-MM) or default to current month (team's timezone)
     const qMonth = (event.queryStringParameters && event.queryStringParameters.month) || null;
     let year, month;
 
@@ -102,12 +104,12 @@ exports.handler = async function(event, context) {
         year = parsedYear;
         month = parsedMonth - 1; // JS months are 0-indexed
     } else {
-        year = centralNow.year;
-        month = centralNow.month;
+        year = teamNow.year;
+        month = teamNow.month;
     }
 
     const cacheKey = `${year}-${month}`;
-    const isCurrentMonth = (year === centralNow.year && month === centralNow.month);
+    const isCurrentMonth = (year === teamNow.year && month === teamNow.month);
 
     // CACHE: 60s for current month, 5 min for past months
     // Cache holds the expensive Teamwork-derived data only (userList, rawProjects).
@@ -127,10 +129,10 @@ exports.handler = async function(event, context) {
             const AUTH = 'Basic ' + Buffer.from(TOKEN + ':xxx').toString('base64');
             const startDate = `${year}${String(month + 1).padStart(2, '0')}01`;
 
-            // For current month use today (Central); for past months use last day of that month
+            // For current month use today (team's timezone); for past months use last day of that month
             let endDate;
             if (isCurrentMonth) {
-                endDate = todayCentralStr;
+                endDate = todayTeamStr;
             } else {
                 const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
                 endDate = `${year}${String(month + 1).padStart(2, '0')}${String(lastDay).padStart(2, '0')}`;
@@ -162,7 +164,7 @@ exports.handler = async function(event, context) {
             let projects = Object.create(null);
 
             // Track today's billable hours separately for timezone-neutral projections
-            const todayStr = isCurrentMonth ? todayCentralStr : '';
+            const todayStr = isCurrentMonth ? todayTeamStr : '';
             todayBillableHours = 0;
 
             entries.forEach(e => {
