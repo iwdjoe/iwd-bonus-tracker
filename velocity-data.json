@@ -465,7 +465,7 @@
         "plan": "Core",
         "rate": 165,
         "minHours": 80,
-        "plannedHours": 80
+        "plannedHours": 100
       },
       "PSU Extension - Maintenance": {
         "plan": "Growth",
