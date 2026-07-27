@@ -30,6 +30,45 @@ function getTimezoneNow(timezone) {
     );
 }
 
+// Work-day window: starts 9:00 on the team clock, ENDS 12:00 PM US Central.
+// The end is anchored to Central (not hardcoded as a team-clock hour) so it stays
+// correct when either zone shifts for daylight saving.
+const WORK_END_TIMEZONE = 'America/Chicago';
+const WORK_START_HOUR = 9;
+const WORK_END_HOUR_CENTRAL = 12;
+
+function getHourDecimalInZone(date, timeZone) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone, hour: '2-digit', minute: '2-digit', hour12: false
+    }).formatToParts(date);
+    const p = {};
+    parts.forEach(part => { if (part.type !== 'literal') p[part.type] = part.value; });
+    let hour = parseInt(p.hour, 10);
+    if (hour === 24) hour = 0;
+    return hour + parseInt(p.minute, 10) / 60;
+}
+
+/**
+ * Noon Central expressed as an hour on the team clock (e.g. 19.0 in Warsaw while
+ * Central runs 7 hours behind).
+ */
+function getWorkEndHourTeamTime(timezone) {
+    const instant = new Date();
+    let offset = getHourDecimalInZone(instant, timezone) - getHourDecimalInZone(instant, WORK_END_TIMEZONE);
+    if (offset > 12) offset -= 24;
+    if (offset < -12) offset += 24;
+    return WORK_END_HOUR_CENTRAL + offset;
+}
+
+/**
+ * Fraction of today's work day elapsed, 0 to 1, by clock time.
+ */
+function getWorkDayFractionByClock(now, timezone) {
+    const hourDecimal = now.getHours() + now.getMinutes() / 60;
+    const span = Math.max(getWorkEndHourTeamTime(timezone) - WORK_START_HOUR, 0.5);
+    return Math.max(0, Math.min((hourDecimal - WORK_START_HOUR) / span, 1));
+}
+
 /**
  * Count business days (Mon-Fri) between two dates, inclusive
  */
@@ -82,8 +121,7 @@ function calculateStats(data, timezone) {
             todayFraction = avgDailyHours > 0 ? Math.min(todayHours / avgDailyHours, 1) : 0;
         } else {
             // Fallback: use time-of-day when no hours logged yet today
-            const hourDecimal = now.getHours() + now.getMinutes() / 60;
-            todayFraction = Math.max(0, Math.min((hourDecimal - 9) / 8, 1));
+            todayFraction = getWorkDayFractionByClock(now, timezone);
         }
         currentWorkDay = completedDays + todayFraction;
     } else {

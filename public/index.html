@@ -396,6 +396,45 @@
             return new Date(parseInt(p.year, 10), parseInt(p.month, 10) - 1, parseInt(p.day, 10), hour, parseInt(p.minute, 10), parseInt(p.second, 10));
         }
 
+        // ── Work-day window ──────────────────────────────────────────────────────
+        // The day starts at 9:00 on the team clock and ENDS at 12:00 PM US Central.
+        // The end is anchored to Central rather than hardcoded as a team-clock hour
+        // so it stays correct when either zone shifts for daylight saving (the
+        // Warsaw-to-Chicago gap is usually 7h, but briefly 6h or 8h when the two
+        // zones change on different dates).
+        const WORK_END_TIMEZONE = 'America/Chicago';
+        const WORK_START_HOUR = 9;         // 9:00 AM team time
+        const WORK_END_HOUR_CENTRAL = 12;  // 12:00 PM US Central
+
+        function getHourDecimalInZone(date, timeZone) {
+            const parts = new Intl.DateTimeFormat('en-US', {
+                timeZone, hour: '2-digit', minute: '2-digit', hour12: false
+            }).formatToParts(date);
+            const p = {};
+            parts.forEach(part => { if (part.type !== 'literal') p[part.type] = part.value; });
+            let hour = parseInt(p.hour, 10);
+            if (hour === 24) hour = 0;
+            return hour + parseInt(p.minute, 10) / 60;
+        }
+
+        // Noon Central expressed as an hour on the team clock (e.g. 19.0 in Warsaw
+        // while Central runs 7 hours behind).
+        function getWorkEndHourTeamTime() {
+            const instant = new Date();
+            let offset = getHourDecimalInZone(instant, TEAM_TIMEZONE) - getHourDecimalInZone(instant, WORK_END_TIMEZONE);
+            if (offset > 12) offset -= 24;
+            if (offset < -12) offset += 24;
+            return WORK_END_HOUR_CENTRAL + offset;
+        }
+
+        // Fraction of today's work day elapsed, 0 to 1, by clock time.
+        function getWorkDayFractionByClock(now) {
+            const hourDecimal = now.getHours() + now.getMinutes() / 60;
+            const span = Math.max(getWorkEndHourTeamTime() - WORK_START_HOUR, 0.5);
+            return Math.max(0, Math.min((hourDecimal - WORK_START_HOUR) / span, 1));
+        }
+        // ─────────────────────────────────────────────────────────────────────────
+
         // Returns the short zone label the browser gives Poland's time (e.g.
         // 'GMT+1' in winter, 'GMT+2' in summer during CEST), so the displayed
         // label always matches reality regardless of daylight saving.
@@ -580,8 +619,7 @@
                         todayFraction = avgDailyHours > 0 ? Math.min(todayHours / avgDailyHours, 1) : 0;
                     } else {
                         // Fallback: use time-of-day when no hours logged yet today
-                        const hourDecimal = now.getHours() + now.getMinutes() / 60;
-                        todayFraction = Math.max(0, Math.min((hourDecimal - 9) / 8, 1));
+                        todayFraction = getWorkDayFractionByClock(now);
                     }
                     daysPassed = completedDays + todayFraction;
                 } else {
