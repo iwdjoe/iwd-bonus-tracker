@@ -623,7 +623,7 @@
         "plan": "Core",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 200
+        "plannedHours": 150
       },
       "Inyo Pools - Maintenance": {
         "plan": "Support",
