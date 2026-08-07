@@ -551,6 +551,92 @@
         "minHours": 0,
         "plannedHours": 150
       }
+    },
+    "2026-08": {
+      "School Fix - Maintenance": {
+        "plan": "Core",
+        "rate": 165,
+        "minHours": 80,
+        "plannedHours": 80
+      },
+      "PSU Extension - Maintenance": {
+        "plan": "Growth",
+        "rate": 160,
+        "minHours": 40,
+        "plannedHours": 40
+      },
+      "DMC Tools - Maintenance": {
+        "plan": "Support",
+        "rate": 140,
+        "minHours": 20,
+        "plannedHours": 20
+      },
+      "Purdue - Maintenance": {
+        "plan": "Support",
+        "rate": 150,
+        "minHours": 20,
+        "plannedHours": 20
+      },
+      "Warner Press - Maintenance": {
+        "plan": "Light Touch",
+        "rate": 150,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "Europa Eyewear - General": {
+        "plan": "Support",
+        "rate": 150,
+        "minHours": 0,
+        "plannedHours": 3
+      },
+      "US Camera Pro - Maintenance": {
+        "plan": "Support",
+        "rate": 160,
+        "minHours": 20,
+        "plannedHours": 20
+      },
+      "Europa Eyewear - EyeBobs to Bloomingdale’s Integration": {
+        "plan": "Support",
+        "rate": 150,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "Europa Eyewear – Image Curation": {
+        "plan": "Support",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "PSU Creamery - Maintenance": {
+        "plan": "Light Touch",
+        "rate": 160,
+        "minHours": 0,
+        "plannedHours": 6
+      },
+      "PSU - Enhanced Learning Platform": {
+        "plan": "Core",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "DMCE - Adobe Commerce": {
+        "plan": "Core",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 200
+      },
+      "Inyo Pools - Maintenance": {
+        "plan": "Support",
+        "rate": 155,
+        "minHours": 20,
+        "plannedHours": 20
+      },
+      "Inyo Pools - Project Hammerhead Phase 2": {
+        "plan": "Core",
+        "rate": 160,
+        "minHours": 0,
+        "plannedHours": 200
+      }
     }
   },
   "status": {
