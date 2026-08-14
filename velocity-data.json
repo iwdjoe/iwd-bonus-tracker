@@ -581,13 +581,13 @@
         "plan": "Light Touch",
         "rate": 150,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 5
       },
       "Europa Eyewear - General": {
         "plan": "Support",
         "rate": 150,
         "minHours": 0,
-        "plannedHours": 5
+        "plannedHours": 8
       },
       "US Camera Pro - Maintenance": {
         "plan": "Support",
