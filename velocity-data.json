@@ -557,7 +557,7 @@
         "plan": "Core",
         "rate": 165,
         "minHours": 80,
-        "plannedHours": 80
+        "plannedHours": 100
       },
       "PSU Extension - Maintenance": {
         "plan": "Growth",
@@ -617,7 +617,7 @@
         "plan": "Core",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 200
       },
       "DMCE - Adobe Commerce": {
         "plan": "Core",
@@ -629,7 +629,7 @@
         "plan": "Support",
         "rate": 155,
         "minHours": 20,
-        "plannedHours": 20
+        "plannedHours": 50
       },
       "Inyo Pools - Project Hammerhead Phase 2": {
         "plan": "Core",
