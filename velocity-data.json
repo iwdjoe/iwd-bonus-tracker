@@ -642,6 +642,12 @@
         "rate": 155,
         "minHours": 0,
         "plannedHours": 25
+      },
+      "Europa Eyewear - B2B Replatforming": {
+        "plan": "",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
       }
     }
   },
