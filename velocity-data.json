@@ -623,7 +623,7 @@
         "plan": "Core",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 150
+        "plannedHours": 130
       },
       "Inyo Pools - Maintenance": {
         "plan": "Support",
@@ -637,17 +637,11 @@
         "minHours": 0,
         "plannedHours": 200
       },
-      "Europa Eyewear -  B2B Replatforming": {
-        "plan": "Core",
-        "rate": 155,
-        "minHours": 0,
-        "plannedHours": 25
-      },
       "Europa Eyewear - B2B Replatforming": {
         "plan": "",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 25
       }
     }
   },
