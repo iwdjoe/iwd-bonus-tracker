@@ -642,6 +642,18 @@
         "rate": 155,
         "minHours": 0,
         "plannedHours": 25
+      },
+      "Inyo Pools - Phase 2 Mission 100% Traffic": {
+        "plan": "",
+        "rate": 160,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "Inyo Pools - On Going Support": {
+        "plan": "",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
       }
     }
   },
