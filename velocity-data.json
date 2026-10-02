@@ -830,8 +830,8 @@
       "Inyo Pools - On Going Support": {
         "plan": "Support",
         "rate": 155,
-        "minHours": 20,
-        "plannedHours": 20
+        "minHours": 0,
+        "plannedHours": 0
       }
     }
   },
