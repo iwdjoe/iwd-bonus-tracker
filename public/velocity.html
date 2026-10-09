@@ -91,7 +91,7 @@
         [data-tooltip]::after {
             content: attr(data-tooltip);
             position: absolute;
-            bottom: calc(100% + 7px);
+            top: calc(100% + 7px);
             left: 50%;
             transform: translateX(-50%);
             background: #1e293b;
@@ -105,7 +105,7 @@
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.15s;
-            z-index: 200;
+            z-index: 9999;
             box-shadow: 0 4px 14px rgba(0,0,0,0.35);
             text-transform: none;
             letter-spacing: 0;
@@ -113,15 +113,15 @@
         [data-tooltip]::before {
             content: '';
             position: absolute;
-            bottom: calc(100% + 2px);
+            top: calc(100% + 2px);
             left: 50%;
             transform: translateX(-50%);
             border: 5px solid transparent;
-            border-top-color: #1e293b;
+            border-bottom-color: #1e293b;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.15s;
-            z-index: 200;
+            z-index: 9999;
         }
         [data-tooltip]:hover::after,
         [data-tooltip]:hover::before { opacity: 1; }
@@ -609,7 +609,7 @@
 
             ind.textContent = 'Live';
             ind.className = 'text-[10px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300 uppercase';
-            document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+            document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
 
             autoDetectNewClients();
             render();
