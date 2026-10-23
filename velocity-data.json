@@ -832,6 +832,12 @@
         "rate": 155,
         "minHours": 0,
         "plannedHours": 0
+      },
+      "Dominate - Billable": {
+        "plan": "Support",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 42
       }
     }
   },
