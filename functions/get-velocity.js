@@ -155,7 +155,7 @@ exports.handler = async function(event, context) {
         let totalHours = 0;
 
         entries.forEach(e => {
-            if (e['project-name'].match(/IWD|Runners|Dominate/i)) return;
+            if (e['project-name'].match(/IWD|Runners/i)) return;
             if (e['isbillable'] !== '1') return;
 
             const hours  = parseFloat(e.hours) + (parseFloat(e.minutes) / 60);
