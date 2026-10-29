@@ -834,7 +834,7 @@
         "plannedHours": 0
       },
       "Dominate - Maintenance": {
-        "plan": "",
+        "plan": "Support",
         "rate": 155,
         "minHours": 0,
         "plannedHours": 10
