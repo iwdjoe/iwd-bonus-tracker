@@ -839,6 +839,98 @@
         "minHours": 0,
         "plannedHours": 10
       }
+    },
+    "2026-11": {
+      "School Fix - Maintenance": {
+        "plan": "Core",
+        "rate": 165,
+        "minHours": 80,
+        "plannedHours": 100
+      },
+      "PSU Extension - Maintenance": {
+        "plan": "Growth",
+        "rate": 160,
+        "minHours": 40,
+        "plannedHours": 40
+      },
+      "DMC Tools - Maintenance": {
+        "plan": "Support",
+        "rate": 140,
+        "minHours": 20,
+        "plannedHours": 20
+      },
+      "Purdue - Maintenance": {
+        "plan": "Support",
+        "rate": 150,
+        "minHours": 20,
+        "plannedHours": 20
+      },
+      "Warner Press - Maintenance": {
+        "plan": "Light Touch",
+        "rate": 150,
+        "minHours": 0,
+        "plannedHours": 5
+      },
+      "Europa Eyewear - General": {
+        "plan": "Support",
+        "rate": 150,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "US Camera Pro - Maintenance": {
+        "plan": "Support",
+        "rate": 160,
+        "minHours": 20,
+        "plannedHours": 20
+      },
+      "Europa Eyewear - EyeBobs to Bloomingdale’s Integration": {
+        "plan": "Support",
+        "rate": 150,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "PSU Creamery - Maintenance": {
+        "plan": "Light Touch",
+        "rate": 160,
+        "minHours": 0,
+        "plannedHours": 0
+      },
+      "PSU - Enhanced Learning Platform": {
+        "plan": "Core",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 60
+      },
+      "DMCE - Adobe Commerce": {
+        "plan": "Core",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 80
+      },
+      "Europa Eyewear - B2B Replatforming": {
+        "plan": "Core",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 210
+      },
+      "Inyo Pools - Phase 2 Mission 100% Traffic": {
+        "plan": "Core",
+        "rate": 160,
+        "minHours": 0,
+        "plannedHours": 60
+      },
+      "Inyo Pools - On Going Support": {
+        "plan": "Support",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 80
+      },
+      "Dominate - Maintenance": {
+        "plan": "Support",
+        "rate": 155,
+        "minHours": 0,
+        "plannedHours": 0
+      }
     }
   },
   "status": {
