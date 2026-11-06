@@ -1017,7 +1017,8 @@
       "US Camera Pro - Maintenance": "Offering 107h ($17,120) for the Magento 2.4.9 upgrade to USCP because PHP 8.2 reaches end of life on Dec 31, 2026, which puts PCI compliance at risk. Magento 2.4.7 also reaches end of support in April"
     },
     "2026-11": {
-      "DMCE - Adobe Commerce": "Orange. Sage API activation and staging access still undelivered with no date; 7 of 16 dev days burned without starting. Change order unsigned since Sep 22. 13 items sitting in Irene's UAT up to 63 da"
+      "DMCE - Adobe Commerce": "Orange. Sage API activation and staging access still undelivered with no date; 7 of 16 dev days burned without starting. Change order unsigned since Sep 22. 13 items sitting in Irene's UAT up to 63 da",
+      "PSU - Enhanced Learning Platform": "Yellow. Go-live Nov 24 TBC, Learning Path Dec 2. Fixing UAT issues before Pradeep's leave. Nov 24 hangs on Kate's decision on the 184h Waitlist change order,  if it ships together, go-live moves to Fe"
     }
   }
 }
