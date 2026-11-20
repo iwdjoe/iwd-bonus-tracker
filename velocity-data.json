@@ -929,7 +929,7 @@
         "plan": "",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 0
+        "plannedHours": 10
       },
       "DMC Tools - Ongoing Support": {
         "plan": "Support",
