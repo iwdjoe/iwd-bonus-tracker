@@ -847,18 +847,6 @@
         "minHours": 80,
         "plannedHours": 100
       },
-      "PSU Extension - Maintenance": {
-        "plan": "Growth",
-        "rate": 160,
-        "minHours": 40,
-        "plannedHours": 40
-      },
-      "DMC Tools - Maintenance": {
-        "plan": "Support",
-        "rate": 140,
-        "minHours": 20,
-        "plannedHours": 20
-      },
       "Purdue - Maintenance": {
         "plan": "Support",
         "rate": 150,
@@ -899,7 +887,7 @@
         "plan": "Core",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 60
+        "plannedHours": 40
       },
       "DMCE - Adobe Commerce": {
         "plan": "Core",
@@ -917,13 +905,13 @@
         "plan": "Core",
         "rate": 160,
         "minHours": 0,
-        "plannedHours": 80
+        "plannedHours": 50
       },
       "Inyo Pools - On Going Support": {
         "plan": "Support",
         "rate": 155,
         "minHours": 0,
-        "plannedHours": 110
+        "plannedHours": 170
       },
       "Dominate - Maintenance": {
         "plan": "Support",
@@ -932,10 +920,10 @@
         "plannedHours": 0
       },
       "PSU Extension - Ongoing Support": {
-        "plan": "",
-        "rate": 155,
-        "minHours": 0,
-        "plannedHours": 0
+        "plan": "Support",
+        "rate": 160,
+        "minHours": 40,
+        "plannedHours": 40
       },
       "Dominate - Ongoing Support": {
         "plan": "",
@@ -944,10 +932,10 @@
         "plannedHours": 0
       },
       "DMC Tools - Ongoing Support": {
-        "plan": "",
-        "rate": 155,
-        "minHours": 0,
-        "plannedHours": 0
+        "plan": "Support",
+        "rate": 140,
+        "minHours": 20,
+        "plannedHours": 20
       }
     }
   },
