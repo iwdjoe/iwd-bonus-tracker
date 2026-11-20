@@ -936,6 +936,12 @@
         "rate": 140,
         "minHours": 20,
         "plannedHours": 20
+      },
+      "Purdue - Magento Upgrade": {
+        "plan": "Support",
+        "rate": 160,
+        "minHours": 12,
+        "plannedHours": 12
       }
     }
   },
